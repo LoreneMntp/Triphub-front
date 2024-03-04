@@ -5,7 +5,7 @@ export default function CreateTripScreen() {
     return (
         <SafeAreaView>
             <Text className="text-2xl text-teal-700 font-bold ">
-                Create Trip Activity
+                Create Trip Screen
             </Text>
 
         </SafeAreaView>
