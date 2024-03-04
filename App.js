@@ -69,7 +69,7 @@ export default function App() {
     return (
         <Provider store={store} >
             <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: true, headerBackTitleVisible: false}}>
+                <Stack.Navigator screenOptions={{ headerShown: false, headerBackTitleVisible: false}}>
                     <Stack.Screen name="Landing" component={LandingScreen} />
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="Register" component={RegisterScreen} />
