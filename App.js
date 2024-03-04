@@ -5,7 +5,7 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 
 
 // Import all the stacks screens
-import HomeScreen from "./screens/Stack/HomeScreen";
+import LandingScreen from "./screens/Stack/LandingScreen";
 import LoginScreen from "./screens/Stack/LoginScreen";
 import RegisterScreen from "./screens/Stack/RegisterScreen";
 import SettingsScreen from "./screens/Stack/SettingsScreen";
@@ -13,7 +13,7 @@ import AddActivityScreen from "./screens/Stack/AddActivityScreen";
 import CreateTripScreen from "./screens/Stack/CreateTripScreen";
 import ViewDocumentsScreen from "./screens/Stack/ViewDocumentsScreen";
 import ShowActivityScreen from "./screens/Stack/ShowActivityScreen";
-
+import HomeScreen from "./screens/Stack/HomeScreen";
 // Import bottom tab navigator screens
 import TripScreen from "./screens/TabNavigator/TripScreen";
 import HelpScreen from "./screens/TabNavigator/HelpScreen";
@@ -57,10 +57,11 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: true, headerBackTitleVisible: false}}>
-                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Landing" component={LandingScreen} />
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Register" component={RegisterScreen} />
                 <Stack.Screen name="Settings" component={SettingsScreen} />
+                <Stack.Screen name="Home" component={HomeScreen}
                 <Stack.Screen name="AddActivity" component={AddActivityScreen} />
                 <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
                 <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
