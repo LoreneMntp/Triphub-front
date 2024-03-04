@@ -22,6 +22,11 @@ export default function LandingScreen({ navigation }) {
                             Register
                         </Text>
                     </Pressable>
+                    <Pressable onPress={() => navigation.navigate('Home')} className="bg-[#F2A65A] px-6 py-2 rounded-2xl">
+                        <Text className="text-xl text-white font-bold ">
+                            Home
+                        </Text>
+                    </Pressable>
                     <Pressable onPress={() => navigation.navigate('AddActivity')} className="bg-[#F2A65A] px-6 py-2 rounded-2xl">
                         <Text className="text-xl text-white font-bold ">
                             Add Activity

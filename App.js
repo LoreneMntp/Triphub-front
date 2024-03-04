@@ -3,6 +3,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 
+// import redux
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+
+//import reducer
+import user from './reducers/users';
+
+//redux store configuration
+const store = configureStore({
+    reducer: { user: user},
+});
+
 
 // Import all the stacks screens
 import LandingScreen from "./screens/Stack/LandingScreen";
@@ -55,19 +67,22 @@ const TabNavigator = () => {
 
 export default function App() {
     return (
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: true, headerBackTitleVisible: false}}>
-                <Stack.Screen name="Landing" component={LandingScreen} />
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Register" component={RegisterScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="AddActivity" component={AddActivityScreen} />
-                <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
-                <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
-                <Stack.Screen name="ShowActivity" component={ShowActivityScreen} />
-                <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false}} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <Provider store={store} >
+            <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: true, headerBackTitleVisible: false}}>
+                    <Stack.Screen name="Landing" component={LandingScreen} />
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Register" component={RegisterScreen} />
+                    <Stack.Screen name="Settings" component={SettingsScreen} />
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="AddActivity" component={AddActivityScreen} />
+                    <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
+                    <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
+                    <Stack.Screen name="ShowActivity" component={ShowActivityScreen} />
+                    <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false}} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+
     );
 }
