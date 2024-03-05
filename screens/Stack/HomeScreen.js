@@ -13,7 +13,8 @@ export default function HomeScreen({navigation}) {
     const [isAlertVisible, setAlertVisible] = useState(false)
     const [isConnected, setIsConnected] = useState(null)
 
-    const user = useSelector((state) => state.user.user)
+    const user = useSelector((state) => state.user.value)
+    console.log(user)
 
 useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
