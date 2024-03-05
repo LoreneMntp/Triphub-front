@@ -1,19 +1,20 @@
 import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Keyboard,
-  TextInput,
-  Pressable,
+  KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import {FontAwesome5} from "@expo/vector-icons";
+import {ChevronLeft, Chrome, Facebook} from "lucide-react-native";
+import React, {useState} from "react";
+import {useDispatch} from "react-redux";
+import {useNavigation} from "@react-navigation/native";
+import { login } from '../../reducers/users'
 
 const EMAIL_REGEX =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -35,7 +36,7 @@ export default function LoginScreen() {
     if (email && password) {
       try {
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/login`;
-        const login = await fetch(url, {
+        const res = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -46,15 +47,16 @@ export default function LoginScreen() {
           }),
         });
 
-        const data = await login.json();
+        const data = await res.json();
         if (data.result === true) {
-          /*dispatch(
+          //console.log('data:', data);
+          dispatch(
             login({
-              email: email,
-              token: data.token,
-              name: data.name,
+              email: data.user.email,
+              token: data.user.token,
+              name: data.user.username,
             })
-          );*/
+          );
           setPassword("");
           setEmail("");
           navigation.navigate("Home"); // Naviguer vers HomePage après la connexion réussie ?
@@ -63,10 +65,10 @@ export default function LoginScreen() {
         }
       } catch (error) {
         console.error(
-          "Une erreur s'/est produite lors de la connexion :",
+          "Une erreur s'est produite lors de la connexion :",
           error
         );
-        alert("Une erreur s'/est produite lors de la connexion. Réessayez.");
+        alert("Une erreur s'est produite lors de la connexion. Réessayez.");
       }
     } else {
       alert("E-mail ou mot de passe invalide.");

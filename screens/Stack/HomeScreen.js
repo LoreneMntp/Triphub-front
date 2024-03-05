@@ -1,6 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, Pressable, Image, ScrollView} from "react-native";
 import {LogOut, Settings, SquarePen} from 'lucide-react-native';
+import { useSelector} from "react-redux";
 
 export default function HomeScreen({navigation}) {
 const mockUserData = {
@@ -83,7 +84,6 @@ const mockUserData = {
         serial_phone: '0000-0000'
     }]
 }
-
 const trips = mockUserData.trips.map((data, i) => {
     const dateWithoutHours = new Date(data.start_at.setHours(0,0,0,0))
     const stringifiedData = JSON.stringify(data)
