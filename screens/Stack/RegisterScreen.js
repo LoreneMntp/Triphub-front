@@ -63,7 +63,9 @@ const RegisterScreen = () => {
     };
 
     // Envoyer les données au backend via une requête fetch
-    fetch('http://192.168.1.69:3000/users/register', {
+    const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/register`;
+    console.log(url)
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
