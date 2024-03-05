@@ -119,12 +119,14 @@ const RegisterScreen = () => {
         value={username}
         placeholder="Nom d'utilisateur"
         style={styles.input}
+        autoCapitalize="none"
       />
       <TextInput
         onChangeText={setEmail}
         value={email}
         placeholder="E-mail"
         style={styles.input}
+        autoCapitalize="none"
       />
       <TextInput
         onChangeText={setPassword}
@@ -132,6 +134,7 @@ const RegisterScreen = () => {
         secureTextEntry={true}
         placeholder="Mot de passe"
         style={styles.input}
+        autoCapitalize="none"
       />
       <TextInput
         onChangeText={setConfirmPassword}
@@ -139,6 +142,7 @@ const RegisterScreen = () => {
         secureTextEntry={true}
         placeholder="Confirmer le mot de passe"
         style={styles.input}
+        autoCapitalize="none"
       />
       {/* Bouton d'inscription */}
       <Pressable style={styles.button_register} onPress={handleRegister}>
