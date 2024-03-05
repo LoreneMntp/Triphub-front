@@ -14,7 +14,8 @@ export default function HomeScreen({navigation}) {
     const [isConnected, setIsConnected] = useState(null)
 
     const user = useSelector((state) => state.user.value)
-    const tokenMock = 'bb04a46d-2416-4c9d-9b49-ab2b679242ce'
+    //console.log(user.user.token)
+    const tokenMock = '83b1faad-3672-402f-8399-460607dbe0b5'
 
 useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -23,11 +24,12 @@ useEffect(() => {
     return () => unsubscribe()
 }, [])
 
+//Fixer le useEffect, pour je ne sais quelle raison il rentre pas dedans
 useEffect(() => {
         //console.log(isConnected)
 
         if(isConnected) {
-            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${tokenMock}`
+            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${user.user.token}`
             fetch(url)
             .then(response => response.json())
             .then (data => {

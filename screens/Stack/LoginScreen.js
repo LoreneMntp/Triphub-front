@@ -114,6 +114,8 @@ export default function LoginScreen() {
           {/* Input Email */}
           <View style={styles.inputContainer}>
             <TextInput
+              autoCapitalize="none"
+              value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
               style={[
@@ -127,6 +129,8 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <View style={styles.passwordInputContainer}>
               <TextInput
+                autoCapitalize="none"
+                value={password}
                 placeholder="Mot de passe"
                 onChangeText={(text) => setPassword(text)}
                 secureTextEntry={!isPasswordVisible} // permet de masquer le mdp quand on écrit
