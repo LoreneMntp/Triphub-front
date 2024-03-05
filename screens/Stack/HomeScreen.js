@@ -13,8 +13,8 @@ export default function HomeScreen({navigation}) {
     const [isAlertVisible, setAlertVisible] = useState(false)
     const [isConnected, setIsConnected] = useState(null)
 
-    const user = useSelector((state) => state.user.user)
-    const tokenMock = '9ec4b784-cce1-4b1e-84b9-8ef3b43216d3'
+    const user = useSelector((state) => state.user.value)
+    const tokenMock = 'bb04a46d-2416-4c9d-9b49-ab2b679242ce'
 
 useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -24,26 +24,16 @@ useEffect(() => {
 }, [])
 
 useEffect(() => {
-    /* async function getFetch() {
-        console.log('Coucou 1')
         //console.log(isConnected)
-        (async () => {
-            console.log('coucou 2')
-        })
-    }
-    getFetch() */
-    if(isConnected) {
-        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips`
-        fetch(url, {
-            method: 'GET', 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({token: tokenMock})
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-        })
-    }
+
+        if(isConnected) {
+            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${tokenMock}`
+            fetch(url)
+            .then(response => response.json())
+            .then (data => {
+                console.log(data)
+            })
+        }
 }, [])
 
 
