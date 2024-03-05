@@ -16,10 +16,7 @@ export default function TripScreen({ navigation, route}) {
     //console.log(dataParsed)
 
     return (
-        <SafeAreaView className='flex-1 items-center justify-center'>
-            <Text className="text-2xl text-teal-700 font-bold ">
-                Trip Screen
-            </Text>
+        <SafeAreaView className='flex-1 items-center'>
             <Text>{dataParsed.title}</Text>
         </SafeAreaView>
     );

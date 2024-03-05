@@ -1,8 +1,38 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, Pressable, Image, ScrollView} from "react-native";
-import {LogOut, Settings, SquarePen} from 'lucide-react-native';
+import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback, TextInput} from "react-native";
+import {LogOut, Settings, SquarePen, WifiOff } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo'
+import { useSelector } from 'react-redux';
 
 export default function HomeScreen({navigation}) {
+    const [modalInviteVisible, setModalInviteVisible] = useState(false)
+    const [modalLogoutVisible, setModalLogoutVisible] = useState(false)
+    const [invitationLink, setInvitationLink] = useState('')
+    const [alertMessage, setAlertMessage] = useState('')
+    const [isAlertVisible, setAlertVisible] = useState(false)
+    const [isConnected, setIsConnected] = useState(null)
+
+    const user = useSelector((state) => state.user.user)
+
+useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected)
+    })
+    return () => unsubscribe()
+}, [])
+
+useEffect(() => {
+    /* if(isConnected) {
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips`
+        const res = await fetch(url, {
+            method: 'GET', 
+            headers: {'Content-Type': 'application/json'},
+            body: user.token
+        })
+    } */
+}, [])
+
 const mockUserData = {
     username: 'JohnD123',
     email: 'john.doe@gmail.com',
@@ -104,11 +134,60 @@ const trips = mockUserData.trips.map((data, i) => {
         </View>
     )
 })
+    const handleJoinTrip = (link) => {
+        if(!link) {
+            setAlertMessage('Veuillez remplir le champ')
+            setAlertVisible(true)
+        }
+        else {
+            //lancer un fetch pour rejoindre le trip et vérifier que le lien est valide
+        }
+    }
+
+    const handleLogout = () => {
+        setModalLogoutVisible(true)
+    }
 
     return (
-        <SafeAreaView title="Background" className='bg-white flex-1 items-center'>
+        <SafeAreaView title="Background" className='bg-white flex-1 items-center pt-8'>
+            <Modal title="Invite Modal" visible={modalInviteVisible} animationType='fade' transparent>
+                <View className='flex-1 justify-center items-center'>
+                    <TouchableWithoutFeedback onPress={()=> setModalInviteVisible(!modalInviteVisible)}>
+                        <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
+                    </TouchableWithoutFeedback>
+
+                    <View title='Centered view' className='bg-white w-5/6 h-3/6 pt-20 items-center'>
+                        <TextInput placeholder='Lien inviation' className='border-2 border-slate-200 rounded-md p-2 w-2/3' onChangeText={setInvitationLink} value={invitationLink}>
+                        </TextInput>
+                        {isAlertVisible && <Text className='text-red-700'>{alertMessage}</Text>}
+                        <Pressable title="Join" className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3 mt-10' onPress={()=> handleJoinTrip(invitationLink)}>
+                            <Text className='text-white text-lg'>Rejoindre</Text>
+                        </Pressable>
+                    </View>
+                </View>
+
+            </Modal>
+            <Modal title="Logout Modal" visible={modalLogoutVisible} animationType='fade' transparent>
+                <View className='flex-1 justify-center items-center'>
+                    <TouchableWithoutFeedback onPress={()=> setModalInviteVisible(!modalInviteVisible)}>
+                        <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
+                    </TouchableWithoutFeedback>
+
+                    <View title='Centered view' className='bg-white w-5/6 h-3/6 pt-20 items-center'>
+                        <Text className='text-2xl mb-3 text-center'>Êtes-vous sûr(e) de vouloir vous déconnecter ?</Text>
+                        <Text className='mb-5 text-center'>Si vous n'avez pas d'accès à internet vous ne pourrez plus utiliser l'application.</Text>
+                        <Pressable className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3' onPress={()=> navigation.navigate('Landing')}>
+                            <Text className='text-white text-lg'>Oui</Text>
+                        </Pressable>
+                        <Pressable className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3' onPress={() => setModalLogoutVisible(false)}>
+                            <Text className='text-white text-lg'>Non</Text>
+                        </Pressable>
+                    </View>
+                </View>
+
+            </Modal>
             <View title="Header" className='flex-row items-center justify-around w-full mb-6'>
-                <Pressable title="LogoutBtn" onPress={() => navigation.navigate('Login')}>
+                <Pressable title="LogoutBtn" onPress={() => handleLogout()}>
                     <LogOut color={'black'} size={30}/>
                 </Pressable>
                 <Text className='text-3xl font-bold'>
@@ -120,11 +199,20 @@ const trips = mockUserData.trips.map((data, i) => {
             </View>
             <View title="CreateJoinTrips" className='items-center mb-3 justify-around'>
                 <Pressable title="NewTrip" className='bg-[#F2A65A] w-60 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3' 
-                onPress={() => navigation.navigate('CreateTrip')}>
-                    <Text className='text-white text-lg'>Créer un nouveau Voyage</Text>
+                onPress={() => navigation.navigate('CreateTrip')}
+                disabled={!isConnected}
+                style={{backgroundColor: isConnected ? '#F2A65A' : 'gray'}}>
+                    <Text className='text-white text-lg'
+                    style={{color: isConnected ? 'white' : 'black'}}>Créer un nouveau Voyage</Text>
+                    {!isConnected && <WifiOff color={'#ff0000'} size={14} />}
                 </Pressable>
-                <Pressable title="JoinTrip" className='bg-[#F2A65A] w-60 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3'>
-                    <Text className='text-white text-lg'>Rejoindre un voyage</Text>
+                <Pressable title="JoinTrip" className='bg-[#F2A65A] w-60 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3'
+                onPress={()=> setModalInviteVisible(true)}
+                disabled={!isConnected}
+                style={{backgroundColor: isConnected ? '#F2A65A' : 'gray'}}>
+                    <Text className='text-white text-lg'
+                    style={{color: isConnected ? 'white' : 'black'}}>Rejoindre un voyage</Text>
+                    {!isConnected && <WifiOff color={'#ff0000'} size={14} />}
                 </Pressable>
                 <Text className='text-black text-lg'>Commencer à préparer un nouveau voyage</Text>
             </View>
