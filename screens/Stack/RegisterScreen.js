@@ -12,7 +12,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { useNavigation } from '@react-navigation/native';
-import { ChevronLeft, Chrome, Facebook } from 'lucide-react-native'; // Import du composant Facebook et Google et Flèche de droite
+import { ChevronLeft, Chrome, Facebook } from 'lucide-react-native';
+import {login} from "../../reducers/users"; // Import du composant Facebook et Google et Flèche de droite
+import { useDispatch} from "react-redux";
 
 const RegisterScreen = () => {
   // Variables d'état pour stocker la saisie utilisateur et gérer la visibilité de la modal d'alerte
@@ -22,7 +24,7 @@ const RegisterScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  
+  const dispatch = useDispatch();
   // Hook de navigation pour gérer les actions de navigation
   const navigation = useNavigation();
 
@@ -63,7 +65,9 @@ const RegisterScreen = () => {
     };
 
     // Envoyer les données au backend via une requête fetch
-    fetch('http://192.168.1.69:3000/users/register', {
+    const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/register`;
+    console.log(url)
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,6 +86,13 @@ const RegisterScreen = () => {
         setAlertMessage('Inscription réussie!');
         setAlertVisible(true);
         // Naviguer vers la HomePage après une inscription réussie
+        dispatch(
+            login({
+              email: data.user.email,
+              token: data.user.token,
+              name: data.user.username,
+            })
+        );
         navigation.navigate('Home');
       } else {
         // Gérer les erreurs d'inscription côté client

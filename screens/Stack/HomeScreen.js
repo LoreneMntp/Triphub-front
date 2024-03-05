@@ -113,7 +113,6 @@ const mockUserData = {
         serial_phone: '0000-0000'
     }]
 }
-
 const trips = mockUserData.trips.map((data, i) => {
     const dateWithoutHours = new Date(data.start_at.setHours(0,0,0,0))
     const stringifiedData = JSON.stringify(data)
