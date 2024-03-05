@@ -10,6 +10,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -33,7 +34,8 @@ export default function LoginScreen() {
 
     if (email && password) {
       try {
-        const login = await fetch("http://localhost:3000/login", {
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/login`;
+        const login = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -55,19 +57,21 @@ export default function LoginScreen() {
           );
           setPassword("");
           setEmail("");
-          navigation.navigate("HomePage"); // Naviguer vers HomePage après la connexion réussie ?
+          navigation.navigate("HomeScreen"); // Naviguer vers HomePage après la connexion réussie ?
         } else {
           alert(data.error);
         }
       } catch (error) {
-        console.error("Error occurred while logging in:", error);
-        alert("An error occurred while logging in. Please try again later.");
+        console.error(
+          "Une erreur s'/est produite lors de la connexion :",
+          error
+        );
+        alert("Une erreur s'/est produite lors de la connexion. Réessayez.");
       }
     } else {
-      alert("Invalid email or password.");
+      alert("E-mail ou mot de passe invalide.");
     }
   }
-  //"error occurred while logging in" avec le code ci-dessus, je trouve pas pourquoi
 
   // Vérifie si l'e-mail est valide lors de chaque changement
   function handleEmailChange(text) {
@@ -85,11 +89,22 @@ export default function LoginScreen() {
     navigation.navigate("Register");
   }
 
+  // Naviguer vers HomeScreen
+  const handlePress = () => {
+    navigation.goBack();
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
+      <Pressable
+        style={{ padding: 20, backgroundColor: "#fff" }}
+        onPress={handlePress}
+      >
+        <ChevronLeft style={styles.arrow} />
+      </Pressable>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Login</Text>
@@ -110,7 +125,7 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <View style={styles.passwordInputContainer}>
               <TextInput
-                placeholder="Password"
+                placeholder="Mot de passe"
                 onChangeText={(text) => setPassword(text)}
                 secureTextEntry={!isPasswordVisible} // permet de masquer le mdp quand on écrit
                 style={styles.passwordInput}
@@ -131,66 +146,32 @@ export default function LoginScreen() {
           {/* Button Login */}
           <View style={styles.buttonContainer}>
             <Pressable onPress={handleSubmitSignIn} style={styles.button}>
-              <Text style={styles.buttonText}>Login</Text>
+              <Text style={styles.buttonText}>Se connecter</Text>
             </Pressable>
-            <Text
-              style={{
-                fontSize: 20,
-                textAlign: "center",
-                fontWeight: "bold",
-                padding: 10,
-              }}
-            >
-              OR
-            </Text>
+            <Text style={styles.or}>OU</Text>
           </View>
 
           {/* Button Google */}
           <View style={styles.buttonContainer}>
-            <Pressable
-              onPress={() => {
-                // Action à effectuer lors du clic sur le bouton Google
-              }}
-              style={styles.googleButton}
-            >
-              <FontAwesome5
-                name="google"
-                size={24}
-                color="red"
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
+            <Pressable style={styles.google}>
+              <Chrome style={styles.googleIcon} />
+              <Text style={styles.google_text}>Continuer avec Google</Text>
             </Pressable>
-          </View>
-
-          {/* Button Facebook */}
-          <View style={styles.buttonContainer}>
-            <Pressable
-              onPress={() => {
-                // Action à effectuer lors du clic sur le bouton Facebook
-              }}
-              style={styles.facebookButton}
-            >
-              <FontAwesome5
-                name="facebook"
-                size={24}
-                color="#fff"
-                style={{ marginRight: 10 }}
-              />
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                Continue with Facebook
-              </Text>
+            {/* Bouton d'authentification Facebook */}
+            <Pressable style={styles.facebook}>
+              <Facebook style={styles.facebookIcon} />
+              <Text style={styles.facebook_text}>Continuer avec Facebook</Text>
             </Pressable>
           </View>
 
           {/* Button Register */}
           <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>No Account yet ?</Text>
+            <Text style={styles.registerText}>Pas encore de compte ?</Text>
             <Pressable
               onPress={handleNavigateToRegister}
               style={styles.registerButton}
             >
-              <Text style={styles.registerButtonText}>Register</Text>
+              <Text style={styles.registerButtonText}>S'inscrire</Text>
             </Pressable>
           </View>
         </View>
@@ -204,9 +185,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
+    padding: 40,
+    textAlign: "center",
+    fontSize: 40,
+    marginBottom: 20,
+  },
+  arrow: {
+    color: "black",
   },
   title: {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: "bold",
     padding: 30,
   },
@@ -248,14 +236,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: "#EEC170",
+    backgroundColor: "#F2A65A",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
     alignSelf: "center",
     width: "60%",
-    marginBottom: 50,
     elevation: 5, // ombre pour Android
     shadowColor: "#000", // ombre pour iOS
     shadowOffset: {
@@ -269,34 +256,51 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  googleButton: {
+  or: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginTop: 40,
+  },
+  google: {
     flexDirection: "row",
-    backgroundColor: "transparent",
-    borderRadius: 30,
-    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 10,
+    marginTop: 20,
+    borderColor: "gray",
     borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    width: "80%",
   },
-  facebookButton: {
-    flexDirection: "row",
-    backgroundColor: "#3b5998",
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    width: "80%",
+  googleIcon: {
+    marginRight: 10,
+    color: "#F2A65A",
   },
-  socialButtonText: {
+  google_text: {
     color: "black",
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  facebook: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 10,
+    marginTop: 20,
+    borderColor: "gray",
+    borderWidth: 1,
+  },
+  facebookIcon: {
+    marginRight: 10,
+    color: "#1877F2",
+  },
+  facebook_text: {
+    color: "black",
+    fontSize: 15,
     fontWeight: "bold",
   },
   registerContainer: {
@@ -310,7 +314,7 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   registerButton: {
-    backgroundColor: "#EEC170",
+    backgroundColor: "#F2A65A",
     borderRadius: 15,
     paddingVertical: 12,
     paddingHorizontal: 20,
