@@ -14,7 +14,6 @@ export default function HomeScreen({navigation}) {
     const [isConnected, setIsConnected] = useState(null)
 
     const user = useSelector((state) => state.user.value)
-    console.log(value)
     const tokenMock = 'bb04a46d-2416-4c9d-9b49-ab2b679242ce'
 
 useEffect(() => {
