@@ -48,16 +48,16 @@ export default function LoginScreen() {
 
         const data = await login.json();
         if (data.result === true) {
-          dispatch(
+          /*dispatch(
             login({
               email: email,
               token: data.token,
               name: data.name,
             })
-          );
+          );*/
           setPassword("");
           setEmail("");
-          navigation.navigate("HomeScreen"); // Naviguer vers HomePage après la connexion réussie ?
+          navigation.navigate("Home"); // Naviguer vers HomePage après la connexion réussie ?
         } else {
           alert(data.error);
         }
