@@ -13,7 +13,8 @@ export default function HomeScreen({navigation}) {
     const [isAlertVisible, setAlertVisible] = useState(false)
     const [isConnected, setIsConnected] = useState(null)
 
-    const user = useSelector((state) => state.user.user)
+    const user = useSelector((state) => state.user.value)
+    console.log(user)
     const tokenMock = '9ec4b784-cce1-4b1e-84b9-8ef3b43216d3'
 
 useEffect(() => {
