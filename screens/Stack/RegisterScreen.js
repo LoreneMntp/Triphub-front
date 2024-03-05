@@ -63,7 +63,7 @@ const RegisterScreen = () => {
     };
 
     // Envoyer les données au backend via une requête fetch
-    fetch('http://localhost:3000/users/register', {
+    fetch('http://192.168.1.69:3000/users/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const RegisterScreen = () => {
         setAlertMessage('Inscription réussie!');
         setAlertVisible(true);
         // Naviguer vers la HomePage après une inscription réussie
-        navigation.navigate('HomePage');
+        navigation.navigate('Home');
       } else {
         // Gérer les erreurs d'inscription côté client
         if (data.error === "Email already exists.") {
