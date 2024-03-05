@@ -14,6 +14,7 @@ export default function HomeScreen({navigation}) {
     const [isConnected, setIsConnected] = useState(null)
 
     const user = useSelector((state) => state.user.user)
+    const tokenMock = '9ec4b784-cce1-4b1e-84b9-8ef3b43216d3'
 
 useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -23,15 +24,28 @@ useEffect(() => {
 }, [])
 
 useEffect(() => {
-    /* if(isConnected) {
+    /* async function getFetch() {
+        console.log('Coucou 1')
+        //console.log(isConnected)
+        (async () => {
+            console.log('coucou 2')
+        })
+    }
+    getFetch() */
+    if(isConnected) {
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips`
-        const res = await fetch(url, {
+        fetch(url, {
             method: 'GET', 
             headers: {'Content-Type': 'application/json'},
-            body: user.token
+            body: JSON.stringify({token: tokenMock})
         })
-    } */
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+        })
+    }
 }, [])
+
 
 const mockUserData = {
     username: 'JohnD123',
