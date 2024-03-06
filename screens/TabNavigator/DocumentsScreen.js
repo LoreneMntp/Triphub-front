@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, Modal, FlatList, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Modal,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useNavigation } from "@react-navigation/native";
@@ -8,8 +16,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
 import { PlusCircle, Eye, Trash2, Filter } from "lucide-react-native";
 
-
-
 export default function DocumentsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState("");
@@ -17,6 +23,12 @@ export default function DocumentsScreen() {
   //console.log("docuri", documentUris);
   const navigation = useNavigation();
   const userInfos = useSelector((state) => state.user.value);
+  let dataBilletsTransport = [];
+  if (userInfos.documents) {
+    dataBilletsTransport = userInfos.documents.filter(
+      (billet) => (billet.category = "Billets de transport")
+    );
+  }
 
   console.log("userInfosDoc", userInfos.documents);
   const openModal = (document) => {
@@ -25,35 +37,44 @@ export default function DocumentsScreen() {
   };
   const dispatch = useDispatch();
 
-   const handleAddDocument = async () => {
-      try {
-         const document = await DocumentPicker.getDocumentAsync({
-         type: "*/*",
-         copyToCacheDirectory: false,
-         });
+  const handleAddDocument = async (category) => {
+    try {
+      const document = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: false,
+      });
 
-         if (document.assets[0].uri) {
-          const fileUri = document.assets[0].uri;
-         const fileName = document.assets[0].name;
+      if (document.assets[0].uri) {
+        const fileUri = document.assets[0].uri;
+        const fileName = document.assets[0].name;
 
-           const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
-         await FileSystem.copyAsync({
-           from: fileUri,
-           to: destinationUri,
-         });
+        const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
+        await FileSystem.copyAsync({
+          from: fileUri,
+          to: destinationUri,
+        });
 
-         setDocumentUris([
-           ...documentUris,
-           {
-             uri: destinationUri,
-             category: selectedDocument,
-             fileName: fileName,
-         },
-        ]);
-       }
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addDocument`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: userInfos.user.token,
+            title: category,
+            fileName: fileName,
+            category: category,
+            link_doc: fileUri,
+            serial_phone: "123456789",
+          }),
+        });
+
+        const data = res.json();
+
+        dispatch(initDocuments(data.documents));
+      }
     } catch (error) {
       console.error("Erreur lors de l'ajout du fichier:", error);
-     }
+    }
   };
 
   const handleViewDocument = () => {
@@ -64,11 +85,6 @@ export default function DocumentsScreen() {
   //   ...modalButtonStyle,
   //   backgroundColor: "grey", // Changez la couleur pour griser le bouton
   // };
-
-  const billets = ""
-  const identity =""
-  const autres = ""
-  const hotel = ""
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,155 +101,44 @@ export default function DocumentsScreen() {
     fetchData();
   }, []);
 
-  
   const renderDocumentItem = ({ item }) => (
     <View style={styles.documentItem}>
-      <Text style={styles.documentText}>{item.name}</Text>
+      <Text style={styles.documentText}>{item.fileName}</Text>
       <View style={styles.iconContainer}>
         <Pressable onPress={() => handleViewDocument(item)}>
           <Eye color="#4A90E2" size={24} />
         </Pressable>
-        <Pressable onPress={() => handleDeleteDocument(item.uri)}>
+        <Pressable onPress={() => handleDeleteDocument(item.link_doc)}>
           <Trash2 color="#E53935" size={24} />
         </Pressable>
       </View>
     </View>
   );
 
-  const mockData = [
-    {
-      id: '1',
-      name: 'Facture Juillet.pdf',
-      uri: 'file://path/to/FactureJuillet.pdf',
-      category: 'Factures'
-    },
-    {
-      id: '2',
-      name: 'CV John Doe.pdf',
-      uri: 'file://path/to/CVJohnDoe.pdf',
-      category: 'CV'
-    },
-    {
-      id: '3',
-      name: 'Tarte aux pommes.jpg',
-      uri: 'file://path/to/RecetteTarteAuxPommes.jpg',
-      category: 'Recettes'
-    },
-  ];
-  
-
-  const [documentData, setDocumentData] = useState(mockData); // Utilisez mockData comme état initial
-
-
   return (
     <View style={styles.container}>
       <ScrollView>
-      <Text style={styles.header}>Gestion des documents</Text>
-      <View style={styles.docs}>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.selectedDocumentText}>Billets de voyage</Text>
-        <Pressable onPress={handleAddDocument}>
-          <PlusCircle color="#4A90E2" size={24} />
-        </Pressable>
-      </View>
-      <FlatList
-  data={mockData} // Utilisez mockData directement ici
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <View style={styles.documentItem}>
-      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
-          <Eye color="#4A90E2" size={24} />
-        </Pressable>
-      <Text style={styles.documentText}>{item.name}</Text>
-      <View style={styles.iconContainer}>
-
-        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
-          <Trash2 color="#E53935" size={24} />
-        </Pressable>
-      </View>
-    </View>
-  )}
-/>
-</View>
-<View style={styles.docs}>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.selectedDocumentText}></Text>
-        <Pressable onPress={handleAddDocument}>
-          <PlusCircle color="#4A90E2" size={24} />
-        </Pressable>
-      </View>
-      <FlatList
-  data={mockData} // Utilisez mockData directement ici
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <View style={styles.documentItem}>
-      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
-          <Eye color="#4A90E2" size={24} />
-        </Pressable>
-      <Text style={styles.documentText}>{item.name}</Text>
-      <View style={styles.iconContainer}>
-
-        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
-          <Trash2 color="#E53935" size={24} />
-        </Pressable>
-      </View>
-    </View>
-  )}
-/>
-</View>
-<View style={styles.docs}>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.selectedDocumentText}></Text>
-        <Pressable onPress={handleAddDocument}>
-          <PlusCircle color="#4A90E2" size={24} />
-        </Pressable>
-      </View>
-      <FlatList
-  data={mockData} // Utilisez mockData directement ici
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <View style={styles.documentItem}>
-      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
-          <Eye color="#4A90E2" size={24} />
-        </Pressable>
-      <Text style={styles.documentText}>{item.name}</Text>
-      <View style={styles.iconContainer}>
-
-        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
-          <Trash2 color="#E53935" size={24} />
-        </Pressable>
-      </View>
-    </View>
-  )}
-/>
-</View>
-<View style={styles.docs}>
-      <View style={styles.buttonContainer}>
-        <Text style={styles.selectedDocumentText}></Text>
-        <Pressable onPress={handleAddDocument}>
-          <PlusCircle color="#4A90E2" size={24} />
-        </Pressable>
-      </View>
-      <FlatList
-  data={mockData} // Utilisez mockData directement ici
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <View style={styles.documentItem}>
-      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
-          <Eye color="#4A90E2" size={24} />
-        </Pressable>
-      <Text style={styles.documentText}>{item.name}</Text>
-      <View style={styles.iconContainer}>
-
-        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
-          <Trash2 color="#E53935" size={24} />
-        </Pressable>
-      </View>
-    </View>
-  )}
-/>
-</View>
-</ScrollView>
+        <Text style={styles.header}>Gestion des documents</Text>
+        <View style={styles.docs}>
+          <View style={styles.buttonContainer}>
+            <Text style={styles.selectedDocumentText}>
+              Billets de transport
+            </Text>
+            <Pressable
+              onPress={() => handleAddDocument("Billets de transport")}
+            >
+              <PlusCircle color="#4A90E2" size={24} />
+            </Pressable>
+          </View>
+          {dataBilletsTransport && (
+            <FlatList
+              data={dataBilletsTransport} // Utilisez mockData directement ici
+              keyExtractor={(item) => item._id}
+              renderItem={renderDocumentItem}
+            />
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -244,57 +149,56 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center"
+    textAlign: "center",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    flexDirection: "row",
+    justifyContent: "space-evenly",
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: "#4A90E2",
     padding: 10,
     borderRadius: 20,
     width: 100,
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 3, // Ajoute une ombre sous Android
-    shadowColor: '#000', // Ajoute une ombre sous iOS
+    shadowColor: "#000", // Ajoute une ombre sous iOS
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  docs:{
-    backgroundColor: 'white',
+  docs: {
+    backgroundColor: "white",
     paddingVertical: 15,
-    marginTop: 10
+    marginTop: 10,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
   },
   documentItem: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: "#FFF3E0",
     padding: 10,
     borderRadius: 10,
     marginVertical: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     alignSelf: "center",
-    width: "90%"
-    
+    width: "90%",
   },
   documentText: {
     fontSize: 16,
-    textAlign: "center"
+    textAlign: "center",
   },
   selectedDocumentText: {
     fontSize: 16,
