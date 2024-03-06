@@ -8,11 +8,17 @@ import {
   ScrollView,
 } from "react-native";
 import { ChevronLeft, Phone } from "lucide-react-native";
+import { useSelector } from "react-redux";
 
 export default function HelpScreen({ navigation }) {
   const handlePress = () => {
     navigation.goBack();
   };
+  const { trips, selectedTripId} = useSelector((state) => state.user.value);
+
+  const selectedTrip = trips.filter((trip) => trip._id === selectedTripId);
+  console.log(selectedTrip[0].sos_infos);
+  
 
   const CountryData = {
     sos_infos: [
@@ -41,7 +47,8 @@ export default function HelpScreen({ navigation }) {
   };
 
   const handleCallPress = () => {
-    const emergencyNumber = CountryData.sos_infos[0].emergency_number;
+    const emergencyNumber =
+      selectedTrip[0].sos_infos.emergency_number;
     Linking.openURL(`tel:${emergencyNumber}`);
   };
 
@@ -56,63 +63,70 @@ export default function HelpScreen({ navigation }) {
           <Text style={styles.title}>SOS</Text>
 
           {/* Affichage du numéro d'urgence du pays */}
-          {CountryData.sos_infos.map((countryInfo, index) => (
-            <View key={index}>
-              <Text style={styles.nameText}>Numéro d'urgence</Text>
-              <View style={styles.infoContainer}>
-                <View style={styles.infoText}>
-                  <Text>{countryInfo.emergency_number}</Text>
-                  <Pressable onPress={handleCallPress}>
-                    <Phone style={styles.icon} />
-                  </Pressable>
-                </View>
-              </View>
 
-              {/* Affichage des informations sur l'ambassade */}
-              <Text style={styles.nameText}>Ambassade</Text>
-              <View style={styles.infoContainer}>
-                <View style={styles.infoText}>
-                  <Text>Adresse: {countryInfo.embassy.address}</Text>
-                </View>
-                <View style={styles.infoText}>
-                  <Text>Téléphone: {countryInfo.embassy.phone}</Text>
-                </View>
-                <View style={styles.infoText}>
-                  <Text>Email: {countryInfo.embassy.email}</Text>
-                </View>
-              </View>
-
-              {/* Affichage des informations sur le consulat */}
-              <Text style={styles.nameText}>Consulat</Text>
-              {countryInfo.consulate.map((consulate, index) => (
-                <View key={index} style={styles.infoContainer}>
-                  <View style={styles.infoText}>
-                    <Text>Adresse: {consulate.address}</Text>
-                  </View>
-                  <View style={styles.infoText}>
-                    <Text>Téléphone: {consulate.phone}</Text>
-                  </View>
-                  <View style={styles.infoText}>
-                    <Text>Email: {consulate.email}</Text>
-                  </View>
-                </View>
-              ))}
-
-              {/* Affichage des contacts utiles */}
-              <Text style={styles.nameText}>Contacts utiles</Text>
-              <View style={styles.infoContainer}>
-                <View style={styles.infoText}>
-                  <Text>Police : {countryInfo.police_number}</Text>
-                </View>
-                <View style={styles.infoText}>
-                  <Text>Urgences : {countryInfo.emergency_number}</Text>
-                </View>
-                <View style={styles.infoText}>
-                  <Text>Pompiers : {countryInfo.firefighter_number}</Text>
-                </View>
+          <View>
+            <Text style={styles.nameText}>Numéro d'urgence</Text>
+            <View style={styles.infoContainer}>
+              <View style={styles.infoText}>
+                <Text>{selectedTrip[0].sos_infos.emergency_number}</Text>
+                <Pressable onPress={handleCallPress}>
+                  <Phone style={styles.icon} />
+                </Pressable>
               </View>
             </View>
-          ))}
+
+            {/* Affichage des informations sur l'ambassade */}
+            <Text style={styles.nameText}>Ambassade</Text>
+            <View style={styles.infoContainer}>
+              <View style={styles.infoText}>
+                <Text>
+                  Adresse: {selectedTrip[0].sos_infos.embassy.address}
+                </Text>
+              </View>
+              <View style={styles.infoText}>
+                <Text>
+                  Téléphone: {selectedTrip[0].sos_infos.embassy.phone}
+                </Text>
+              </View>
+              <View style={styles.infoText}>
+                <Text>Email: {selectedTrip[0].sos_infos.embassy.email}</Text>
+              </View>
+            </View>
+
+            {/* Affichage des informations sur le consulat */}
+            <Text style={styles.nameText}>Consulat</Text>
+            {selectedTrip[0].sos_infos.consulate.map((consulate, index) => (
+              <View key={index} style={styles.infoContainer}>
+                <View style={styles.infoText}>
+                  <Text>Adresse: {consulate.address}</Text>
+                </View>
+                <View style={styles.infoText}>
+                  <Text>Téléphone: {consulate.phone}</Text>
+                </View>
+                <View style={styles.infoText}>
+                  <Text>Email: {consulate.email}</Text>
+                </View>
+              </View>
+            ))}
+
+            {/* Affichage des contacts utiles */}
+            <Text style={styles.nameText}>Contacts utiles</Text>
+            <View style={styles.infoContainer}>
+              <View style={styles.infoText}>
+                <Text>Police : {selectedTrip[0].sos_infos.police_number}</Text>
+              </View>
+              <View style={styles.infoText}>
+                <Text>
+                  Urgences : {selectedTrip[0].sos_infos.emergency_number}
+                </Text>
+              </View>
+              <View style={styles.infoText}>
+                <Text>
+                  Pompiers : {selectedTrip[0].sos_infos.firefighter_number}
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
       </View>
     </ScrollView>
