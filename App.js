@@ -1,23 +1,23 @@
 //import react navigation
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 // import redux
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 
 //import reducer
-import user from './reducers/users';
+import user from "./reducers/users";
 
 //redux store configuration
 const store = configureStore({
-    reducer: { user: user},
+  reducer: { user: user },
 });
-
 
 // Import all the stacks screens
 import LandingScreen from "./screens/Stack/LandingScreen";
+import LandingFinalScreen from "./screens/Stack/LandingFinalScreen";
 import LoginScreen from "./screens/Stack/LoginScreen";
 import RegisterScreen from "./screens/Stack/RegisterScreen";
 import SettingsScreen from "./screens/Stack/SettingsScreen";
@@ -41,48 +41,56 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
-    return (
-        <Tab.Navigator screenOptions={({ route }) => ({
-            tabBarIcon: ({ color, size, focused }) => {
-                if(route.name === 'Trip') {
-                    return <Plane stroke={color} size={size} />
-                }
-                if(route.name === 'Docs') {
-                    return <FileText stroke={color}  size={size} />
-                }
-                if(route.name === 'Help') {
-                    return <LifeBuoy stroke={color}  size={size} />
-                }
-            },
-            tabBarActiveTintColor: '#F58549',
-            tabBarInactiveTintColor: 'gray',
-            headerShown: false,
-        })}>
-            <Tab.Screen name="Trip" component={TripScreen} />
-            <Tab.Screen name="Docs" component={DocumentsScreen} />
-            <Tab.Screen name="Help" component={HelpScreen} />
-        </Tab.Navigator>
-    );
-}
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size, focused }) => {
+          if (route.name === "Trip") {
+            return <Plane stroke={color} size={size} />;
+          }
+          if (route.name === "Docs") {
+            return <FileText stroke={color} size={size} />;
+          }
+          if (route.name === "Help") {
+            return <LifeBuoy stroke={color} size={size} />;
+          }
+        },
+        tabBarActiveTintColor: "#F58549",
+        tabBarInactiveTintColor: "gray",
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen name="Trip" component={TripScreen} />
+      <Tab.Screen name="Docs" component={DocumentsScreen} />
+      <Tab.Screen name="Help" component={HelpScreen} />
+    </Tab.Navigator>
+  );
+};
 
 export default function App() {
-    return (
-        <Provider store={store} >
-            <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: false, headerBackTitleVisible: false}}>
-                    <Stack.Screen name="Landing" component={LandingScreen} />
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Register" component={RegisterScreen} />
-                    <Stack.Screen name="Settings" component={SettingsScreen} />
-                    <Stack.Screen name="Home" component={HomeScreen} />
-                    <Stack.Screen name="AddActivity" component={AddActivityScreen} />
-                    <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
-                    <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
-                    <Stack.Screen name="ShowActivity" component={ShowActivityScreen} />
-                    <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false}} />
-                </Stack.Navigator>
-            </NavigationContainer>
-        </Provider>
-
-    );
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false, headerBackTitleVisible: false }}
+        >
+          <Stack.Screen name="Landing" component={LandingScreen} />
+          <Stack.Screen name="LandingFinal" component={LandingFinalScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="AddActivity" component={AddActivityScreen} />
+          <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
+          <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
+          <Stack.Screen name="ShowActivity" component={ShowActivityScreen} />
+          <Stack.Screen
+            name="TabNavigator"
+            component={TabNavigator}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  );
 }
