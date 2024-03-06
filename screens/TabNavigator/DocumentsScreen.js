@@ -30,7 +30,7 @@ export default function DocumentsScreen() {
                 const fileName = document.assets[0].name;
                 console.log('Nom du fichier:', fileName);
     
-                const destinationUri = `${FileSystem.cacheDirectory}${fileName}`;
+                const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
     
                 console.log('URI de destination:', destinationUri);
     
@@ -96,14 +96,13 @@ export default function DocumentsScreen() {
                                 <Text style={modalButtonTextStyle}>Ajouter</Text>
                             </Pressable>
                             <Pressable
-    style={modalButtonStyle}
-    onPress={() => {
-        setModalVisible(false);
-        handleViewDocument(); // Adjusted to no longer need a specific document URI
-    }}>
-    <Text style={modalButtonTextStyle}>Lire</Text>
-</Pressable>
-
+                                style={modalButtonStyle}
+                                onPress={() => {
+                                    setModalVisible(false);
+                                    handleViewDocument(); // Adjusted to no longer need a specific document URI
+                                }}>
+                                <Text style={modalButtonTextStyle}>Lire</Text>
+                            </Pressable>
                         </View>
                     </View>
                 </View>
