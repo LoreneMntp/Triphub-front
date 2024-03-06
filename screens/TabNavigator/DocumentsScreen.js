@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, Modal } from "react-native";
+import { View, Text, Pressable, Modal, FlatList, StyleSheet, ScrollView } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useNavigation } from "@react-navigation/native";
 import ViewDocumentsScreen from "../Stack/ViewDocumentsScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
+import { PlusCircle, Eye, Trash2, Filter } from "lucide-react-native";
+
+
+
 export default function DocumentsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState("");
@@ -13,6 +17,7 @@ export default function DocumentsScreen() {
   //console.log("docuri", documentUris);
   const navigation = useNavigation();
   const userInfos = useSelector((state) => state.user.value);
+
   console.log("userInfosDoc", userInfos.documents);
   const openModal = (document) => {
     setSelectedDocument(document);
@@ -20,46 +25,50 @@ export default function DocumentsScreen() {
   };
   const dispatch = useDispatch();
 
-  //   const handleAddDocument = async () => {
-  //     try {
-  //       const document = await DocumentPicker.getDocumentAsync({
-  //         type: "*/*",
-  //         copyToCacheDirectory: false,
-  //       });
+   const handleAddDocument = async () => {
+      try {
+         const document = await DocumentPicker.getDocumentAsync({
+         type: "*/*",
+         copyToCacheDirectory: false,
+         });
 
-  //       if (document.assets[0].uri) {
-  //         const fileUri = document.assets[0].uri;
-  //         const fileName = document.assets[0].name;
+         if (document.assets[0].uri) {
+          const fileUri = document.assets[0].uri;
+         const fileName = document.assets[0].name;
 
-  //         const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
+           const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
+         await FileSystem.copyAsync({
+           from: fileUri,
+           to: destinationUri,
+         });
 
-  //         await FileSystem.copyAsync({
-  //           from: fileUri,
-  //           to: destinationUri,
-  //         });
-
-  //         setDocumentUris([
-  //           ...documentUris,
-  //           {
-  //             uri: destinationUri,
-  //             category: selectedDocument,
-  //             fileName: fileName,
-  //           },
-  //         ]);
-  //       }
-  //     } catch (error) {
-  //       console.error("Erreur lors de l'ajout du fichier:", error);
-  //     }
-  //   };
+         setDocumentUris([
+           ...documentUris,
+           {
+             uri: destinationUri,
+             category: selectedDocument,
+             fileName: fileName,
+         },
+        ]);
+       }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du fichier:", error);
+     }
+  };
 
   const handleViewDocument = () => {
     navigation.navigate("ViewDocuments", { documentData: userInfos.documents });
   };
 
-  const disabledModalButtonStyle = {
-    ...modalButtonStyle,
-    backgroundColor: "grey", // Changez la couleur pour griser le bouton
-  };
+  // const disabledModalButtonStyle = {
+  //   ...modalButtonStyle,
+  //   backgroundColor: "grey", // Changez la couleur pour griser le bouton
+  // };
+
+  const billets = ""
+  const identity =""
+  const autres = ""
+  const hotel = ""
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,137 +85,224 @@ export default function DocumentsScreen() {
     fetchData();
   }, []);
 
-  return (
-    <View style={{ padding: 80 }}>
-      <View style={{ alignItems: "center" }}>
-        <Text
-          style={{
-            fontSize: 30,
-            textAlign: "center",
-            fontWeight: "bold",
-            marginBottom: 80,
-          }}
-        >
-          Mes documents
-        </Text>
-        <Pressable
-          style={buttonStyle}
-          onPress={() => openModal("Billets de transport")}
-        >
-          <Text style={buttonTextStyle}>Billets de transport</Text>
+  
+  const renderDocumentItem = ({ item }) => (
+    <View style={styles.documentItem}>
+      <Text style={styles.documentText}>{item.name}</Text>
+      <View style={styles.iconContainer}>
+        <Pressable onPress={() => handleViewDocument(item)}>
+          <Eye color="#4A90E2" size={24} />
         </Pressable>
-        <Pressable
-          style={buttonStyle}
-          onPress={() => openModal("Réservations")}
-        >
-          <Text style={buttonTextStyle}>Réservations</Text>
-        </Pressable>
-        <Pressable style={buttonStyle} onPress={() => openModal("Identité")}>
-          <Text style={buttonTextStyle}>Identité</Text>
-        </Pressable>
-        <Pressable
-          style={buttonStyle}
-          onPress={() => openModal("Autres documents")}
-        >
-          <Text style={buttonTextStyle}>Autres documents</Text>
+        <Pressable onPress={() => handleDeleteDocument(item.uri)}>
+          <Trash2 color="#E53935" size={24} />
         </Pressable>
       </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          <View
-            style={{ backgroundColor: "white", padding: 20, borderRadius: 10 }}
-          >
-            <Text
-              style={{ fontSize: 18, marginBottom: 20, textAlign: "center" }}
-            >
-              Que voulez-vous faire avec {selectedDocument}?
-            </Text>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Pressable
-                style={modalButtonStyle}
-                onPress={() => handleAddDocument()}
-              >
-                <Text style={modalButtonTextStyle}>Ajouter</Text>
-              </Pressable>
-              <Pressable
-                style={
-                  userInfos.documents.length > 0
-                    ? modalButtonStyle
-                    : disabledModalButtonStyle
-                }
-                onPress={() => {
-                  if (userInfos.documents.length > 0) {
-                    setModalVisible(false);
-                    handleViewDocument();
-                  }
-                }}
-              >
-                <Text style={modalButtonTextStyle}>Lire</Text>
-              </Pressable>
+    </View>
+  );
 
-              <Pressable
-                style={modalButtonStyleClose}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={modalButtonTextStyle}>Fermer</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+  const mockData = [
+    {
+      id: '1',
+      name: 'Facture Juillet.pdf',
+      uri: 'file://path/to/FactureJuillet.pdf',
+      category: 'Factures'
+    },
+    {
+      id: '2',
+      name: 'CV John Doe.pdf',
+      uri: 'file://path/to/CVJohnDoe.pdf',
+      category: 'CV'
+    },
+    {
+      id: '3',
+      name: 'Tarte aux pommes.jpg',
+      uri: 'file://path/to/RecetteTarteAuxPommes.jpg',
+      category: 'Recettes'
+    },
+  ];
+  
+
+  const [documentData, setDocumentData] = useState(mockData); // Utilisez mockData comme état initial
+
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+      <Text style={styles.header}>Gestion des documents</Text>
+      <View style={styles.docs}>
+      <View style={styles.buttonContainer}>
+        <Text style={styles.selectedDocumentText}>Billets de voyage</Text>
+        <Pressable onPress={handleAddDocument}>
+          <PlusCircle color="#4A90E2" size={24} />
+        </Pressable>
+      </View>
+      <FlatList
+  data={mockData} // Utilisez mockData directement ici
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <View style={styles.documentItem}>
+      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
+          <Eye color="#4A90E2" size={24} />
+        </Pressable>
+      <Text style={styles.documentText}>{item.name}</Text>
+      <View style={styles.iconContainer}>
+
+        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
+          <Trash2 color="#E53935" size={24} />
+        </Pressable>
+      </View>
+    </View>
+  )}
+/>
+</View>
+<View style={styles.docs}>
+      <View style={styles.buttonContainer}>
+        <Text style={styles.selectedDocumentText}></Text>
+        <Pressable onPress={handleAddDocument}>
+          <PlusCircle color="#4A90E2" size={24} />
+        </Pressable>
+      </View>
+      <FlatList
+  data={mockData} // Utilisez mockData directement ici
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <View style={styles.documentItem}>
+      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
+          <Eye color="#4A90E2" size={24} />
+        </Pressable>
+      <Text style={styles.documentText}>{item.name}</Text>
+      <View style={styles.iconContainer}>
+
+        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
+          <Trash2 color="#E53935" size={24} />
+        </Pressable>
+      </View>
+    </View>
+  )}
+/>
+</View>
+<View style={styles.docs}>
+      <View style={styles.buttonContainer}>
+        <Text style={styles.selectedDocumentText}></Text>
+        <Pressable onPress={handleAddDocument}>
+          <PlusCircle color="#4A90E2" size={24} />
+        </Pressable>
+      </View>
+      <FlatList
+  data={mockData} // Utilisez mockData directement ici
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <View style={styles.documentItem}>
+      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
+          <Eye color="#4A90E2" size={24} />
+        </Pressable>
+      <Text style={styles.documentText}>{item.name}</Text>
+      <View style={styles.iconContainer}>
+
+        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
+          <Trash2 color="#E53935" size={24} />
+        </Pressable>
+      </View>
+    </View>
+  )}
+/>
+</View>
+<View style={styles.docs}>
+      <View style={styles.buttonContainer}>
+        <Text style={styles.selectedDocumentText}></Text>
+        <Pressable onPress={handleAddDocument}>
+          <PlusCircle color="#4A90E2" size={24} />
+        </Pressable>
+      </View>
+      <FlatList
+  data={mockData} // Utilisez mockData directement ici
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <View style={styles.documentItem}>
+      <Pressable onPress={() => {/* Fonction pour gérer l'affichage du document */}}>
+          <Eye color="#4A90E2" size={24} />
+        </Pressable>
+      <Text style={styles.documentText}>{item.name}</Text>
+      <View style={styles.iconContainer}>
+
+        <Pressable onPress={() => {/* Fonction pour gérer la suppression du document */}}>
+          <Trash2 color="#E53935" size={24} />
+        </Pressable>
+      </View>
+    </View>
+  )}
+/>
+</View>
+</ScrollView>
     </View>
   );
 }
 
-const buttonStyle = {
-  backgroundColor: "#F58549",
-  padding: 10,
-  borderRadius: 5,
-  marginVertical: 10,
-  width: 250,
-  alignItems: "center",
-};
-
-const modalButtonStyleClose = {
-  backgroundColor: "#585123",
-  padding: 10,
-  borderRadius: 5,
-  width: "25%",
-  alignItems: "center",
-};
-const buttonTextStyle = {
-  color: "white",
-  fontWeight: "bold",
-  fontSize: 20,
-  textAlign: "center",
-};
-
-const modalButtonStyle = {
-  backgroundColor: "#F2A65A",
-  padding: 10,
-  borderRadius: 5,
-  width: "25%",
-  alignItems: "center",
-};
-
-const modalButtonTextStyle = {
-  color: "white",
-  fontWeight: "bold",
-  textAlign: "center",
-};
+const styles = StyleSheet.create({
+  container: {
+    padding: 40,
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: "center"
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#4A90E2',
+    padding: 10,
+    borderRadius: 20,
+    width: 100,
+    alignItems: 'center',
+    elevation: 3, // Ajoute une ombre sous Android
+    shadowColor: '#000', // Ajoute une ombre sous iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  docs:{
+    backgroundColor: 'white',
+    paddingVertical: 15,
+    marginTop: 10
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  documentItem: {
+    backgroundColor: '#FFF3E0',
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: "center",
+    width: "90%"
+    
+  },
+  documentText: {
+    fontSize: 16,
+    textAlign: "center"
+  },
+  selectedDocumentText: {
+    fontSize: 16,
+    marginRight: 10, // Assure un espacement entre le texte et l'icône
+  },
+  iconContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: 100, // Assure un espacement suffisant entre les icônes
+  },
+});
