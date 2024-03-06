@@ -23,24 +23,19 @@ export default function DocumentsScreen() {
                 copyToCacheDirectory: false
             });
     
-            console.log('Document sélectionné:', document);
-    
             if (document.assets[0].uri) {
                 const fileUri = document.assets[0].uri;
                 const fileName = document.assets[0].name;
-                console.log('Nom du fichier:', fileName);
     
                 const destinationUri = `${FileSystem.documentDirectory}${fileName}`; // Store in documentDirectory
     
-                console.log('URI de destination:', destinationUri);
     
                 await FileSystem.copyAsync({
                     from: fileUri,
                     to: destinationUri
                 });
     
-                console.log('Fichier copié avec succès');
-                setDocumentUris([...documentUris, destinationUri]);
+                setDocumentUris([...documentUris, { uri: destinationUri, category: selectedDocument, fileName: fileName }]);
             }
         } catch (error) {
             console.error('Erreur lors de l\'ajout du fichier:', error);
@@ -48,15 +43,19 @@ export default function DocumentsScreen() {
     };
     
     const handleViewDocument = () => {
-        navigation.navigate('ViewDocuments', { documentUris: documentUris });
+        navigation.navigate('ViewDocuments', { documentData: documentUris });
     };
     
+    const disabledModalButtonStyle = {
+        ...modalButtonStyle,
+        backgroundColor: 'grey', // Changez la couleur pour griser le bouton
+    };
 
     return (
-        <View style={{ padding: 40 }}>
+        <View style={{ padding: 80 }}>
             <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>
-                    View Documents Screen
+                <Text style={{ fontSize: 30, textAlign: "center", fontWeight: 'bold', marginBottom: 80 }}>
+                    Mes documents
                 </Text>
                 <Pressable
                     style={buttonStyle}
@@ -80,53 +79,56 @@ export default function DocumentsScreen() {
                 </Pressable>
             </View>
             <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    setModalVisible(false);
-                }}>
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                    <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-                        <Text style={{ fontSize: 18, marginBottom: 20 }}>Que voulez-vous faire avec {selectedDocument}?</Text>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Pressable
-                                style={modalButtonStyle}
-                                onPress={() => handleAddDocument()}>
-                                <Text style={modalButtonTextStyle}>Ajouter</Text>
-                            </Pressable>
-                            <Pressable
-                                style={modalButtonStyle}
-                                onPress={() => {
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+                setModalVisible(false);
+            }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
+                    <Text style={{ fontSize: 18, marginBottom: 20 }}>Que voulez-vous faire avec {selectedDocument}?</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Pressable
+                            style={modalButtonStyle}
+                            onPress={() => handleAddDocument()}>
+                            <Text style={modalButtonTextStyle}>Ajouter</Text>
+                        </Pressable>
+                        <Pressable
+                            style={documentUris.length > 0 ? modalButtonStyle : disabledModalButtonStyle}
+                            onPress={() => {
+                                if (documentUris.length > 0) {
                                     setModalVisible(false);
-                                    handleViewDocument(); // Adjusted to no longer need a specific document URI
-                                }}>
-                                <Text style={modalButtonTextStyle}>Lire</Text>
-                            </Pressable>
-                        </View>
+                                    handleViewDocument();
+                                }
+                            }}>
+                            <Text style={modalButtonTextStyle}>Lire</Text>
+                        </Pressable>
                     </View>
                 </View>
-            </Modal>
+            </View>
+        </Modal>
         </View>
     );
 }
 
 const buttonStyle = {
-    backgroundColor: 'teal',
+    backgroundColor: '#F58549',
     padding: 10,
     borderRadius: 5,
     marginVertical: 10,
-    width: 200,
+    width: 250,
     alignItems: 'center',
 };
 
 const buttonTextStyle = {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 20,
 };
 
 const modalButtonStyle = {
-    backgroundColor: 'teal',
+    backgroundColor: '#F2A65A',
     padding: 10,
     borderRadius: 5,
     width: '45%',
