@@ -3,9 +3,13 @@ import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedba
 import {LogOut, Settings, SquarePen, WifiOff } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { initTrips } from '../../reducers/users';
+
 
 export default function HomeScreen({navigation}) {
+    const dispatch = useDispatch()
+
     const [modalInviteVisible, setModalInviteVisible] = useState(false)
     const [modalLogoutVisible, setModalLogoutVisible] = useState(false)
     const [invitationLink, setInvitationLink] = useState('')
@@ -14,29 +18,28 @@ export default function HomeScreen({navigation}) {
     const [isConnected, setIsConnected] = useState(null)
 
     const user = useSelector((state) => state.user.value)
-    //console.log(user.user.token)
-    const tokenMock = '83b1faad-3672-402f-8399-460607dbe0b5'
+    //console.log(user.user)
+    //const tokenMock = '83b1faad-3672-402f-8399-460607dbe0b5'
 
 useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
         setIsConnected(state.isConnected)
     })
+    //console.log(isConnected)
+    if(isConnected) {
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${user.user.token}`
+        fetch(url)
+        .then(response => response.json())
+        .then (data => {
+            //console.log(data.data[0].sos_infos)
+            dispatch(initTrips(data.data))
+        })
+    }
     return () => unsubscribe()
 }, [])
 
 //Fixer le useEffect, pour je ne sais quelle raison il rentre pas dedans
-useEffect(() => {
-        //console.log(isConnected)
 
-        if(isConnected) {
-            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${user.user.token}`
-            fetch(url)
-            .then(response => response.json())
-            .then (data => {
-                console.log(data)
-            })
-        }
-}, [])
 
 
 const mockUserData = {
@@ -119,12 +122,13 @@ const mockUserData = {
         serial_phone: '0000-0000'
     }]
 }
-const trips = mockUserData.trips.map((data, i) => {
-    const dateWithoutHours = new Date(data.start_at.setHours(0,0,0,0))
-    const stringifiedData = JSON.stringify(data)
+const trips = user.trips.map((data, i) => {
+    console.log(data.start_at)
+    //const dateWithoutHours = new Date(data.start_at.setHours(0,0,0,0))
+    //const stringifiedData = JSON.stringify(data)
     return (
         <View key={i} title="Trip" className='h-36 mb-8 w-80 items-between p-2 rounded-3xl' style={i % 2 === 0 ? {backgroundColor: '#585123'} : {backgroundColor: '#EEC170'}}>
-            <Pressable title="EditBtn" onPress={() => navigation.navigate('TabNavigator', {params: {stringifiedData},screen: 'Trip'})}>
+            {/*<Pressable title="EditBtn" onPress={() => navigation.navigate('TabNavigator', {params: {stringifiedData},screen: 'Trip'})}>
                 <SquarePen size={20} style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}/>
             </Pressable>
             <View title="Trip Content" className='flex-row'>
@@ -135,7 +139,7 @@ const trips = mockUserData.trips.map((data, i) => {
                     <Text title="Trip length" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{Math.floor((data.end_at.getTime() - data.start_at.getTime()) / (1000 * 60 * 60 * 24))} jours</Text>
                     <Text title="Departure In" className='text-xs' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>Départ dans : {Math.floor((data.start_at - Date.now()) / (1000 * 60 * 60 * 24))} jours</Text>
                 </View>
-            </View>
+            </View>*/}
         </View>
     )
 })
@@ -165,7 +169,7 @@ const trips = mockUserData.trips.map((data, i) => {
                         <TextInput placeholder='Lien inviation' className='border-2 border-slate-200 rounded-md p-2 w-2/3' onChangeText={setInvitationLink} value={invitationLink}>
                         </TextInput>
                         {isAlertVisible && <Text className='text-red-700'>{alertMessage}</Text>}
-                        <Pressable title="Join" className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3 mt-10' onPress={()=> handleJoinTrip(invitationLink)}>
+                        <Pressable title="Join" className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-lg shadow-black mb-3 mt-10' onPress={()=> handleJoinTrip(invitationLink)}>
                             <Text className='text-white text-lg'>Rejoindre</Text>
                         </Pressable>
                     </View>
@@ -196,7 +200,7 @@ const trips = mockUserData.trips.map((data, i) => {
                     <LogOut color={'black'} size={30}/>
                 </Pressable>
                 <Text className='text-3xl font-bold'>
-                    Bonjour {mockUserData.username}
+                    Bonjour {user.user.username}
                 </Text>
                 <Pressable title="Settings" onPress={() => navigation.navigate('Settings')}>
                     <Settings color={'black'} size={30}/>

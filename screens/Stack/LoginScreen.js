@@ -54,7 +54,7 @@ export default function LoginScreen() {
             login({
               email: data.user.email,
               token: data.user.token,
-              name: data.user.username,
+              username: data.user.username,
             })
           );
           setPassword("");
@@ -109,7 +109,7 @@ export default function LoginScreen() {
       </Pressable>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Connexion</Text>
 
           {/* Input Email */}
           <View style={styles.inputContainer}>
@@ -118,6 +118,7 @@ export default function LoginScreen() {
               value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              inputMode="email"
               style={[
                 styles.input,
                 { color: isEmailValid ? "black" : "grey" }, // Condition pour la couleur du texte quand valid ou non
