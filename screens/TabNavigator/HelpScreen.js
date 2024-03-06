@@ -11,6 +11,9 @@ import { ChevronLeft, Phone } from "lucide-react-native";
 import { useSelector } from "react-redux";
 
 export default function HelpScreen({ navigation }) {
+  const sosInfos = useSelector((state) => state.user.value);
+  console.log(sosInfos.trips[0]);
+
   const handlePress = () => {
     navigation.goBack();
   };
