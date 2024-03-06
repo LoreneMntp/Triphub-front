@@ -6,8 +6,8 @@ import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { Trash2 } from 'lucide-react-native'; 
 
-
 export default function ViewDocumentsScreen({ route }) {
+  // Initialisation des états avec les données passées par la navigation et contrôle des modales
   const { documentData: initialDocumentData } = route.params;
   const [documentData, setDocumentData] = useState(initialDocumentData);
   const [modalVisible, setModalVisible] = useState(false);
@@ -15,9 +15,11 @@ export default function ViewDocumentsScreen({ route }) {
   const [selectedImageUri, setSelectedImageUri] = useState('');
   const [documentToDeleteUri, setDocumentToDeleteUri] = useState('');
 
+  // Fonction pour ouvrir un document PDF, support spécifique pour Android
   const openPDF = async (uri) => {
     try {
       let documentUri = uri;
+      // Sur Android, copie le fichier dans le répertoire document si nécessaire
       if (Platform.OS === 'android' && !uri.startsWith('file://')) {
         const destinationUri = `${FileSystem.documentDirectory}${uri.substring(uri.lastIndexOf('/') + 1)}`;
         await FileSystem.copyAsync({ from: uri, to: destinationUri });
@@ -25,19 +27,23 @@ export default function ViewDocumentsScreen({ route }) {
       }
       await Print.printAsync({ uri: documentUri });
     } catch (error) {
-      }
+      console.error(error); // Log les erreurs si l'opération échoue
+    }
   };
 
+  // Permet d'afficher l'image dans un modal
   const viewImage = (uri) => {
     setSelectedImageUri(uri);
     setModalVisible(true);
   };
 
+  // Supprime un document de la liste
   const deleteDocument = (uri) => {
     setDocumentData(documentData.filter(doc => doc.uri !== uri));
     setConfirmModalVisible(false);
   };
 
+  // Regroupe les documents par catégorie pour un affichage organisé
   const groupedDocuments = documentData.reduce((acc, curr) => {
     (acc[curr.category] = acc[curr.category] || []).push(curr);
     return acc;
@@ -46,14 +52,17 @@ export default function ViewDocumentsScreen({ route }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+        {/* Affiche les documents regroupés par catégorie */}
         {Object.entries(groupedDocuments).map(([category, documents]) => (
           <View key={category}>
             <Text style={styles.categoryHeader}>{category}</Text>
             {documents.map((doc, index) => (
               <View key={index} style={styles.documentRow}>
+                {/* Affiche le nom du document et permet son ouverture ou sa visualisation */}
                 <TouchableOpacity onPress={() => doc.uri.toLowerCase().endsWith('.pdf') ? openPDF(doc.uri) : viewImage(doc.uri)} style={styles.documentContainer}>
                   <Text>{doc.fileName}</Text>
                 </TouchableOpacity>
+                {/* Bouton pour supprimer le document */}
                 <TouchableOpacity style={styles.deleteIcon} onPress={() => {
                   setDocumentToDeleteUri(doc.uri);
                   setConfirmModalVisible(true);
@@ -65,7 +74,7 @@ export default function ViewDocumentsScreen({ route }) {
           </View>
         ))}
       </ScrollView>
-      {/* Modale pour la suppression */}
+      {/* Modal de confirmation pour la suppression */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -75,6 +84,7 @@ export default function ViewDocumentsScreen({ route }) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.textDelete}>Êtes-vous sûr de vouloir supprimer ce document ?</Text>
+            {/* Boutons de confirmation Oui/Non */}
             <View style={styles.confirmationButtons}>
               <TouchableOpacity style={[styles.button, styles.buttonConfirm]} onPress={() => deleteDocument(documentToDeleteUri)}>
                 <Text style={styles.textStyle}>Oui</Text>
@@ -86,25 +96,7 @@ export default function ViewDocumentsScreen({ route }) {
           </View>
         </View>
       </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Image source={{ uri: selectedImageUri }} style={styles.fullImage} />
-            <TouchableOpacity
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.textStyle}>Fermer</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {/* Modale pour l'affichage de l'image reste inchangée */}
+      {/* Modal pour afficher l'image sélectionnée */}
       <Modal
         animationType="slide"
         transparent={true}

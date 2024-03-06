@@ -33,6 +33,7 @@
     "react-native-modal": "^13.0.1",
     "react-native-openanything": "^0.0.6",
     "react-native-pdf": "^6.7.4",
+    "react-native-pdf-reader": "^1.0.2",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
     "react-native-svg": "^15.0.0",

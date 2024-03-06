@@ -87,11 +87,12 @@ export default function DocumentsScreen() {
             }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                 <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-                    <Text style={{ fontSize: 18, marginBottom: 20 }}>Que voulez-vous faire avec {selectedDocument}?</Text>
+                    <Text style={{ fontSize: 18, marginBottom: 20, textAlign:'center' }}>Que voulez-vous faire avec {selectedDocument}?</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Pressable
                             style={modalButtonStyle}
                             onPress={() => handleAddDocument()}>
+                                
                             <Text style={modalButtonTextStyle}>Ajouter</Text>
                         </Pressable>
                         <Pressable
@@ -103,7 +104,10 @@ export default function DocumentsScreen() {
                                 }
                             }}>
                             <Text style={modalButtonTextStyle}>Lire</Text>
+                            
                         </Pressable>
+
+                        <Pressable style={modalButtonStyleClose} onPress={() => setModalVisible(false)}><Text style={modalButtonTextStyle}>Fermer</Text></Pressable>
                     </View>
                 </View>
             </View>
@@ -121,21 +125,31 @@ const buttonStyle = {
     alignItems: 'center',
 };
 
+const modalButtonStyleClose = {
+    backgroundColor: '#585123',
+    padding: 10,
+    borderRadius: 5,
+    width: '25%',
+    alignItems: 'center',
+}
 const buttonTextStyle = {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 20,
+    textAlign: "center"
 };
 
 const modalButtonStyle = {
     backgroundColor: '#F2A65A',
     padding: 10,
     borderRadius: 5,
-    width: '45%',
+    width: '25%',
     alignItems: 'center',
 };
 
 const modalButtonTextStyle = {
     color: 'white',
     fontWeight: 'bold',
+    textAlign: "center"
+
 };
