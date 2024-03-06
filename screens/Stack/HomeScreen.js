@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback, TextInput} from "react-native";
-import {LogOut, Settings, SquarePen, WifiOff } from 'lucide-react-native';
+import {LogOut, Settings, WifiOff, Trash2 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo'
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,27 +14,26 @@ export default function HomeScreen({navigation}) {
 
     const [modalInviteVisible, setModalInviteVisible] = useState(false)
     const [modalLogoutVisible, setModalLogoutVisible] = useState(false)
+    const [modalDeleteVisible, setModalDeleteVisible] = useState(false)
     const [invitationLink, setInvitationLink] = useState('')
     const [alertMessage, setAlertMessage] = useState('')
     const [isAlertVisible, setAlertVisible] = useState(false)
     const [isConnected, setIsConnected] = useState(null)
+    const [tempSelectedTrip, setTempSelectedTrip] = useState(null)
 
     const user = useSelector((state) => state.user.value)
-    //console.log(user.user)
-    //const tokenMock = '83b1faad-3672-402f-8399-460607dbe0b5'
+
 
 useEffect(() => {
-    //console.log('coucou')
     const unsubscribe = NetInfo.addEventListener(state => {
         setIsConnected(state.isConnected)
     })
-    //console.log(isConnected)
     if(isConnected) {
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/getTrips/${user.user.token}`
         fetch(url)
         .then(response => response.json())
         .then (data => {
-            //console.log(data.data[0].sos_infos)
+            //console.log(data.data)
             dispatch(initTrips(data.data))
         })
     }
@@ -127,21 +126,40 @@ const handleSelectTrip = (id) => {
     navigation.navigate('TabNavigator')
 }
 
-const trips = user.trips.map((data, i) => {
+const handleShowDeleteTrip = (tripId) => {
+    setModalDeleteVisible(true)
+}
 
+const handleDeleteTrip = (tripId) => {
+    const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/delete/`
+    const bodyData = {
+        tripId,
+        token: user.user.token
+    }
+    fetch(url, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(bodyData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        dispatch(initTrips(data.data))
+        setModalDeleteVisible(false)
+    })
+}
+
+const trips = user.trips.map((data, i) => {
+    
     const startDate = moment(data.start_at)
     const endDate = moment(data.end_at)
-    //console.log(data)
-    //console.log(startDate, today)
-    //console.log(startDate.fromNow())
-    const stringifiedData = JSON.stringify(data)
+
     return (
-        <View key={i} title="Trip" className='h-36 mb-8 w-80 items-between p-2 rounded-3xl' style={i % 2 === 0 ? {backgroundColor: '#585123'} : {backgroundColor: '#EEC170'}}>
-            <Pressable title="EditBtn" onPress={() => handleSelectTrip(data._id) }>
-                <SquarePen size={20} style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}/>
+        <Pressable key={i} title="Trip" className='mb-8 w-80 h-40 items-between p-2 rounded-3xl' style={i % 2 === 0 ? {backgroundColor: '#585123'} : {backgroundColor: '#EEC170'}}  onPress={() => handleSelectTrip(data._id)}>
+            <Pressable title="Delete BTN" onPress={() => {handleShowDeleteTrip(); setTempSelectedTrip(data._id)}}>
+                <Trash2 size={20} style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}/>
             </Pressable>
-            <View title="Trip Content" className='flex-row'>
-                <Image source={{uri: data.background_url}} style={{width: 150, height: 100}} className='mr-2 rounded-3xl'/>
+            <View title="Trip Content" className='flex-row mt-2 justify-center'>
+                <Image source={data.background_url ? {uri: data.background_url} : require('../../assets/palm-tree-icon.jpg')} style={{width: 150, height: 100}} className='mr-3 rounded-3xl'/>
                 <View title="Trip Infos">
                     <Text title="Trip Title" className='text-lg font-bold' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{data.title}</Text>
                     <Text title="Start Date" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{startDate.calendar()}</Text>
@@ -149,7 +167,7 @@ const trips = user.trips.map((data, i) => {
                     <Text title="Departure In" className='text-xs' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>Départ {startDate.fromNow()}</Text>
                 </View>
             </View>
-        </View>
+        </Pressable>
     )
 })
     const handleJoinTrip = (link) => {
@@ -167,7 +185,7 @@ const trips = user.trips.map((data, i) => {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data)
+                //console.log(data)
                 setModalInviteVisible(false)
             })
         }
@@ -194,8 +212,8 @@ const trips = user.trips.map((data, i) => {
                         </Pressable>
                     </View>
                 </View>
-
             </Modal>
+
             <Modal title="Logout Modal" visible={modalLogoutVisible} animationType='fade' transparent>
                 <View className='flex-1 justify-center items-center'>
                     <TouchableWithoutFeedback onPress={()=> setModalInviteVisible(!modalInviteVisible)}>
@@ -213,8 +231,26 @@ const trips = user.trips.map((data, i) => {
                         </Pressable>
                     </View>
                 </View>
-
             </Modal>
+
+            <Modal title="Delete Trip Modal" visible={modalDeleteVisible} animationType='fade' transparent>
+                <View className='flex-1 justify-center items-center'>
+                    <TouchableWithoutFeedback onPress={()=> setModalDeleteVisible(!modalDeleteVisible)}>
+                        <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
+                    </TouchableWithoutFeedback>
+
+                    <View title='Centered view' className='bg-white w-5/6 h-3/6 pt-20 items-center'>
+                        <Text className='text-2xl mb-3 text-center'>Êtes-vous sûr(e) de vouloir supprimer ce Voyage ?</Text>
+                        <Pressable className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3' onPress={()=> handleDeleteTrip(tempSelectedTrip)}>
+                            <Text className='text-white text-lg'>Oui</Text>
+                        </Pressable>
+                        <Pressable className='bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3' onPress={() => setModalDeleteVisible(false)}>
+                            <Text className='text-white text-lg'>Non</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+
             <View title="Header" className='flex-row items-center justify-around w-full mb-6'>
                 <Pressable title="LogoutBtn" onPress={() => handleLogout()}>
                     <LogOut color={'black'} size={30}/>

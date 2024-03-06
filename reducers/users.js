@@ -24,7 +24,7 @@ export const userSlice = createSlice({
         },
         selectTrip: (state, action) => {
             state.value.selectedTripId = action.payload.tripId;
-            //console.log('Trip selected: ', action.payload.tripId)
+            console.log('Trip selected: ', action.payload.tripId)
         },
         addTrip: (state, action) => {
             state.value.trips.push(action.payload);
