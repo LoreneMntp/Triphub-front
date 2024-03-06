@@ -9,12 +9,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
-import {ChevronLeft, Chrome, Facebook} from "lucide-react-native";
-import React, {useState} from "react";
-import {useDispatch} from "react-redux";
-import {useNavigation} from "@react-navigation/native";
-import { login } from '../../reducers/users'
+import { FontAwesome5 } from "@expo/vector-icons";
+import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { login } from "../../reducers/users";
 
 const EMAIL_REGEX =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

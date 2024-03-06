@@ -5822,6 +5822,13 @@ react-native-openanything@^0.0.6:
     lodash "^4.17.4"
     prop-types "^15.6.0"
 
+react-native-pdf-reader@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-pdf-reader/-/react-native-pdf-reader-1.0.2.tgz#35c300adbd67bfebab3654325b14aedff0c407fc"
+  integrity sha512-9EMUE7RWUso5t70feYUS9/mfXPpuTQcKcME9HVs1NBHRqS9YMS+D4Yo0Ak3k3TXNAobXSqmfF6a72czxi0xFIg==
+  dependencies:
+    prop-types "^15.6.2"
+
 react-native-pdf@^6.7.4:
   version "6.7.4"
   resolved "https://registry.yarnpkg.com/react-native-pdf/-/react-native-pdf-6.7.4.tgz#f350af350074ee0a93fff578caefec16867781b4"
