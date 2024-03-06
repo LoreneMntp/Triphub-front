@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity, Text, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Print from 'expo-print';
-import { Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import { Trash2, ChevronLeft } from 'lucide-react-native'; 
-import { useNavigation } from '@react-navigation/native';
-
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Modal,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Print from "expo-print";
+import { Platform } from "react-native";
+import * as FileSystem from "expo-file-system";
+import { Trash2 } from "lucide-react-native";
+import { useSelector } from "react-redux";
 
 export default function ViewDocumentsScreen({ route }) {
   // Initialisation des états avec les données passées par la navigation et contrôle des modales
@@ -14,17 +21,18 @@ export default function ViewDocumentsScreen({ route }) {
   const [documentData, setDocumentData] = useState(initialDocumentData);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [selectedImageUri, setSelectedImageUri] = useState('');
-  const [documentToDeleteUri, setDocumentToDeleteUri] = useState('');
-  const navigation = useNavigation();
-  
+  const [selectedImageUri, setSelectedImageUri] = useState("");
+  const [documentToDeleteUri, setDocumentToDeleteUri] = useState("");
+
   // Fonction pour ouvrir un document PDF, support spécifique pour Android
   const openPDF = async (uri) => {
     try {
       let documentUri = uri;
       // Sur Android, copie le fichier dans le répertoire document si nécessaire
-      if (Platform.OS === 'android' && !uri.startsWith('file://')) {
-        const destinationUri = `${FileSystem.documentDirectory}${uri.substring(uri.lastIndexOf('/') + 1)}`;
+      if (Platform.OS === "android" && !uri.startsWith("file://")) {
+        const destinationUri = `${FileSystem.documentDirectory}${uri.substring(
+          uri.lastIndexOf("/") + 1
+        )}`;
         await FileSystem.copyAsync({ from: uri, to: destinationUri });
         documentUri = destinationUri;
       }
@@ -42,7 +50,7 @@ export default function ViewDocumentsScreen({ route }) {
 
   // Supprime un document de la liste
   const deleteDocument = (uri) => {
-    setDocumentData(documentData.filter(doc => doc.uri !== uri));
+    setDocumentData(documentData.filter((doc) => doc.uri !== uri));
     setConfirmModalVisible(false);
   };
 
@@ -72,15 +80,25 @@ export default function ViewDocumentsScreen({ route }) {
             {documents.map((doc, index) => (
               <View key={index} style={styles.documentRow}>
                 {/* Affiche le nom du document et permet son ouverture ou sa visualisation */}
-                <TouchableOpacity onPress={() => doc.uri.toLowerCase().endsWith('.pdf') ? openPDF(doc.uri) : viewImage(doc.uri)} style={styles.documentContainer}>
+                <TouchableOpacity
+                  onPress={() =>
+                    doc.link_doc.toLowerCase().endsWith(".pdf")
+                      ? openPDF(doc.link_doc)
+                      : viewImage(doc.link_doc)
+                  }
+                  style={styles.documentContainer}
+                >
                   <Text>{doc.fileName}</Text>
                 </TouchableOpacity>
                 {/* Bouton pour supprimer le document */}
-                <TouchableOpacity style={styles.deleteIcon} onPress={() => {
-                  setDocumentToDeleteUri(doc.uri);
-                  setConfirmModalVisible(true);
-                }}>
-                  <Trash2 name="delete" size={24} color="red"/>
+                <TouchableOpacity
+                  style={styles.deleteIcon}
+                  onPress={() => {
+                    setDocumentToDeleteUri(doc.uri);
+                    setConfirmModalVisible(true);
+                  }}
+                >
+                  <Trash2 name="delete" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -96,13 +114,21 @@ export default function ViewDocumentsScreen({ route }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.textDelete}>Êtes-vous sûr de vouloir supprimer ce document ?</Text>
+            <Text style={styles.textDelete}>
+              Êtes-vous sûr de vouloir supprimer ce document ?
+            </Text>
             {/* Boutons de confirmation Oui/Non */}
             <View style={styles.confirmationButtons}>
-              <TouchableOpacity style={[styles.button, styles.buttonConfirm]} onPress={() => deleteDocument(documentToDeleteUri)}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonConfirm]}
+                onPress={() => deleteDocument(documentToDeleteUri)}
+              >
                 <Text style={styles.textStyle}>Oui</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.buttonClose]} onPress={() => setConfirmModalVisible(false)}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setConfirmModalVisible(false)}
+              >
                 <Text style={styles.textStyle}>Non</Text>
               </TouchableOpacity>
             </View>
@@ -118,7 +144,10 @@ export default function ViewDocumentsScreen({ route }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Image source={{ uri: selectedImageUri }} style={styles.fullImage} />
+            <Image
+              source={{ uri: selectedImageUri }}
+              style={styles.fullImage}
+            />
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(false)}
@@ -134,15 +163,15 @@ export default function ViewDocumentsScreen({ route }) {
 
 const styles = StyleSheet.create({
   documentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '90%',
-    backgroundColor: '#FFF3E0', 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "90%",
+    backgroundColor: "#FFF3E0",
     borderRadius: 10,
     marginVertical: 5,
     padding: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
@@ -150,23 +179,23 @@ const styles = StyleSheet.create({
   },
   documentContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center', 
-    backgroundColor: 'transparent', 
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
   },
   deleteIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 10,
   },
   confirmationButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 20,
   },
   buttonConfirm: {
-    backgroundColor: '#E53935', 
-    marginRight: 20
+    backgroundColor: "#E53935",
+    marginRight: 20,
   },
   container: {
     flex: 1,
@@ -176,25 +205,25 @@ const styles = StyleSheet.create({
     paddingTop: 20
   },
   categoryHeader: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 22,
-    textAlign: 'center',
-    color: '#FF7043', 
+    textAlign: "center",
+    color: "#FF7043",
     paddingVertical: 20,
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   modalView: {
     margin: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 20,
     padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -206,22 +235,23 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonClose: {
-    backgroundColor: '#FF7043', 
+    backgroundColor: "#FF7043",
   },
   textStyle: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "#FFF",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   textDelete: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 15,
-    color: '#FF7043', 
-  },fullImage: {
+    color: "#FF7043",
+  },
+  fullImage: {
     width: 300, // Vous pouvez ajuster cette taille selon les besoins
     height: 400, // Ajustez en fonction de l'aspect ratio souhaité
     marginBottom: 15,
-    resizeMode: 'contain', // Assurez-vous que l'image est entièrement visible
+    resizeMode: "contain", // Assurez-vous que l'image est entièrement visible
   },
   backButtonContainer: {
     position: 'absolute',
