@@ -4,8 +4,10 @@ import {LogOut, Settings, SquarePen, WifiOff } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo'
 import { useDispatch, useSelector } from 'react-redux';
-import { initTrips } from '../../reducers/users';
-
+import { initTrips, selectTrip } from '../../reducers/users';
+import moment from 'moment'
+import 'moment/locale/fr'
+moment.locale('fr')
 
 export default function HomeScreen({navigation}) {
     const dispatch = useDispatch()
@@ -22,6 +24,7 @@ export default function HomeScreen({navigation}) {
     //const tokenMock = '83b1faad-3672-402f-8399-460607dbe0b5'
 
 useEffect(() => {
+    //console.log('coucou')
     const unsubscribe = NetInfo.addEventListener(state => {
         setIsConnected(state.isConnected)
     })
@@ -36,13 +39,9 @@ useEffect(() => {
         })
     }
     return () => unsubscribe()
-}, [])
+}, [isConnected])
 
-//Fixer le useEffect, pour je ne sais quelle raison il rentre pas dedans
-
-
-
-const mockUserData = {
+/* const mockUserData = {
     username: 'JohnD123',
     email: 'john.doe@gmail.com',
     password: 'test123',
@@ -121,25 +120,35 @@ const mockUserData = {
         linked_trip: '123456789',
         serial_phone: '0000-0000'
     }]
+} */
+
+const handleSelectTrip = (id) => {
+    dispatch(selectTrip({tripId: id}))
+    navigation.navigate('TabNavigator')
 }
+
 const trips = user.trips.map((data, i) => {
-    console.log(data.start_at)
-    //const dateWithoutHours = new Date(data.start_at.setHours(0,0,0,0))
-    //const stringifiedData = JSON.stringify(data)
+
+    const startDate = moment(data.start_at)
+    const endDate = moment(data.end_at)
+    //console.log(data)
+    //console.log(startDate, today)
+    //console.log(startDate.fromNow())
+    const stringifiedData = JSON.stringify(data)
     return (
         <View key={i} title="Trip" className='h-36 mb-8 w-80 items-between p-2 rounded-3xl' style={i % 2 === 0 ? {backgroundColor: '#585123'} : {backgroundColor: '#EEC170'}}>
-            {/*<Pressable title="EditBtn" onPress={() => navigation.navigate('TabNavigator', {params: {stringifiedData},screen: 'Trip'})}>
+            <Pressable title="EditBtn" onPress={() => handleSelectTrip(data._id) }>
                 <SquarePen size={20} style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}/>
             </Pressable>
             <View title="Trip Content" className='flex-row'>
                 <Image source={{uri: data.background_url}} style={{width: 150, height: 100}} className='mr-2 rounded-3xl'/>
                 <View title="Trip Infos">
                     <Text title="Trip Title" className='text-lg font-bold' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{data.title}</Text>
-                    <Text title="Start Date" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{dateWithoutHours.toLocaleDateString().split('T')[0]}</Text>
-                    <Text title="Trip length" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{Math.floor((data.end_at.getTime() - data.start_at.getTime()) / (1000 * 60 * 60 * 24))} jours</Text>
-                    <Text title="Departure In" className='text-xs' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>Départ dans : {Math.floor((data.start_at - Date.now()) / (1000 * 60 * 60 * 24))} jours</Text>
+                    <Text title="Start Date" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{startDate.calendar()}</Text>
+                    <Text title="Trip length" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{Math.floor((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))} jours</Text>
+                    <Text title="Departure In" className='text-xs' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>Départ {startDate.fromNow()}</Text>
                 </View>
-            </View>*/}
+            </View>
         </View>
     )
 })
@@ -150,6 +159,17 @@ const trips = user.trips.map((data, i) => {
         }
         else {
             //lancer un fetch pour rejoindre le trip et vérifier que le lien est valide
+            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/join/${link}`
+            fetch(url, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token: user.user.token})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                setModalInviteVisible(false)
+            })
         }
     }
 

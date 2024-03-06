@@ -90,7 +90,7 @@ const RegisterScreen = () => {
             login({
               email: data.user.email,
               token: data.user.token,
-              name: data.user.username,
+              username: data.user.username,
             })
         );
         navigation.navigate('Home');
