@@ -29,6 +29,9 @@ export const userSlice = createSlice({
         addTrip: (state, action) => {
             state.value.trips.push(action.payload);
         },
+        initDocuments: (state, action) => {
+            state.value.documents = action.payload;
+        }
     },
 });
 
