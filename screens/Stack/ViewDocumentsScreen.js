@@ -4,7 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Print from 'expo-print';
 import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { Trash2 } from 'lucide-react-native'; 
+import { Trash2, ChevronLeft } from 'lucide-react-native'; 
+import { useNavigation } from '@react-navigation/native';
+
 
 export default function ViewDocumentsScreen({ route }) {
   // Initialisation des états avec les données passées par la navigation et contrôle des modales
@@ -14,7 +16,8 @@ export default function ViewDocumentsScreen({ route }) {
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState('');
   const [documentToDeleteUri, setDocumentToDeleteUri] = useState('');
-
+  const navigation = useNavigation();
+  
   // Fonction pour ouvrir un document PDF, support spécifique pour Android
   const openPDF = async (uri) => {
     try {
@@ -49,8 +52,18 @@ export default function ViewDocumentsScreen({ route }) {
     return acc;
   }, {});
 
+   // Fonction pour gérer la navigation arrière
+   const handlePress = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.backButtonContainer}>
+        <TouchableOpacity onPress={handlePress}>
+          <ChevronLeft size={24} color="black" />
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
         {/* Affiche les documents regroupés par catégorie */}
         {Object.entries(groupedDocuments).map(([category, documents]) => (
@@ -160,7 +173,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF', 
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 40
+    paddingTop: 20
   },
   categoryHeader: {
     fontWeight: 'bold',
@@ -209,5 +222,13 @@ const styles = StyleSheet.create({
     height: 400, // Ajustez en fonction de l'aspect ratio souhaité
     marginBottom: 15,
     resizeMode: 'contain', // Assurez-vous que l'image est entièrement visible
+  },
+  backButtonContainer: {
+    position: 'absolute',
+    top: 10, // Ajustez la valeur selon les besoins
+    left: 10, // Ajustez la valeur selon les besoins
+    zIndex: 10, // S'assure que le bouton est au-dessus des autres éléments
+    paddingTop: 40,
+    paddingLeft: 20
   },
 });
