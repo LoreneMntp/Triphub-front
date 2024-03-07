@@ -163,7 +163,7 @@ const trips = user.trips.map((data, i) => {
                 <View title="Trip Infos">
                     <Text title="Trip Title" className='text-lg font-bold' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{data.title}</Text>
                     <Text title="Start Date" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{startDate.calendar()}</Text>
-                    <Text title="Trip length" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))} jours</Text>
+                    <Text title="Trip length" style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>{Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24)) + 1} jours</Text>
                     <Text title="Departure In" className='text-xs' style={i % 2 === 0 ? {color: 'white'} : {color: 'black'}}>Départ {startDate.fromNow()}</Text>
                 </View>
             </View>
