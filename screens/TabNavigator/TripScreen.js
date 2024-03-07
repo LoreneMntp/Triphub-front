@@ -1,48 +1,41 @@
+//React Native
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback, Clipboard} from "react-native";
+import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback} from "react-native";
 import { useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+
+//Lucide Icons
 import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, SquarePen, Trash2, Copy } from 'lucide-react-native';
+
+//Moment
 import moment from 'moment'
 import 'moment/locale/fr'
-import { useEffect, useState } from 'react';
-//moment.locale('fr')
+import { useCallback, useEffect, useState } from 'react';
+moment.locale('fr')
+
+//Invite Modal Clipboard/Popover
+import * as Clipboard from 'expo-clipboard'
+import Popover, { PopoverMode, PopoverPlacement } from 'react-native-popover-view'
+import {Calendar, CalendarUtils} from 'react-native-calendars';
+import { element } from 'prop-types';
 
 export default function TripScreen({ navigation, route}) {
 
     const [activityPresent, setActivityPresent] = useState(false)
     const [selectedDay, setSelectedDay] = useState(1)
-    const [daysTable, setDaysTable] = useState([])
-    const [groupedActivities, setGroupedActivities] = useState({})
     const [activityForDay, setActivityForDay] = useState([])
     const [loading, setLoading] = useState(true)
     const [modalInviteVisible, setModalInviteVisible] = useState(false)
-    const [copiedText, setCopiedText] = useState('')
-
-    const mockActivityData = [{
-        title: 'Restaurant - Les Petites Fleurs',
-        plannedAt: new Date('2024-08-10T21:30:00.000'),
-        address: '123 rue des Lilas', 
-        notes: ['Table n°12', 'Guillaume en retard, lui commander le poulet']
-    }, 
-    {
-        title: `Retour à l'hotel`,
-        plannedAt: new Date('2024-08-10T23:30:00.000'),
-        address: '123 avenue Jean Raida',
-        notes: ['Chambre 210', 'Aymeric a oublier sa clé']
-    },
-    {
-        title: `Visite au musée`,
-        plannedAt: new Date('2024-08-11T09:30:00.000'),
-        address: '123 avenue Jean Adrien',
-        notes: []
-    },
-]
+    const [popoverVisible, setPopoverVisible] = useState(false)
+    const [modalCalendarVisible, setModalCalendarVisible] = useState(false)
+    const [tripTimestamps, setTripTimestamps] = useState([])
 
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const tripsTable = useSelector((state) => state.user.value.trips)
 
     const tripData = tripsTable.filter((e) => e._id === selectedTrip)
+
+    const allActivitiesForTrip = tripData[0].activities
 
     let tripDuration;
 
@@ -57,7 +50,7 @@ export default function TripScreen({ navigation, route}) {
     //Variables for dates
     const startDate = moment(tripData[0].start_at)
     const endDate = moment(tripData[0].end_at)
-    tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))
+    tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24)) + 1
 
     //Function to Display Activities
     const displayActivityByDay = () => {
@@ -68,16 +61,16 @@ export default function TripScreen({ navigation, route}) {
             const timeStampOfDay = startDate.clone().add(i, 'days').valueOf()
             tempArray.push(timeStampOfDay)
         }
-
+        setTripTimestamps(tempArray)
         //Group the activities based on their plannedAT
-        const groupedData = mockActivityData.reduce((acc, item) => {
+        const groupedData = allActivitiesForTrip.reduce((acc, item) => {
             const date = moment(item.plannedAt).format('YYYY-MM-DD')
             acc[date] = acc[date] || []
             acc[date].push(item)
             return acc
         }, {})
 
-        setGroupedActivities(groupedData)
+        //setGroupedActivities(groupedData)
         setLoading(false)
 
         //Display the activities based on the selected day
@@ -103,7 +96,7 @@ export default function TripScreen({ navigation, route}) {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Loading...</Text>
+                <Text>Chargement...</Text>
             </View>)
     }
 
@@ -134,10 +127,29 @@ export default function TripScreen({ navigation, route}) {
         })
     }
 
-    /* const copyToClipboard = (content) => {
-        Clipboard.
+    const copyToClipboard = async () => {
+        await Clipboard.setStringAsync(tripData[0].invitation_link)
     }
- */
+
+    const showPopover = () => {
+        setPopoverVisible(true)
+        setTimeout(() => {
+            setPopoverVisible(false)
+        }, 800)
+    }
+    const closePopover = () => {
+        setPopoverVisible(false)
+    }
+
+    const INITIAL_DATE = moment(tripData[0].start_at).format('YYYY-MM-DD')
+    //console.log(INITIAL_DATE)
+
+    const handleDayPress = (day) => {
+        const index = tripTimestamps.findIndex((element) => element === day.timestamp)
+        setSelectedDay(index + 1)
+        setModalCalendarVisible(false)
+    }
+
     return (
         <SafeAreaView className='flex-1 bg-white'>
             <Modal title="Invite Modal" visible={modalInviteVisible} animationType='fade' transparent>
@@ -146,14 +158,43 @@ export default function TripScreen({ navigation, route}) {
                         <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
                     </TouchableWithoutFeedback>
 
-                    <View title='Centered view' className='bg-white w-5/6 h-3/6 pt-20 items-center'>
+                    <View title='Centered view' className='bg-white w-5/6 h-2/6 pt-20 items-center'>
                         <Text className='text-center pr-4 pl-4'>Copiez ce lien, et envoyez le à vos proches pour qu'ils rejoignent votre voyage !</Text>
                         <View className='flex-row items-center justify-center mt-6'>
                             <Text className='font-bold  items-center mr-4' selectable={true}>{tripData[0].invitation_link}</Text>
-                            <Pressable>
-                                <Copy size={30} color={'black'}/>
-                            </Pressable>
+                            <Popover
+                            isVisible={popoverVisible}
+                            placement={PopoverPlacement.TOP}
+                            onRequestClose={closePopover}
+                            from={(
+                                <Pressable onPress={() => {copyToClipboard(); showPopover()}} className='flex-row items-center border-2 border-slate-300 p-2'>
+                                    <Copy size={30} color={'black'} className='mr-2'/>
+                                    <Text>Copier</Text>
+                                </Pressable>
+                            )}
+                            animationConfig={{duration: 1000, timing:'linear'}}>
+                                <Text>Lien copié !</Text>
+                            </Popover>
                         </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal title="Calendar" visible={modalCalendarVisible} animationType='fade' transparent>
+                <View className='flex-1 justify-center items-center'>
+                    <TouchableWithoutFeedback onPress={()=> setModalCalendarVisible(!modalCalendarVisible)}>
+                        <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
+                    </TouchableWithoutFeedback>
+
+                    <View title='Centered view' className='bg-white w-5/6 h-3/6 items-center justify-center'>
+                        <Calendar 
+                        enableSwipeMonths 
+                        current={INITIAL_DATE} 
+                        minDate={INITIAL_DATE} 
+                        maxDate={moment(tripData[0].end_at).format('YYYY-MM-DD')}
+                        disableAllTouchEventsForDisabledDays
+                        onDayPress={handleDayPress}
+                        />
                     </View>
                 </View>
             </Modal>
@@ -181,40 +222,41 @@ export default function TripScreen({ navigation, route}) {
             <View title='calendar' className='items-center mt-6'>
                 <Text className='text-lg'>Emploi du Temps</Text>
                 <View title='calendar-view' className='border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl' style={{width: '80%', height: 300}}>
-                    <View title='calendar-bar' className='flex-row bg-slate-300 w-full h-10 p-2'>
-                        <View title='calender-left' className='flex-row items-center mr-8'>
+                    <View title='calendar-bar' className='flex-row bg-slate-300 w-full h-10 p-2 mb-2'>
+                        <View title='calender-left ' className='mr-8'>
                             {selectedDay > 1 ? 
                             <> 
-                                <Pressable title='arrow-left' className='mr-2' onPress={() => setSelectedDay(selectedDay - 1)}>
-                                    <ArrowLeft size={25} color={'black'}/>
+                                <Pressable title='arrow-left' className=' flex-row items-center' onPress={() => setSelectedDay(selectedDay - 1)}>
+                                    <ArrowLeft size={25} color={'black'} className='mr-2'/>
+                                    <Text>Jour {selectedDay - 1}</Text>
                                 </Pressable>
-                                <Text>Jour {selectedDay - 1}</Text>
                             </> : <View style={{width: 76}}></View>}
                         </View>
                         <View title='calendar-center' className='flex-row items-center mr-8'>
                             <View title='selected-day' className='flex-row items-center bg-white h-8 pr-2 pl-2 border-slate-100 border-2 rounded-md'>
-                                <Text className='mr-2'>Jour {selectedDay}</Text>
-                                <Pressable>
+                                <Pressable onPress={() => setModalCalendarVisible(true)} className='flex-row items-center'>
+                                    <Text className='mr-2'>Jour {selectedDay}</Text>
                                     <CalendarDays size={25} color={'black'}/>
                                 </Pressable>
                             </View>
                         </View>
-                        <View title='calendar-right' className='flex-row items-center'>
+                        <View title='calendar-right' >
                             {selectedDay < tripDuration ?
                             <>
-                                <Text className='mr-2'>Jour {selectedDay + 1}</Text>
-                                <Pressable  onPress={() => setSelectedDay(selectedDay + 1)}>
+                                <Pressable  onPress={() => setSelectedDay(selectedDay + 1)} className='flex-row items-center'>
+                                    <Text className='mr-2'>Jour {selectedDay + 1}</Text>
                                     <ArrowRight size={25} color={'black'}/>
                                 </Pressable>
                             </> : <></>}
                         </View>
                     </View>
                     <ScrollView title='activity-container'>
-                        {activityPresent && activities.length > 0 ? activities : <View title='activity-absent' className=' items-center mt-16'>
-                        <Pressable>
+                        {activities}
+                        <View title='activity-absent' className=' items-center'>
+                        <Pressable onPress={() => navigation.navigate('AddActivity')}>
                             <PlusCircle size={100} color={'#F2A65A'}/>
                         </Pressable>
-                    </View>}
+                    </View>
                     </ScrollView>
 
                 </View>
