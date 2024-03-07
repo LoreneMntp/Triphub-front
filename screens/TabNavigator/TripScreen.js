@@ -5,17 +5,20 @@ import { useSelector } from 'react-redux';
 import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, SquarePen, Trash2 } from 'lucide-react-native';
 import moment from 'moment'
 import 'moment/locale/fr'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 moment.locale('fr')
 
 export default function TripScreen({ navigation, route}) {
 
-    const [activityPresent, setActivityPresent] = useState(true)
+    const [activityPresent, setActivityPresent] = useState(false)
     const [selectedDay, setSelectedDay] = useState(1)
-    
+    const [daysTable, setDaysTable] = useState([])
+    const [groupedActivities, setGroupedActivities] = useState({})
+    const [activityForDay, setActivityForDay] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const mockActivityData = [{
-        title: 'Restaurant',
+        title: 'Restaurant - Les Petites Fleurs',
         plannedAt: new Date('2024-08-10T21:30:00.000'),
         address: '123 rue des Lilas', 
         notes: ['Table n°12', 'Guillaume en retard, lui commander le poulet']
@@ -25,41 +28,115 @@ export default function TripScreen({ navigation, route}) {
         plannedAt: new Date('2024-08-10T23:30:00.000'),
         address: '123 avenue Jean Raida',
         notes: ['Chambre 210', 'Aymeric a oublier sa clé']
-    }]
+    },
+    {
+        title: `Visite au musée`,
+        plannedAt: new Date('2024-08-11T09:30:00.000'),
+        address: '123 avenue Jean Adrien',
+        notes: []
+    },
+]
 
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const tripsTable = useSelector((state) => state.user.value.trips)
 
-    tripData = tripsTable.filter((e) => e._id === selectedTrip)
+    const tripData = tripsTable.filter((e) => e._id === selectedTrip)
 
-    const startDate = moment(tripData[0].start_at)
-    const endDate = moment(tripData[0].end_at)
-    const tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))
+    let tripDuration;
 
-    const activities = mockActivityData.map((data, i) => {
-        const notes = data.notes.map((note, i) => {
-            return <Text key={i} className='text-slate-600'>• {note} {'\n'}</Text>
-        })
-
+    if (!tripData || tripData.length === 0) {
         return (
-            <View key={i}>
-                <View className='flex-row items-center justify-between mb-1 ml-2 mt-2'  style={{width: '90%'}}>
-                    <View title='Activity-content' className='justify-around'>
-                        <Text className='font-bold'>{data.title}</Text>
-                        <Text>Heure : {moment(data.plannedAt).format('HH:mm')}</Text>
-                        <Text>Adresse : {data.address}</Text>
-                        <Text>Notes : {'\n'}{notes}</Text>
-                    </View>
-                    <Pressable>
-                        <Trash2 size={20} color={'black'}/>
-                    </Pressable>
-                </View>
-                <View className='border-b-2 border-slate-300 w-full mb-2'>
-
-                </View>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>No trip data found</Text>
             </View>
-        )
-    })
+        );
+    }
+    else {
+        const startDate = moment(tripData[0].start_at)
+        const endDate = moment(tripData[0].end_at)
+        tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))
+    
+        //Function to find all the timestamps of the trip for each days
+        const findTripTimestamps = () => {
+            const tempArray = []
+    
+            for (let i = 0; i < tripDuration; i++) {
+                const timeStampOfDay = startDate.clone().add(i, 'days').valueOf()
+                tempArray.push(timeStampOfDay)
+            }
+            setDaysTable([...tempArray])
+        }
+    
+        //Function to group activities depending on their plannedAt
+        const groupActivitiesByDays = () => {
+            const groupedData = mockActivityData.reduce((acc, item) => {
+                const date = moment(item.plannedAt).format('YYYY-MM-DD')
+                acc[date] = acc[date] || []
+                acc[date].push(item)
+                return acc
+            }, {})
+            setGroupedActivities(groupedData)
+            setLoading(false)
+            //console.log(groupedActivities)
+        }
+    
+        //Function to display activity when updating the state selected Day
+        const displayActivityByDay = () => {
+            const date = moment(daysTable[selectedDay - 1]).format('YYYY-MM-DD')
+            if(!groupedActivities || !groupedActivities[date])
+            {
+                setActivityPresent(false)
+                setActivityForDay([])
+            }
+            else {
+                setActivityPresent(true)
+                setActivityForDay([...groupedActivities[date]])
+            }
+        }
+    
+        useEffect(()=>{
+            findTripTimestamps()
+            groupActivitiesByDays()
+            displayActivityByDay()
+            //console.log(activityForDay)
+        }, [selectedDay])
+    }
+
+
+    let activities = []
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Loading...</Text>
+            </View>)
+    }
+
+    if(activityForDay) {
+        activities = activityForDay.map((data, i) => {
+            const notes = data.notes.map((note, i) => {
+                return <Text key={i} className='text-slate-600'>• {note} {'\n'}</Text>
+            })
+    
+            return (
+                <View key={i}>
+                    <View className='flex-row items-center justify-between mb-1 ml-2 mt-2'  style={{width: '90%'}}>
+                        <View title='Activity-content' className='justify-around'>
+                            <Text className='font-bold'>{data.title}</Text>
+                            <Text>Heure : {moment(data.plannedAt).format('HH:mm')}</Text>
+                            <Text>Adresse : {data.address}</Text>
+                            <Text>Notes : {'\n'}{notes}</Text>
+                        </View>
+                        <Pressable>
+                            <Trash2 size={20} color={'black'}/>
+                        </Pressable>
+                    </View>
+                    <View className='border-b-2 border-slate-300 w-full mb-2'>
+    
+                    </View>
+                </View>
+            )
+        })
+    }
     //console.log(tripData)
     //console.log(tripData[0].background_url)
     return (
@@ -115,12 +192,11 @@ export default function TripScreen({ navigation, route}) {
                         </View>
                     </View>
                     <ScrollView title='activity-container'>
-                        {!activityPresent && <View title='activity-absent' className=' items-center mt-16'>
-                            <Pressable>
-                                <PlusCircle size={100} color={'#F2A65A'}/>
-                            </Pressable>
-                        </View>}
-                        {activityPresent && activities }
+                        {activityPresent && activities.length > 0 ? activities : <View title='activity-absent' className=' items-center mt-16'>
+                        <Pressable>
+                            <PlusCircle size={100} color={'#F2A65A'}/>
+                        </Pressable>
+                    </View>}
                     </ScrollView>
 
                 </View>
