@@ -1,14 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Circle } from "lucide-react-native";
 
-// J'ai pris une image libre de droit sur pixabay
-const myImage = require("../../assets/van.jpg");
-
 export default function LandingFinalScreen() {
+  // J'ai pris une image libre de droit sur pixabay
+  const myImage = require("../../assets/van.jpg");
+
   const navigation = useNavigation();
-  const [buttonText, setButtonText] = useState("Start the Adventure");
+  const [buttonText, setButtonText] = useState("Commencer l'aventure !");
 
   // Naviguer vers la page login
   function handleNavigateToLogin() {
@@ -21,9 +28,9 @@ export default function LandingFinalScreen() {
   };
 
   const handlePress = () => {
-    setButtonText("Adventure Started!");
+    setButtonText("L'aventure commence !");
     setTimeout(() => {
-      setButtonText("Start the Adventure");
+      setButtonText("Commencer l'aventure !");
       handleNavigateToLogin(); // Naviguer vers la page login après le délai
     }, 2000); // Attendre 2 secondes avant de réinitialiser le texte du bouton
     // Autres actions à effectuer lors de l'appui sur le bouton
@@ -54,7 +61,7 @@ export default function LandingFinalScreen() {
           strokeWidth={0}
           absoluteStrokeWidth
           fill="white"
-          size={180}
+          size={190}
         />
         <Circle
           style={styles.circle4}
@@ -76,7 +83,7 @@ export default function LandingFinalScreen() {
       <Text style={styles.title}>TripHub</Text>
       <Image style={styles.image} source={myImage} />
       <Text style={styles.text}>
-        Explore the World with TripHub by your side
+        Explorez le monde avec Triphub à vos côtés
       </Text>
       <Pressable
         onPress={() => {
@@ -96,6 +103,7 @@ export default function LandingFinalScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -139,7 +147,7 @@ const styles = StyleSheet.create({
   },
   circle3: {
     position: "absolute",
-    top: "70%",
+    top: "69%",
     right: "50%",
     opacity: 0.9,
   },
