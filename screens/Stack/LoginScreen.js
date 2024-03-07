@@ -1,31 +1,22 @@
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import { login } from "../../reducers/users";
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { login } from '../../reducers/users';
+import { Chrome, Facebook } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 
-const EMAIL_REGEX =
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/;
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isEmailValid, setIsEmailValid] = useState(false); // État pour suivre si l'adresse mail est valide
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const dispatch = useDispatch();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   async function handleSubmitSignIn() {
     if (!isEmailValid) {
@@ -75,43 +66,33 @@ export default function LoginScreen() {
     }
   }
 
-  // Vérifie si l'e-mail est valide lors de chaque changement
-  function handleEmailChange(text) {
+
+  const handleEmailChange = (text) => {
     setEmail(text);
     setIsEmailValid(EMAIL_REGEX.test(text));
-  }
+  };
 
-  //Rend le password invisible
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  // Naviguer vers la page d'inscription
-  function handleNavigateToRegister() {
-    navigation.navigate("Register");
-  }
+  const handleNavigateToRegister = () => {
+    navigation.navigate('Register');
+  };
 
-  // Naviguer vers HomeScreen
   const handlePress = () => {
     navigation.goBack();
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <Pressable
-        style={{ padding: 20, backgroundColor: "#fff" }}
-        onPress={handlePress}
-      >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <Pressable style={{ paddingHorizontal: 30, paddingTop: 40, backgroundColor: '#fff' }} onPress={handlePress}>
         <ChevronLeft style={styles.arrow} />
       </Pressable>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Connexion</Text>
 
-          {/* Input Email */}
           <View style={styles.inputContainer}>
             <TextInput
               autoCapitalize="none"
@@ -119,14 +100,10 @@ export default function LoginScreen() {
               placeholder="Email"
               onChangeText={handleEmailChange}
               inputMode="email"
-              style={[
-                styles.input,
-                { color: isEmailValid ? "black" : "grey" }, // Condition pour la couleur du texte quand valid ou non
-              ]}
+              style={[styles.input, { color: isEmailValid ? 'black' : 'grey' }]}
             />
           </View>
 
-          {/* Input Password */}
           <View style={styles.inputContainer}>
             <View style={styles.passwordInputContainer}>
               <TextInput
@@ -134,23 +111,15 @@ export default function LoginScreen() {
                 value={password}
                 placeholder="Mot de passe"
                 onChangeText={(text) => setPassword(text)}
-                secureTextEntry={!isPasswordVisible} // permet de masquer le mdp quand on écrit
+                secureTextEntry={!isPasswordVisible}
                 style={styles.passwordInput}
               />
-              <Pressable
-                onPress={togglePasswordVisibility} // permet d'afficher le mdp quand on appuie sur l'icône
-                style={styles.eyeIconContainer}
-              >
-                <FontAwesome5
-                  name={isPasswordVisible ? "eye-slash" : "eye"}
-                  size={14}
-                  color="grey"
-                />
+              <Pressable onPress={togglePasswordVisibility} style={styles.eyeIconContainer}>
+                <FontAwesome5 name={isPasswordVisible ? 'eye-slash' : 'eye'} size={14} color="grey" />
               </Pressable>
             </View>
           </View>
 
-          {/* Button Login */}
           <View style={styles.buttonContainer}>
             <Pressable onPress={handleSubmitSignIn} style={styles.button}>
               <Text style={styles.buttonText}>Se connecter</Text>
@@ -158,26 +127,20 @@ export default function LoginScreen() {
             <Text style={styles.or}>OU</Text>
           </View>
 
-          {/* Button Google */}
           <View style={styles.buttonContainer}>
             <Pressable style={styles.google}>
               <Chrome style={styles.googleIcon} />
               <Text style={styles.google_text}>Continuer avec Google</Text>
             </Pressable>
-            {/* Bouton d'authentification Facebook */}
             <Pressable style={styles.facebook}>
               <Facebook style={styles.facebookIcon} />
               <Text style={styles.facebook_text}>Continuer avec Facebook</Text>
             </Pressable>
           </View>
 
-          {/* Button Register */}
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Pas encore de compte ?</Text>
-            <Pressable
-              onPress={handleNavigateToRegister}
-              style={styles.registerButton}
-            >
+            <Pressable onPress={handleNavigateToRegister} style={styles.registerButton}>
               <Text style={styles.registerButtonText}>S'inscrire</Text>
             </Pressable>
           </View>
@@ -185,47 +148,48 @@ export default function LoginScreen() {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 40,
-    textAlign: "center",
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 40,
+    textAlign: 'center',
     fontSize: 40,
     marginBottom: 20,
+
   },
   arrow: {
-    color: "black",
+    color: 'black',
+    paddingTop: 40
   },
   title: {
     fontSize: 40,
-    fontWeight: "bold",
-    padding: 30,
+    fontWeight: 'bold',
   },
   inputContainer: {
-    width: "80%",
+    width: '100%',
     maxWidth: 500,
     marginTop: 20,
   },
   input: {
-    backgroundColor: "#F2F4F5",
-    borderColor: "#ccc",
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 15,
-    color: "#000",
+    color: '#000',
     marginBottom: 20,
-    width: "100%",
+    width: '100%',
   },
   passwordInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F2F4F5",
-    borderColor: "#ccc",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
     marginBottom: 30,
@@ -239,19 +203,19 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   buttonContainer: {
-    width: "100%",
+    width: '100%',
     marginBottom: 20,
   },
   button: {
-    backgroundColor: "#F2A65A",
+    backgroundColor: '#F2A65A',
     borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 12,
-    alignSelf: "center",
-    width: "60%",
-    elevation: 5, // ombre pour Android
-    shadowColor: "#000", // ombre pour iOS
+    alignSelf: 'center',
+    width: '100%',
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
@@ -260,74 +224,75 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 20
   },
   or: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 20,
     marginTop: 40,
   },
   google: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
     borderRadius: 15,
     padding: 10,
     marginTop: 20,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderWidth: 1,
   },
   googleIcon: {
     marginRight: 10,
-    color: "#F2A65A",
+    color: '#F2A65A',
   },
   google_text: {
-    color: "black",
+    color: 'black',
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   facebook: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
     borderRadius: 15,
     padding: 10,
     marginTop: 20,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderWidth: 1,
   },
   facebookIcon: {
     marginRight: 10,
-    color: "#1877F2",
+    color: '#1877F2',
   },
   facebook_text: {
-    color: "black",
+    color: 'black',
     fontSize: 15,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   registerContainer: {
     marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   registerText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     padding: 30,
   },
   registerButton: {
-    backgroundColor: "#F2A65A",
+    backgroundColor: '#F2A65A',
     borderRadius: 15,
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginLeft: 10,
-    elevation: 5, // ombre pour Android
-    shadowColor: "#000", // ombre pour iOS
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
@@ -336,7 +301,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   registerButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
+
+export default LoginScreen;

@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 
 export default function HelpScreen({ navigation }) {
   const sosInfos = useSelector((state) => state.user.value);
-  console.log(sosInfos.trips[0]);
+  
 
   const handlePress = () => {
     navigation.goBack();
@@ -20,34 +20,7 @@ export default function HelpScreen({ navigation }) {
   const { trips, selectedTripId} = useSelector((state) => state.user.value);
 
   const selectedTrip = trips.filter((trip) => trip._id === selectedTripId);
-  console.log(selectedTrip[0].sos_infos);
   
-
-  const CountryData = {
-    sos_infos: [
-      {
-        country: "United States of America",
-        embassy: {
-          address: "122 Example Street",
-          phone: "500-123-456-789",
-          email: "france-ambassade@americanmail.com",
-          emergency_phone: "500-123-123-123",
-        },
-        consulate: [
-          {
-            address: "123 Example Street",
-            phone: "500-123-456-789",
-            email: "france-consulat@americanmail.com",
-            emergency_phone: "500-123-123-123",
-          },
-        ],
-        emergency_number: "911",
-        police_number: "911",
-        firefighter_number: "911",
-        member_112: true,
-      },
-    ],
-  };
 
   const handleCallPress = () => {
     const emergencyNumber =
@@ -71,7 +44,7 @@ export default function HelpScreen({ navigation }) {
             <Text style={styles.nameText}>Numéro d'urgence</Text>
             <View style={styles.infoContainer}>
               <View style={styles.infoText}>
-                <Text>{selectedTrip[0].sos_infos.emergency_number}</Text>
+                <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 15 }}>{selectedTrip[0].sos_infos.emergency_number}</Text>
                 <Pressable onPress={handleCallPress}>
                   <Phone style={styles.icon} />
                 </Pressable>
@@ -83,31 +56,34 @@ export default function HelpScreen({ navigation }) {
             <View style={styles.infoContainer}>
               <View style={styles.infoText}>
                 <Text>
-                  Adresse: {selectedTrip[0].sos_infos.embassy.address}
+                <Text style={{ fontWeight: 'bold', color: 'black' }}>Adresse: </Text>{selectedTrip[0].sos_infos.embassy.address}
                 </Text>
               </View>
               <View style={styles.infoText}>
                 <Text>
-                  Téléphone: {selectedTrip[0].sos_infos.embassy.phone}
+                <Text style={{ fontWeight: 'bold', color: 'black' }}>Téléphone: </Text>{selectedTrip[0].sos_infos.embassy.phone}
                 </Text>
               </View>
               <View style={styles.infoText}>
-                <Text>Email: {selectedTrip[0].sos_infos.embassy.email}</Text>
+                <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Email: </Text>{selectedTrip[0].sos_infos.embassy.email}</Text>
               </View>
             </View>
 
             {/* Affichage des informations sur le consulat */}
-            <Text style={styles.nameText}>Consulat</Text>
+            <Text style={styles.nameText}>Consulat(s)</Text>
             {selectedTrip[0].sos_infos.consulate.map((consulate, index) => (
               <View key={index} style={styles.infoContainer}>
                 <View style={styles.infoText}>
-                  <Text>Adresse: {consulate.address}</Text>
+                  <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Adresse: </Text>{consulate.address}</Text>
                 </View>
                 <View style={styles.infoText}>
-                  <Text>Téléphone: {consulate.phone}</Text>
+                  <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Téléphone: </Text>{consulate.phone}</Text>
                 </View>
                 <View style={styles.infoText}>
-                  <Text>Email: {consulate.email}</Text>
+                  <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Email: </Text>{consulate.email}</Text>
+                </View>
+                <View style={styles.infoText}>
+                  <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Numéro: </Text>{consulate.phone}</Text>
                 </View>
               </View>
             ))}
@@ -116,16 +92,16 @@ export default function HelpScreen({ navigation }) {
             <Text style={styles.nameText}>Contacts utiles</Text>
             <View style={styles.infoContainer}>
               <View style={styles.infoText}>
-                <Text>Police : {selectedTrip[0].sos_infos.police_number}</Text>
+                <Text><Text style={{ fontWeight: 'bold', color: 'black' }}>Police : </Text>{selectedTrip[0].sos_infos.police_number}</Text>
               </View>
               <View style={styles.infoText}>
                 <Text>
-                  Urgences : {selectedTrip[0].sos_infos.emergency_number}
+                <Text style={{ fontWeight: 'bold', color: 'black' }}>Urgences : </Text>{selectedTrip[0].sos_infos.emergency_number}
                 </Text>
               </View>
               <View style={styles.infoText}>
                 <Text>
-                  Pompiers : {selectedTrip[0].sos_infos.firefighter_number}
+                <Text style={{ fontWeight: 'bold', color: 'black' }}>Pompiers : </Text>{selectedTrip[0].sos_infos.firefighter_number}
                 </Text>
               </View>
             </View>
@@ -144,7 +120,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   container: {
-    margin: 10,
+    margin: 20,
+    backgroundColor: "#F2F4F5"
   },
   arrow: {
     color: "black",
@@ -152,24 +129,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: "bold",
-    padding: 30,
     alignItems: "center",
     textAlign: "center",
   },
   nameText: {
-    textAlign: "left",
+    textAlign: "center",
     fontWeight: "bold",
-    paddingLeft: 30,
+    paddingLeft: 0,
     marginTop: 40,
     marginBottom: 10,
+    fontSize: 20
   },
   icon: {
     fontSize: 24,
     marginLeft: 10,
-    color: "black",
+    color: "green",
   },
   infoContainer: {
-    backgroundColor: "#E3E5E5",
+    backgroundColor: "#EEC170",
     borderRadius: 15,
     marginVertical: 5,
     padding: 20,

@@ -24,7 +24,8 @@
         "permissions": [
           "WRITE_EXTERNAL_STORAGE",
           "READ_EXTERNAL_STORAGE",
-          "READ_MEDIA_STORAGE"
+          "READ_MEDIA_STORAGE",
+          "MANAGE_DOCUMENTS"
         ]
       }
     },

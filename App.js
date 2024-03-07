@@ -1,21 +1,10 @@
-//import react navigation
+import React from 'react';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-// import redux
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-
-//import reducer
 import user from "./reducers/users";
-
-//redux store configuration
-const store = configureStore({
-  reducer: { user: user },
-});
-
-// Import all the stacks screens
 import LandingScreen from "./screens/Stack/LandingScreen";
 import LandingFinalScreen from "./screens/Stack/LandingFinalScreen";
 import LoginScreen from "./screens/Stack/LoginScreen";
@@ -26,18 +15,16 @@ import CreateTripScreen from "./screens/Stack/CreateTripScreen";
 import ViewDocumentsScreen from "./screens/Stack/ViewDocumentsScreen";
 import ShowActivityScreen from "./screens/Stack/ShowActivityScreen";
 import HomeScreen from "./screens/Stack/HomeScreen";
-// Import bottom tab navigator screens
 import TripScreen from "./screens/TabNavigator/TripScreen";
 import HelpScreen from "./screens/TabNavigator/HelpScreen";
 import DocumentsScreen from "./screens/TabNavigator/DocumentsScreen";
-
-//Import icons
 import { FileText, Plane, LifeBuoy } from "lucide-react-native";
 
-// Create a stack navigator
-const Stack = createNativeStackNavigator();
+const store = configureStore({
+  reducer: { user: user },
+});
 
-// Create a bottom tab navigator
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -45,15 +32,15 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size, focused }) => {
+          let iconComponent;
           if (route.name === "Trip") {
-            return <Plane stroke={color} size={size} />;
+            iconComponent = <Plane stroke={color} size={size} />;
+          } else if (route.name === "Docs") {
+            iconComponent = <FileText stroke={color} size={size} />;
+          } else if (route.name === "Help") {
+            iconComponent = <LifeBuoy stroke={color} size={size} />;
           }
-          if (route.name === "Docs") {
-            return <FileText stroke={color} size={size} />;
-          }
-          if (route.name === "Help") {
-            return <LifeBuoy stroke={color} size={size} />;
-          }
+          return iconComponent;
         },
         tabBarActiveTintColor: "#F58549",
         tabBarInactiveTintColor: "gray",
