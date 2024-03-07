@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 
 export default function HelpScreen({ navigation }) {
   const sosInfos = useSelector((state) => state.user.value);
-  console.log(sosInfos.trips[0]);
+  
 
   const handlePress = () => {
     navigation.goBack();
@@ -20,7 +20,7 @@ export default function HelpScreen({ navigation }) {
   const { trips, selectedTripId} = useSelector((state) => state.user.value);
 
   const selectedTrip = trips.filter((trip) => trip._id === selectedTripId);
-  console.log(selectedTrip[0].sos_infos);
+  
   
 
   const CountryData = {

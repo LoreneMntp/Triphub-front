@@ -6,7 +6,7 @@ import {
   Modal,
   FlatList,
   StyleSheet,
-  ScrollView,
+
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -16,6 +16,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
 import { PlusCircle, Eye, Trash2, Filter } from "lucide-react-native";
 import Constants from "expo-constants";
+
+
+
 
 export default function DocumentsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,6 +49,7 @@ export default function DocumentsScreen() {
           from: fileUri,
           to: destinationUri,
         });
+
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addDocument`;
         const res = await fetch(url, {
           method: "POST",
@@ -85,10 +89,8 @@ export default function DocumentsScreen() {
     dispatch(initDocuments(data.documents));
   };
 
-  const handleViewDocument = () => {
-    navigation.navigate("ViewDocuments", { documentData: userInfos.documents });
-  };
 
+ 
   // const disabledModalButtonStyle = {
   //   ...modalButtonStyle,
   //   backgroundColor: "grey", // Changez la couleur pour griser le bouton
@@ -207,7 +209,8 @@ export default function DocumentsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 40,
+    paddingHorizontal: 40,
+    paddingTop: 70
   },
   header: {
     fontSize: 22,
@@ -217,8 +220,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
     marginBottom: 20,
+    marginHorizontal: 20
   },
   button: {
     backgroundColor: "#4A90E2",
@@ -236,6 +240,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingVertical: 15,
     marginTop: 10,
+    elevation: 3, // Ajoute une ombre sous Android
+    shadowColor: "#000", // Ajoute une ombre sous iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    borderRadius: 25
   },
   buttonText: {
     color: "white",
@@ -264,11 +274,11 @@ const styles = StyleSheet.create({
   },
   selectedDocumentText: {
     fontSize: 16,
-    marginRight: 10, // Assure un espacement entre le texte et l'icône
+    marginRight: 10, 
   },
   iconContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    width: 100, // Assure un espacement suffisant entre les icônes
+    width: 100, 
   },
 });
