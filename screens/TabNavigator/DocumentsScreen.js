@@ -53,7 +53,6 @@ export default function DocumentsScreen() {
           from: fileUri,
           to: destinationUri,
         });
-
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addDocument`;
         const res = await fetch(url, {
           method: "POST",
@@ -68,7 +67,7 @@ export default function DocumentsScreen() {
           }),
         });
 
-        const data = res.json();
+        const data = await res.json();
 
         dispatch(initDocuments(data.documents));
       }
@@ -117,7 +116,6 @@ export default function DocumentsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
         <Text style={styles.header}>Gestion des documents</Text>
         <View style={styles.docs}>
           <View style={styles.buttonContainer}>
@@ -138,7 +136,7 @@ export default function DocumentsScreen() {
             />
           )}
         </View>
-      </ScrollView>
+      
     </View>
   );
 }

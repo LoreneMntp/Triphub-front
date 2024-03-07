@@ -109,6 +109,9 @@ export default function HelpScreen({ navigation }) {
                 <View style={styles.infoText}>
                   <Text>Email: {consulate.email}</Text>
                 </View>
+                <View style={styles.infoText}>
+                  <Text>Numéro: {consulate.phone}</Text>
+                </View>
               </View>
             ))}
 
