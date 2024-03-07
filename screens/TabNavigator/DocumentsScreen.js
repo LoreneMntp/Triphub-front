@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import ViewDocumentsScreen from "../Stack/ViewDocumentsScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
-import { PlusCircle, Eye, Trash2, Filter } from "lucide-react-native";
+import { PlusCircle, Eye, Trash2, Filter, ChevronLeft } from "lucide-react-native";
 import Constants from "expo-constants";
 
 
@@ -110,12 +110,16 @@ export default function DocumentsScreen() {
     fetchData();
   }, []);
 
+  const handlePress = () => {
+    navigation.goBack();
+  };
+
   const renderDocumentItem = ({ item }) => (
     <View style={styles.documentItem}>
       <Text style={styles.documentText}>{item.fileName}</Text>
       <View style={styles.iconContainer}>
         <Pressable onPress={() => handleViewDocument(item)}>
-          <Eye color="#4A90E2" size={24} />
+          <Eye color="#F58549" size={24} paddingHorizontal={30}/>
         </Pressable>
         <Pressable onPress={() => handleDeleteDocument(item._id)}>
           <Trash2 color="#E53935" size={24} />
@@ -126,12 +130,15 @@ export default function DocumentsScreen() {
 
   return (
     <View style={styles.container}>
+       <Pressable style={styles.pressableContainer} onPress={handlePress}>
+          <ChevronLeft style={styles.arrow} />
+        </Pressable>
       <Text style={styles.header}>Gestion des documents</Text>
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Billets de transport</Text>
           <Pressable onPress={() => handleAddDocument("transport")}>
-            <PlusCircle color="#4A90E2" size={24} />
+            <PlusCircle color="#F58549" size={24} />
           </Pressable>
         </View>
         {userInfos.documents && (
@@ -150,7 +157,7 @@ export default function DocumentsScreen() {
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Réservation</Text>
           <Pressable onPress={() => handleAddDocument("reservation ")}>
-            <PlusCircle color="#4A90E2" size={24} />
+            <PlusCircle color="#F58549" size={24} />
           </Pressable>
         </View>
         {userInfos.documents && (
@@ -169,7 +176,7 @@ export default function DocumentsScreen() {
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Identité</Text>
           <Pressable onPress={() => handleAddDocument("identity")}>
-            <PlusCircle color="#4A90E2" size={24} />
+            <PlusCircle color="#F58549" size={24} />
           </Pressable>
         </View>
         {userInfos.documents && (
@@ -188,7 +195,7 @@ export default function DocumentsScreen() {
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Autres documents</Text>
           <Pressable onPress={() => handleAddDocument("others")}>
-            <PlusCircle color="#4A90E2" size={24} />
+            <PlusCircle color="#F58549" size={24} />
           </Pressable>
         </View>
         {userInfos.documents && (
@@ -210,19 +217,29 @@ export default function DocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 40,
-    paddingTop: 70
+    
+    backgroundColor: "#F2F4F5"
+  },
+  pressableContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 60,
+  },
+  arrow: {
+    color: "black",
   },
   header: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 40,
+    marginTop: 20,
     textAlign: "center",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
-    marginHorizontal: 20
+    marginHorizontal: 20,
   },
   button: {
     backgroundColor: "#4A90E2",
@@ -235,6 +252,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    backgroundColor: "#EEC170"
   },
   docs: {
     backgroundColor: "white",
@@ -245,7 +263,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    borderRadius: 25
+    borderRadius: 25,
+    backgroundColor: "#EEC170"
   },
   buttonText: {
     color: "white",
@@ -274,7 +293,10 @@ const styles = StyleSheet.create({
   },
   selectedDocumentText: {
     fontSize: 16,
-    marginRight: 10, 
+    marginRight: 10,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 20
   },
   iconContainer: {
     flexDirection: "row",

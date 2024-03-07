@@ -117,12 +117,14 @@ const RegisterScreen = () => {
   return (
     <View style={styles.container}>
       {/* Bouton de navigation arrière */}
-      <Pressable style={{ paddingTop: 10 }} onPress={handlePress}>
+      <Pressable onPress={handlePress}>
         <ChevronLeft style={styles.arrow} />
       </Pressable>
+     
       {/* Titre de la page */}
       <Text style={styles.page}>S'inscrire</Text>
       {/* Champs de saisie pour le nom d'utilisateur, l'e-mail, le mot de passe et la confirmation du mot de passe */}
+      
       <TextInput
         onChangeText={setUsername}
         value={username}
@@ -185,10 +187,13 @@ const RegisterScreen = () => {
 // Styles pour le composant RegisterScreen
 const styles = StyleSheet.create({
   container: {
-    padding: 40,
+    paddingHorizontal: 40,
+    backgroundColor: '#fff',
+    paddingTop: 60
   },
   arrow:{
     color: 'black',
+    marginBottom: 10,
   },
   page: {
     textAlign: 'center',
@@ -197,11 +202,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    color: '#000',
+    marginBottom: 20,
+    width: '100%',
+    
   },
   button_register: {
     marginTop: 20,
@@ -209,6 +219,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
     alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     color: 'white',
