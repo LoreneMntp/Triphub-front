@@ -1,13 +1,15 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
-import {View, Text, Pressable} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, Pressable } from "react-native";
+import PDFReader from "rn-pdf-reader-js";
 
-export default function ViewDocumentsScreen() {
-    return (
-        <SafeAreaView>
-            <Text className="text-2xl text-teal-700 font-bold ">
-            ViewDocumentsScreen
-            </Text>
+export default function ViewDocumentsScreen({ route }) {
+  const { url } = route.params;
 
-        </SafeAreaView>
-    );
+  return (
+    <PDFReader
+      source={{
+        uri: url,
+      }}
+    />
+  );
 }
