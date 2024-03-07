@@ -15,22 +15,15 @@ import ViewDocumentsScreen from "../Stack/ViewDocumentsScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
 import { PlusCircle, Eye, Trash2, Filter } from "lucide-react-native";
+import Constants from "expo-constants";
 
 export default function DocumentsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState("");
-  //const [documentUris, setDocumentUris] = useState([]);
-  //console.log("docuri", documentUris);
   const navigation = useNavigation();
   const userInfos = useSelector((state) => state.user.value);
-  let dataBilletsTransport = [];
-  if (userInfos.documents) {
-    dataBilletsTransport = userInfos.documents.filter(
-      (billet) => (billet.category = "Billets de transport")
-    );
-  }
+  const installationId = Constants.installationId;
 
-  console.log("userInfosDoc", userInfos.documents);
   const openModal = (document) => {
     setSelectedDocument(document);
     setModalVisible(true);
@@ -64,17 +57,33 @@ export default function DocumentsScreen() {
             fileName: fileName,
             category: category,
             link_doc: fileUri,
-            serial_phone: "123456789",
+            serial_phone: installationId,
           }),
         });
 
-        const data = res.json();
+        const data = await res.json();
 
         dispatch(initDocuments(data.documents));
       }
     } catch (error) {
       console.error("Erreur lors de l'ajout du fichier:", error);
     }
+  };
+
+  const handleDeleteDocument = async (id) => {
+    const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/deleteDocument`;
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: userInfos.user.token,
+        documentId: id,
+      }),
+    });
+
+    const data = await res.json();
+
+    dispatch(initDocuments(data.documents));
   };
 
   const handleViewDocument = () => {
@@ -91,9 +100,8 @@ export default function DocumentsScreen() {
       const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/documents/${userInfos.user.token}`;
       const res = await fetch(url);
       const data = await res.json();
-      //console.log("datadoc", data.documents);
+
       if (data.result) {
-        // console.log("datadoc", data.documents);
         dispatch(initDocuments(data.documents));
       }
     };
@@ -108,7 +116,7 @@ export default function DocumentsScreen() {
         <Pressable onPress={() => handleViewDocument(item)}>
           <Eye color="#4A90E2" size={24} />
         </Pressable>
-        <Pressable onPress={() => handleDeleteDocument(item.link_doc)}>
+        <Pressable onPress={() => handleDeleteDocument(item._id)}>
           <Trash2 color="#E53935" size={24} />
         </Pressable>
       </View>
@@ -117,28 +125,83 @@ export default function DocumentsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <Text style={styles.header}>Gestion des documents</Text>
-        <View style={styles.docs}>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.selectedDocumentText}>
-              Billets de transport
-            </Text>
-            <Pressable
-              onPress={() => handleAddDocument("Billets de transport")}
-            >
-              <PlusCircle color="#4A90E2" size={24} />
-            </Pressable>
-          </View>
-          {dataBilletsTransport && (
-            <FlatList
-              data={dataBilletsTransport} // Utilisez mockData directement ici
-              keyExtractor={(item) => item._id}
-              renderItem={renderDocumentItem}
-            />
-          )}
+      <Text style={styles.header}>Gestion des documents</Text>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Billets de transport</Text>
+          <Pressable onPress={() => handleAddDocument("transport")}>
+            <PlusCircle color="#4A90E2" size={24} />
+          </Pressable>
         </View>
-      </ScrollView>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "transport" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Réservation</Text>
+          <Pressable onPress={() => handleAddDocument("reservation ")}>
+            <PlusCircle color="#4A90E2" size={24} />
+          </Pressable>
+        </View>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "reservation" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Identité</Text>
+          <Pressable onPress={() => handleAddDocument("identity")}>
+            <PlusCircle color="#4A90E2" size={24} />
+          </Pressable>
+        </View>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "identity" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Autres documents</Text>
+          <Pressable onPress={() => handleAddDocument("others")}>
+            <PlusCircle color="#4A90E2" size={24} />
+          </Pressable>
+        </View>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "others" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
     </View>
   );
 }
