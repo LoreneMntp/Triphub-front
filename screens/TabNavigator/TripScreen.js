@@ -1,12 +1,12 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {View, Text, Pressable, Image, ScrollView} from "react-native";
+import {View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback, Clipboard} from "react-native";
 import { useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
-import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, SquarePen, Trash2 } from 'lucide-react-native';
+import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, SquarePen, Trash2, Copy } from 'lucide-react-native';
 import moment from 'moment'
 import 'moment/locale/fr'
 import { useEffect, useState } from 'react';
-moment.locale('fr')
+//moment.locale('fr')
 
 export default function TripScreen({ navigation, route}) {
 
@@ -16,6 +16,8 @@ export default function TripScreen({ navigation, route}) {
     const [groupedActivities, setGroupedActivities] = useState({})
     const [activityForDay, setActivityForDay] = useState([])
     const [loading, setLoading] = useState(true)
+    const [modalInviteVisible, setModalInviteVisible] = useState(false)
+    const [copiedText, setCopiedText] = useState('')
 
     const mockActivityData = [{
         title: 'Restaurant - Les Petites Fleurs',
@@ -44,6 +46,7 @@ export default function TripScreen({ navigation, route}) {
 
     let tripDuration;
 
+    //Safeguard to check if there is data inside the Trip
     if (!tripData || tripData.length === 0) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -51,56 +54,49 @@ export default function TripScreen({ navigation, route}) {
             </View>
         );
     }
-    else {
-        const startDate = moment(tripData[0].start_at)
-        const endDate = moment(tripData[0].end_at)
-        tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))
-    
-        //Function to find all the timestamps of the trip for each days
-        const findTripTimestamps = () => {
-            const tempArray = []
-    
-            for (let i = 0; i < tripDuration; i++) {
-                const timeStampOfDay = startDate.clone().add(i, 'days').valueOf()
-                tempArray.push(timeStampOfDay)
-            }
-            setDaysTable([...tempArray])
+    //Variables for dates
+    const startDate = moment(tripData[0].start_at)
+    const endDate = moment(tripData[0].end_at)
+    tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24))
+
+    //Function to Display Activities
+    const displayActivityByDay = () => {
+        //Find the timestamp of each day within the trip
+        const tempArray = []
+
+        for (let i = 0; i < tripDuration; i++) {
+            const timeStampOfDay = startDate.clone().add(i, 'days').valueOf()
+            tempArray.push(timeStampOfDay)
         }
-    
-        //Function to group activities depending on their plannedAt
-        const groupActivitiesByDays = () => {
-            const groupedData = mockActivityData.reduce((acc, item) => {
-                const date = moment(item.plannedAt).format('YYYY-MM-DD')
-                acc[date] = acc[date] || []
-                acc[date].push(item)
-                return acc
-            }, {})
-            setGroupedActivities(groupedData)
-            setLoading(false)
-            //console.log(groupedActivities)
+
+        //Group the activities based on their plannedAT
+        const groupedData = mockActivityData.reduce((acc, item) => {
+            const date = moment(item.plannedAt).format('YYYY-MM-DD')
+            acc[date] = acc[date] || []
+            acc[date].push(item)
+            return acc
+        }, {})
+
+        setGroupedActivities(groupedData)
+        setLoading(false)
+
+        //Display the activities based on the selected day
+        const date = moment(tempArray[selectedDay - 1]).format('YYYY-MM-DD')
+        if(!groupedData || !groupedData[date])
+        {
+            setActivityPresent(false)
+            setActivityForDay([])
         }
-    
-        //Function to display activity when updating the state selected Day
-        const displayActivityByDay = () => {
-            const date = moment(daysTable[selectedDay - 1]).format('YYYY-MM-DD')
-            if(!groupedActivities || !groupedActivities[date])
-            {
-                setActivityPresent(false)
-                setActivityForDay([])
-            }
-            else {
-                setActivityPresent(true)
-                setActivityForDay([...groupedActivities[date]])
-            }
+        else {
+            setActivityPresent(true)
+            setActivityForDay(groupedData[date])
         }
-    
-        useEffect(()=>{
-            findTripTimestamps()
-            groupActivitiesByDays()
-            displayActivityByDay()
-            //console.log(activityForDay)
-        }, [selectedDay])
     }
+
+    useEffect(()=>{
+        displayActivityByDay()
+        //console.log(daysTable)
+    }, [selectedDay])
 
 
     let activities = []
@@ -137,10 +133,32 @@ export default function TripScreen({ navigation, route}) {
             )
         })
     }
-    //console.log(tripData)
-    //console.log(tripData[0].background_url)
+
+    /* const copyToClipboard = (content) => {
+        Clipboard.
+    }
+ */
     return (
         <SafeAreaView className='flex-1 bg-white'>
+            <Modal title="Invite Modal" visible={modalInviteVisible} animationType='fade' transparent>
+                <View className='flex-1 justify-center items-center'>
+                    <TouchableWithoutFeedback onPress={()=> setModalInviteVisible(!modalInviteVisible)}>
+                        <View title="Background opaque" className='bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50'></View>
+                    </TouchableWithoutFeedback>
+
+                    <View title='Centered view' className='bg-white w-5/6 h-3/6 pt-20 items-center'>
+                        <Text className='text-center pr-4 pl-4'>Copiez ce lien, et envoyez le à vos proches pour qu'ils rejoignent votre voyage !</Text>
+                        <View className='flex-row items-center justify-center mt-6'>
+                            <Text className='font-bold  items-center mr-4' selectable={true}>{tripData[0].invitation_link}</Text>
+                            <Pressable>
+                                <Copy size={30} color={'black'}/>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+
             <View title='header' className='items-center mt-4 mb-6'>
                 <Text className='text-xl font-bold mb-2'>{tripData[0].title}</Text>
                 <View title='dates'>
@@ -150,7 +168,7 @@ export default function TripScreen({ navigation, route}) {
             </View>
             <View title='invite-bar' className='items-center flex-row just ml-10'>
                 <UserPlus size={30} color={'black'} className='mr-4 ' fill={'black'}/>
-                <Pressable className='border-2 border-black p-2 rounded-lg'>
+                <Pressable className='border-2 border-black p-2 rounded-lg' onPress={() => setModalInviteVisible(true)}>
                     <Text>Inviter</Text>
                 </Pressable>
             </View>
