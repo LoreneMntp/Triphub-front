@@ -6,6 +6,7 @@ import {
   Modal,
   FlatList,
   StyleSheet,
+  Platform,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -13,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import ViewDocumentsScreen from "../Stack/ViewDocumentsScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
+import ButtonOpenPDF from "../../components/ButtonOpenPDF";
 import {
   PlusCircle,
   Eye,
@@ -118,13 +120,7 @@ export default function DocumentsScreen() {
     <View style={styles.documentItem}>
       <Text style={styles.documentText}>{item.fileName}</Text>
       <View style={styles.iconContainer}>
-        <Pressable
-          onPress={() =>
-            navigation.navigate("ViewDocuments", { url: item.link_doc })
-          }
-        >
-          <Eye color="#4A90E2" size={24} />
-        </Pressable>
+        <ButtonOpenPDF fileName={item.fileName} url={item.link_doc} />
         <Pressable onPress={() => handleDeleteDocument(item._id)}>
           <Trash2 color="#E53935" size={24} />
         </Pressable>

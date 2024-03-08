@@ -4834,7 +4834,7 @@ lodash.throttle@^4.1.1:
   resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
   integrity sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==
 
-lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.15, lodash@^4.17.4:
+lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.4:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -6069,6 +6069,11 @@ react-native-pdf-reader@^1.0.2:
   integrity sha512-9EMUE7RWUso5t70feYUS9/mfXPpuTQcKcME9HVs1NBHRqS9YMS+D4Yo0Ak3k3TXNAobXSqmfF6a72czxi0xFIg==
   dependencies:
     prop-types "^15.6.2"
+
+react-native-pdf-renderer@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-pdf-renderer/-/react-native-pdf-renderer-1.2.0.tgz#1705a888fbfc10d3f9f52ce10e9e0d9e4a7ce523"
+  integrity sha512-KfpWdD4bbywl2D2qpnk+tGYA5mB19cVmRQGOlgC5aCRJEcXX6xdSthJRVBjFW2MjRvImtw7wDVzuUZpDUkMddg==
 
 react-native-pdf@^6.7.4:
   version "6.7.4"
@@ -7414,6 +7419,11 @@ xcode@^3.0.0, xcode@^3.0.1:
   dependencies:
     simple-plist "^1.1.0"
     uuid "^7.0.3"
+
+xdate@^0.8.0:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/xdate/-/xdate-0.8.2.tgz#d7b033c00485d02695baf0044f4eacda3fc961a3"
+  integrity sha512-sNBlLfOC8S3V0vLDEUianQOXcTsc9j4lfeKU/klHe0RjHAYn0CXsSttumTot8dzalboV8gZbH38B+WcCIBjhFQ==
 
 xml-js@^1.6.11:
   version "1.6.11"
