@@ -6,6 +6,8 @@ const initialState = {
     documents: [],
     trips: [],
     selectedTripId: null,
+    selectedActivity: null,
+    selectedDay: null,
   },
 };
 
@@ -24,7 +26,12 @@ export const userSlice = createSlice({
     },
     selectTrip: (state, action) => {
       state.value.selectedTripId = action.payload.tripId;
-      //console.log('Trip selected: ', action.payload.tripId)
+    },
+    selectActivity: (state, action) => {
+        state.value.selectedActivity = action.payload.activityId;
+    },
+    selectDay: (state, action) => {
+        state.value.selectedDay = action.payload.day
     },
     addTrip: (state, action) => {
       state.value.trips.push(action.payload);
@@ -32,11 +39,18 @@ export const userSlice = createSlice({
     initDocuments: (state, action) => {
       state.value.documents = action.payload;
     },
+    deleteActivity: (state, action) => {
+        state.value.trips = state.value.trips.map((trip) => {
+            trip.activities = trip.activities.filter((activity) => activity._id !== action.payload)
+            console.log('coucou', trip.activities)
+            return trip;
+        })
+    }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { login, addTrip, initTrips, selectTrip, logout, initDocuments } =
+export const { login, addTrip, initTrips, selectTrip, logout, initDocuments, deleteActivity, selectActivity, selectDay } =
   userSlice.actions;
 
 export default userSlice.reducer;
