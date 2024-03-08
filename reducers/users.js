@@ -42,7 +42,6 @@ export const userSlice = createSlice({
     deleteActivity: (state, action) => {
         state.value.trips = state.value.trips.map((trip) => {
             trip.activities = trip.activities.filter((activity) => activity._id !== action.payload)
-            console.log('coucou', trip.activities)
             return trip;
         })
     }

@@ -22,6 +22,7 @@ export default function HomeScreen({navigation}) {
     const [tempSelectedTrip, setTempSelectedTrip] = useState(null)
 
     const user = useSelector((state) => state.user.value)
+    const tripData = useSelector((state) => state.user.value.trips)
 
 
 useEffect(() => {
@@ -39,6 +40,8 @@ useEffect(() => {
     }
     return () => unsubscribe()
 }, [isConnected])
+
+
 
 /* const mockUserData = {
     username: 'JohnD123',

@@ -1,10 +1,14 @@
 // Importation des composants nécessaires depuis React et React Native
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, FlatList, Modal } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native'; // Icône pour revenir en arrière
 import { useNavigation } from '@react-navigation/native'; // Navigation
 import { Calendar, LocaleConfig } from 'react-native-calendars'; // Calendrier
 import countriesData from '../../pays.json'; // Données des pays
+import { Alert } from 'react-native'; // Ajouter en haut du fichier
+import { useDispatch, useSelector } from 'react-redux';
+import { addTrip, initTrips } from '../../reducers/users';
+
 
 // Configuration locale pour le calendrier en français
 LocaleConfig.locales['fr'] = {
@@ -24,6 +28,58 @@ export default function CreateTripScreen() {
   const [loadingState, setLoadingState] = useState({ isLoading: false, error: null });
   const [showCalendar, setShowCalendar] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const dispatch = useDispatch();
+
+
+  const token = useSelector((state) => state.user.value.user.token)
+
+// Fonction pour créer le voyage
+const createTrip = async () => {
+  try {
+    setLoadingState({ ...loadingState, isLoading: true });
+    const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: formData.title,
+        country: formData.autocompleteInput,
+        start_at: formData.startDate,
+        end_at: formData.endDate,
+        token: token
+      }),
+    });
+
+    const result = await response.json();
+    if (response.status === 200) {
+      Alert.alert('Succès', 'Voyage créé avec succès');
+
+      // Supposons que `result` contient le voyage créé retourné par le serveur
+      // Ajustez cette partie selon la structure réelle de votre réponse serveur
+      dispatch(initTrips(result.data)); // Utilisez directement l'objet voyage retourné si la structure correspond
+      
+      // Naviguer l'utilisateur vers un autre écran si nécessaire
+      navigation.navigate("Home");
+    } else {
+      throw new Error(result.message || 'Erreur lors de la création du voyage');
+    }
+  } catch (error) {
+    Alert.alert('Erreur', error.message);
+  } finally {
+    setLoadingState({ isLoading: false, error: null });
+  }
+};
+
+// Modification de la fonction handleCreateTrip pour utiliser createTrip
+const handleCreateTrip = () => {
+  // Vérification des données nécessaires
+  if (!formData.title || !formData.autocompleteInput || !formData.startDate || !formData.endDate) {
+    Alert.alert('Erreur', 'Tous les champs sont obligatoires');
+    return;
+  }
+  createTrip();
+};
 
   // Fonction pour revenir à l'écran précédent
 const handlePress = () => navigation.goBack();
@@ -84,10 +140,6 @@ const onDayPress = (day) => {
     Keyboard.dismiss(); // Ferme le clavier
   };
 
-  // Création du voyage (placeholder, logique à implémenter)
-  const handleCreateTrip = () => {
-    console.log('Voyage créé avec les données :', formData);
-  };
 
   // Validation des dates sélectionnées (placeholder, logique à implémenter)
   const handleValidateDates = () => {
