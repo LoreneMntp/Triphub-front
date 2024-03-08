@@ -30,7 +30,6 @@ export default function TripScreen({ navigation, route}) {
     const [popoverVisible, setPopoverVisible] = useState(false)
     const [modalCalendarVisible, setModalCalendarVisible] = useState(false)
     const [tripTimestamps, setTripTimestamps] = useState([])
-    const [updateRender, setUpdateRender] = useState(0)
 
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const tripsTable = useSelector((state) => state.user.value.trips)
@@ -130,7 +129,10 @@ export default function TripScreen({ navigation, route}) {
     }
 
     if(activityForDay) {
-        activities = activityForDay.map((data, i) => {
+        const sortedArray = activityForDay.sort((a, b) => {
+            return new Date(a.plannedAt).getTime() - new Date(b.plannedAt).getTime()
+        })
+        activities = sortedArray.map((data, i) => {
             const notes = data.notes.map((note, i) => {
                 return <Text key={i} className='text-slate-600'>• {note} {'\n'}</Text>
             })
@@ -182,7 +184,8 @@ export default function TripScreen({ navigation, route}) {
     }
 
     const handleAddActivity = () => {
-        dispatch(selectDay({day: selectedDay}))
+        dispatch(selectDay({day: selectedDay, date: tripTimestamps[selectedDay - 1]}))
+        //console.log('navigating', tripTimestamps[selectedDay - 1])
         navigation.navigate('AddActivity')
     }
 

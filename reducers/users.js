@@ -31,7 +31,7 @@ export const userSlice = createSlice({
         state.value.selectedActivity = action.payload.activityId;
     },
     selectDay: (state, action) => {
-        state.value.selectedDay = action.payload.day
+        state.value.selectedDay = action.payload
     },
     addTrip: (state, action) => {
       state.value.trips.push(action.payload);
@@ -42,7 +42,7 @@ export const userSlice = createSlice({
     deleteActivity: (state, action) => {
         state.value.trips = state.value.trips.map((trip) => {
             trip.activities = trip.activities.filter((activity) => activity._id !== action.payload)
-            console.log('coucou', trip.activities)
+            //console.log('coucou', trip.activities)
             return trip;
         })
     }
