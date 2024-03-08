@@ -44,6 +44,7 @@
     "react-native-openanything": "^0.0.6",
     "react-native-pdf": "^6.7.4",
     "react-native-pdf-reader": "^1.0.2",
+    "react-native-pdf-renderer": "^1.2.0",
     "react-native-popover-view": "^5.1.8",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
