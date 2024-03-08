@@ -9,33 +9,48 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Platform,
-  ScrollView,
+  Alert,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 import { X } from "lucide-react-native";
 
 export default function SettingsScreen() {
-  // const { username, email } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
-
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [modalInfo, setModalInfo] = useState(false);
   const [modalDeleteAccount, setModalDeleteAccount] = useState(false);
-
   const [isChangingPassword, setIsChangingPassword] = useState(false); // État pour suivre si l'utilisateur est en train de changer de mot de passe
   const [inputValue1, setInputValue1] = useState(""); // Ancien mot de passe
   const [inputValue2, setInputValue2] = useState(""); // Nouveau mot de passe
   const [inputValue3, setInputValue3] = useState(""); // Confirmer le nouveau mot de passe
 
+  // récupérer données utilisateurs
+  const user = useSelector((state) => state.user.value.user);
+  console.log(user);
+
+  useEffect(() => {
+    // Vérifie si l'utilisateur est défini
+    if (user) {
+      console.log("Username:", user.username);
+      console.log("Email:", user.email);
+      console.log("Token:", user.token);
+    }
+  }, [user]);
+
   // Affiche la modal au clic sur "Informations Personnelles"
   const handlePersonalInfoPress = () => {
     setModalInfo(true);
-    console.log("Infos ok");
-    setIsChangingPassword(false); // la modifi du mot de passe n'est pas activée lorsqu'on ouvre la modal
+    setIsChangingPassword(false); // la modif du mot de passe n'est pas activée lorsqu'on ouvre la modal
   };
 
-  const handleDeleteAccountPress = () => {
+  // Affiche la modal au clic sur "Supprimer compte"
+  const handleDeleteAccountModal = () => {
     setModalDeleteAccount(true);
-    console.log("Delete ok");
+  };
+
+  // Rend le password invisible
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
   };
 
   // Ferme la modal
@@ -45,17 +60,144 @@ export default function SettingsScreen() {
     setIsChangingPassword(false);
   };
 
+  // Vérifie le user
+  const handleUpdatePassword = async () => {
+    if (!user.token) {
+      Alert.alert(
+        "Erreur",
+        "Impossible de mettre à jour le mot de passe: Utilisateur non défini."
+      );
+      return;
+    }
+
+    // Vérifie que les deux password correspondent
+    if (inputValue2 !== inputValue3) {
+      Alert.alert("Erreur", "Les nouveaux mots de passe ne correspondent pas.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updatePassword`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: user.token,
+            oldPassword: inputValue1,
+            newPassword: inputValue2,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.result) {
+        Alert.alert("Succès", "Mot de passe mis à jour avec succès.");
+        setInputValue1("");
+        setInputValue2("");
+        setInputValue3("");
+      } else {
+        Alert.alert(
+          "Erreur",
+          `Erreur lors de la mise à jour du mot de passe: ${data.error}`
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du mot de passe:", error);
+      Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
+    }
+  };
+
+  //gérer la suppression de compte
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/deleteAccount`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: user.token,
+          }),
+        }
+      );
+      console.log(user.token);
+
+      const data = await response.json();
+      if (data.result) {
+        // Afficher un message de confirmation
+        Alert.alert("Succès", "Votre compte a été supprimé avec succès.");
+      } else {
+        // Afficher un message d'erreur si la suppression marche pas
+        Alert.alert(
+          "Erreur",
+          `Erreur lors de la suppression du compte: ${data.error}`
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du compte:", error);
+      Alert.alert("Erreur", "Une erreur est survenue. Veuillez réessayer.");
+    }
+  };
+
+  // Fonction pour afficher la modal de suppression de compte
+  const handleDeleteAccountSure = () => {
+    // Affiche une popup de confirmation pour que l'utilisateur confirme la suppression de son compte
+    Alert.alert(
+      "Confirmation",
+      "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+      [
+        {
+          text: "Annuler",
+          onPress: () => console.log("Annulation de la suppression du compte"),
+          style: "cancel",
+        },
+        { text: "Supprimer", onPress: handleDeleteAccount },
+      ]
+    );
+  };
+
+  // Modifie la couleur à l'appui sur le bouton
+  const logPress = (pressType) => {
+    console.log(pressType);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Réglages</Text>
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.buttonInfo} onPress={handlePersonalInfoPress}>
+        <Pressable
+          onPress={() => {
+            logPress("onPress");
+            handlePersonalInfoPress(); //
+          }}
+          onPressIn={() => logPress("onPressIn")}
+          onPressOut={() => logPress("onPressOut")}
+          onLongPress={() => logPress("onLongPress")}
+          style={({ pressed }) => [
+            styles.buttonInfo,
+            { opacity: pressed ? 0.5 : 1 },
+          ]}
+        >
           <Text style={styles.buttonText}>Informations Personnelles</Text>
         </Pressable>
         <View>
           <Pressable
-            style={styles.deleteButton}
-            onPress={handleDeleteAccountPress}
+            onPress={() => {
+              logPress("onPress");
+              handleDeleteAccountModal(); //
+            }}
+            onPressIn={() => logPress("onPressIn")}
+            onPressOut={() => logPress("onPressOut")}
+            onLongPress={() => logPress("onLongPress")}
+            style={({ pressed }) => [
+              styles.deleteButton,
+              { opacity: pressed ? 0.5 : 1 },
+            ]}
           >
             <Text style={styles.buttonText}>Supprimer mon compte</Text>
           </Pressable>
@@ -84,13 +226,20 @@ export default function SettingsScreen() {
               </View>
               <View>
                 <Text style={styles.titleModal}>Informations personnelles</Text>
-                <Text style={styles.textModal}>Username :</Text>
-                <Text style={styles.textModal}>Email :</Text>
+                <Text style={styles.textModal}>Username : {user.username}</Text>
+                <Text style={styles.textModal}>Email : {user.email}</Text>
                 <Pressable
-                  style={styles.buttonModal}
                   onPress={() => {
-                    setIsChangingPassword(!isChangingPassword); // Inverse l'état de modification du mot de passe
+                    logPress("onPress");
+                    setIsChangingPassword(!isChangingPassword); //Inverse l'état de modification du mot de passe
                   }}
+                  onPressIn={() => logPress("onPressIn")}
+                  onPressOut={() => logPress("onPressOut")}
+                  onLongPress={() => logPress("onLongPress")}
+                  style={({ pressed }) => [
+                    styles.buttonModal,
+                    { opacity: pressed ? 0.5 : 1 }, // Réduit l'opacité lorsqu'il est pressé
+                  ]}
                 >
                   <Text style={styles.buttonText}>
                     {isChangingPassword
@@ -100,30 +249,90 @@ export default function SettingsScreen() {
                 </Pressable>
                 {isChangingPassword && (
                   <>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={(text) => setInputValue1(text)}
-                      value={inputValue1}
-                      placeholder="Ancien mot de passe"
-                      placeholderTextColor="grey"
-                      secureTextEntry={true} // Pour masquer le txt
-                    />
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={(text) => setInputValue2(text)}
-                      value={inputValue2}
-                      placeholder="Nouveau mot de passe"
-                      placeholderTextColor="grey"
-                      secureTextEntry={true} // Pour masquer le texte entré
-                    />
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={(text) => setInputValue3(text)}
-                      value={inputValue3}
-                      placeholder="Confirmer le nouveau mot de passe"
-                      placeholderTextColor="grey"
-                      secureTextEntry={true} // Pour masquer le txt
-                    />
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        onChangeText={(text) => setInputValue1(text)}
+                        value={inputValue1}
+                        placeholder="Ancien mot de passe"
+                        placeholderTextColor="grey"
+                        secureTextEntry={!isPasswordVisible}
+                        style={styles.input}
+                      />
+
+                      <Pressable
+                        onPress={() => {
+                          logPress("onPress");
+                          togglePasswordVisibility();
+                        }}
+                        onPressIn={() => logPress("onPressIn")}
+                        onPressOut={() => logPress("onPressOut")}
+                        onLongPress={() => logPress("onLongPress")}
+                        style={({ pressed }) => [
+                          styles.eyeIconContainer,
+                          { opacity: pressed ? 0.5 : 1 },
+                        ]}
+                      >
+                        <FontAwesome5
+                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          size={14}
+                          color="grey"
+                        />
+                      </Pressable>
+                    </View>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        onChangeText={(text) => setInputValue2(text)}
+                        value={inputValue2}
+                        placeholder="Nouveau mot de passe"
+                        placeholderTextColor="grey"
+                        secureTextEntry={!isPasswordVisible}
+                      />
+                      <Pressable
+                        onPress={togglePasswordVisibility}
+                        style={styles.eyeIconContainer}
+                      >
+                        <FontAwesome5
+                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          size={14}
+                          color="grey"
+                        />
+                      </Pressable>
+                    </View>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        onChangeText={(text) => setInputValue3(text)}
+                        value={inputValue3}
+                        placeholder="Confirmer le nouveau mot de passe"
+                        placeholderTextColor="grey"
+                        secureTextEntry={!isPasswordVisible}
+                      />
+                      <Pressable
+                        onPress={togglePasswordVisibility}
+                        style={styles.eyeIconContainer}
+                      >
+                        <FontAwesome5
+                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          size={14}
+                          color="grey"
+                        />
+                      </Pressable>
+                    </View>
+
+                    <Pressable
+                      onPress={() => {
+                        logPress("onPress");
+                        handleUpdatePassword();
+                      }}
+                      onPressIn={() => logPress("onPressIn")}
+                      onPressOut={() => logPress("onPressOut")}
+                      onLongPress={() => logPress("onLongPress")}
+                      style={({ pressed }) => [
+                        styles.buttonModal,
+                        { opacity: pressed ? 0.5 : 1 },
+                      ]}
+                    >
+                      <Text style={styles.buttonText}>Mettre à jour</Text>
+                    </Pressable>
                   </>
                 )}
               </View>
@@ -152,10 +361,35 @@ export default function SettingsScreen() {
               <Text style={styles.textModalAccount}>
                 Êtes-vous sûr de vouloir supprimer votre compte ?
               </Text>
-              <Pressable style={styles.buttonModalAccount}>
+
+              <Pressable
+                onPress={() => {
+                  logPress("onPress");
+                  handleDeleteAccountSure();
+                }}
+                onPressIn={() => logPress("onPressIn")}
+                onPressOut={() => logPress("onPressOut")}
+                onLongPress={() => logPress("onLongPress")}
+                style={({ pressed }) => [
+                  styles.buttonModalAccount,
+                  { opacity: pressed ? 0.5 : 1 },
+                ]}
+              >
                 <Text style={styles.buttonText}>Oui</Text>
               </Pressable>
-              <Pressable style={styles.buttonModalAccount}>
+              <Pressable
+                onPress={() => {
+                  logPress("onPress");
+                  closeModal();
+                }}
+                onPressIn={() => logPress("onPressIn")}
+                onPressOut={() => logPress("onPressOut")}
+                onLongPress={() => logPress("onLongPress")}
+                style={({ pressed }) => [
+                  styles.buttonModalAccount,
+                  { opacity: pressed ? 0.5 : 1 },
+                ]}
+              >
                 <Text style={styles.buttonText}>Non</Text>
               </Pressable>
             </View>
@@ -183,7 +417,8 @@ const styles = StyleSheet.create({
     marginBottom: "10%",
   },
   buttonContainer: {
-    width: "90%",
+    width: "100%",
+    marginBottom: 20,
   },
   buttonInfo: {
     margin: "10%",
@@ -224,6 +459,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 15,
   },
   modalContainer: {
     flex: 1,
@@ -236,10 +472,10 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    width: "90%",
-    height: "80%",
-    padding: "5%",
-    marginTop: "25%",
+    width: 350,
+    height: 650,
+    padding: 20,
+    marginTop: 50,
   },
   modalHeader: {
     flexDirection: "row",
@@ -249,27 +485,27 @@ const styles = StyleSheet.create({
   titleModal: {
     alignSelf: "center",
     fontSize: 20,
-    paddingHorizontal: "2%",
+    paddingHorizontal: 5,
     fontWeight: "bold",
   },
   textModal: {
     fontSize: 15,
-    marginTop: "8%",
-    padding: "3%",
+    marginTop: 20,
+    padding: 10,
     borderColor: "#CCCCCC", // Couleur de la bordure
     borderRadius: 15,
     borderWidth: 1,
   },
   buttonModal: {
     alignSelf: "center",
-    marginTop: "15%",
+    marginTop: 30,
     backgroundColor: "#F2A65A",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: "8%",
+    paddingVertical: 15,
     alignSelf: "center",
-    width: "80%",
+    width: 240,
     elevation: 5, // ombre pour Android
     shadowColor: "#000", // ombre pour iOS
     shadowOffset: {
@@ -279,26 +515,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
-  input: {
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F2F4F5",
+    borderColor: "#ccc",
     borderWidth: 1,
-    margin: "1%",
-    marginTop: "10%",
-    padding: "3%",
-    borderRadius: 15,
-    backgroundColor: "#F0F0F0",
+    borderRadius: 10,
+    marginTop: 30,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+  },
+  eyeIconContainer: {
+    padding: 10,
   },
   buttonModalAccount: {
-    alignSelf: "center",
-    marginTop: "15%",
     backgroundColor: "#F2A65A",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: "8%",
+    paddingVertical: 12,
     alignSelf: "center",
-    width: "50%",
-    elevation: 5, // ombre pour Android
-    shadowColor: "#000", // ombre pour iOS
+    width: "100%",
+    marginTop: 30,
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
