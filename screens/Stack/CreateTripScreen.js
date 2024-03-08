@@ -1,79 +1,162 @@
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
-import React, { useState, useRef, useCallback, memo } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+// Importation des composants nécessaires depuis React et React Native
+import React, { useState, useCallback } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, FlatList, Modal } from 'react-native';
+import { ChevronLeft } from 'lucide-react-native'; // Icône pour revenir en arrière
+import { useNavigation } from '@react-navigation/native'; // Navigation
+import { Calendar, LocaleConfig } from 'react-native-calendars'; // Calendrier
+import countriesData from '../../pays.json'; // Données des pays
 
-export default function LoginScreen() {
+// Configuration locale pour le calendrier en français
+LocaleConfig.locales['fr'] = {
+  monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+  monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: 'Aujourd\'hui'
+};
+LocaleConfig.defaultLocale = 'fr';
+
+export default function CreateTripScreen() {
   const navigation = useNavigation();
-  const [title, setTitle] = useState("");
-  const [password, setPassword] = useState("");
-  const [isEmailValid, setIsEmailValid] = useState(false); // État pour suivre si l'adresse mail est valide
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const dispatch = useDispatch();
+  // État pour le formulaire, les suggestions, le chargement, l'affichage du calendrier et la recherche
+  const [formData, setFormData] = useState({ title: "", autocompleteInput: "", startDate: '', endDate: '', isSelecting: true });
+  const [suggestions, setSuggestions] = useState([]);
+  const [loadingState, setLoadingState] = useState({ isLoading: false, error: null });
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
+  // Fonction pour revenir à l'écran précédent
+const handlePress = () => navigation.goBack();
+
+// Mise à jour des données du formulaire
+const updateFormData = (key, value) => {
+  setFormData(currentFormData => ({ ...currentFormData, [key]: value }));
+};
+
+// Mise à jour des suggestions de pays basée sur l'entrée de l'utilisateur
+const updateSuggestions = (text) => {
+  updateFormData('autocompleteInput', text);
+  setIsSearching(!!text);
+  if (!text) {
+    setSuggestions([]);
+    return;
+  }
+  // Filtrer les pays basés sur le texte entré
+  setSuggestions(countriesData.pays.filter(country => country.toLowerCase().includes(text.toLowerCase())));
+};
+
+// Gestion de la sélection des jours dans le calendrier
+const onDayPress = (day) => {
+  const { startDate, isSelecting } = formData;
+  if (isSelecting || day.dateString < startDate) {
+    updateFormData('startDate', day.dateString);
+    updateFormData('endDate', '');
+    updateFormData('isSelecting', false);
+  } else {
+    updateFormData('endDate', day.dateString);
+    updateFormData('isSelecting', true);
+  }
+};
+
+
+  // Génération des dates marquées pour le calendrier
+  const generateMarkedDates = () => {
+    const { startDate, endDate } = formData;
+    let markedDates = {};
+    let currentDate = startDate;
+    if (startDate) markedDates[startDate] = { startingDay: true, color: 'green', textColor: 'white' };
+    while (currentDate < endDate) {
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+      currentDate = nextDate.toISOString().split('T')[0];
+      if (currentDate <= endDate) {
+        markedDates[currentDate] = currentDate === endDate ? { endingDay: true, color: 'green', textColor: 'white' } : { color: 'green', textColor: 'white' };
+      }
+    }
+    return markedDates;
+  };
+
+  // Sélection d'un pays dans la liste
+  const handleCountrySelect = (item) => {
+    updateFormData('autocompleteInput', item);
+    setSuggestions([]);
+    setIsSearching(false);
+    Keyboard.dismiss(); // Ferme le clavier
+  };
+
+  // Création du voyage (placeholder, logique à implémenter)
+  const handleCreateTrip = () => {
+    console.log('Voyage créé avec les données :', formData);
+  };
+
+  // Validation des dates sélectionnées (placeholder, logique à implémenter)
+  const handleValidateDates = () => {
+    console.log('Dates sélectionnées :', formData.startDate, formData.endDate);
+    setShowCalendar(false);
+  };
+
+  // Interface utilisateur
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <Pressable style={{ padding: 20, backgroundColor: "#fff" }}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.flex}>
+      <Pressable style={styles.pressable} onPress={handlePress}>
         <ChevronLeft style={styles.arrow} />
       </Pressable>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Créer un nouveau voyage</Text>
-
-          {/* Input Email */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              autoCapitalize="none"
-              value={title}
-              placeholder="Alger"
-              inputMode="text"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <Pressable style={styles.button}>
-              <Text style={styles.buttonText}>Créer un voyage</Text>
+          <TextInput value={formData.title} onChangeText={(text) => updateFormData('title', text)} placeholder="Ajoute un Titre à ton voyage" style={styles.input} />
+          <TextInput value={formData.autocompleteInput} onChangeText={updateSuggestions} placeholder="Choisis le pays" style={styles.inputList} />
+          {loadingState.isLoading && <Text>Chargement...</Text>}
+          {loadingState.error && <Text>Erreur: {loadingState.error}</Text>}
+          <FlatList data={suggestions} renderItem={({ item }) => (
+            <Pressable onPress={() => handleCountrySelect(item)} style={({ pressed }) => [styles.suggestionItem, pressed && styles.suggestionItemPressed]}>
+              <Text style={styles.suggestionItemText}>{item}</Text>
             </Pressable>
-          </View>
+          )} keyExtractor={(item) => item} style={styles.suggestionsList} />
+          {!isSearching && <Pressable style={styles.button} onPress={() => setShowCalendar(true)}><Text style={styles.buttonText}>Sélectionner les dates</Text></Pressable>}
+          {!isSearching && <Pressable style={styles.createTripButton} onPress={handleCreateTrip}><Text style={styles.createTripButtonText}>Créer le voyage</Text></Pressable>}
         </View>
       </TouchableWithoutFeedback>
+      <Modal visible={showCalendar} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}><Text style={styles.modalHeaderText}>Sélectionnez vos dates</Text></View>
+          <Calendar onDayPress={onDayPress} markingType={'period'} markedDates={generateMarkedDates()} enableSwipeMonths={true} style={styles.calendarStyle} />
+          <Pressable style={styles.validateButton} onPress={handleValidateDates}><Text style={styles.validateButtonText}>Valider</Text></Pressable>
+          <Pressable style={styles.closeButton} onPress={() => setShowCalendar(false)}><Text style={styles.closeButtonText}>Fermer</Text></Pressable>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
 
+
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1
+  },
+  pressable: {
+    padding: 20,
+    backgroundColor: "#fff"
+  },
+  arrow: {
+    color: "black",
+    marginLeft: 10,
+    marginTop: 20
+  },
   container: {
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
-    padding: 40,
-    textAlign: "center",
-    fontSize: 40,
+    paddingHorizontal: 40,
     marginBottom: 20,
-  },
-  arrow: {
-    color: "black",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    padding: 30,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    paddingBottom: 40,
+    textAlign: "center"
   },
   inputContainer: {
     width: "80%",
@@ -85,43 +168,33 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    color: "#000",
-    marginBottom: 20,
+    padding: 15,
+    marginBottom: 40,
     width: "100%",
   },
-  passwordInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  inputList: {
     backgroundColor: "#F2F4F5",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
-    marginBottom: 30,
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-  },
-  eyeIconContainer: {
-    padding: 10,
-  },
-  buttonContainer: {
+    padding: 15,
+    marginBottom: 2,
     width: "100%",
-    marginBottom: 20,
+  },
+  suggestionsList: {
+    Height: 400,
   },
   button: {
-    backgroundColor: "#F2A65A",
+    backgroundColor: '#F2A65A',
     borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    marginBottom:20,
+    justifyContent: 'center',
     paddingVertical: 12,
-    alignSelf: "center",
-    width: "60%",
-    elevation: 5, // ombre pour Android
-    shadowColor: "#000", // ombre pour iOS
+    alignSelf: 'center',
+    width: '100%',
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
@@ -130,74 +203,86 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 20
   },
-  or: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 40,
-  },
-  google: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
-    marginTop: 20,
-    borderColor: "gray",
-    borderWidth: 1,
-  },
-  googleIcon: {
-    marginRight: 10,
-    color: "#F2A65A",
-  },
-  google_text: {
-    color: "black",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-  facebook: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
-    marginTop: 20,
-    borderColor: "gray",
-    borderWidth: 1,
-  },
-  facebookIcon: {
-    marginRight: 10,
-    color: "#1877F2",
-  },
-  facebook_text: {
-    color: "black",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-  registerContainer: {
-    marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  registerText: {
-    fontWeight: "bold",
-    padding: 30,
-  },
-  registerButton: {
-    backgroundColor: "#F2A65A",
-    borderRadius: 15,
+  suggestionItem: {
+    backgroundColor: "#EEC170",
     paddingVertical: 12,
     paddingHorizontal: 20,
-    marginLeft: 10,
-    elevation: 5, // ombre pour Android
-    shadowColor: "#000", // ombre pour iOS
+    borderRadius: 10,
+    marginVertical: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  suggestionItemPressed: {
+    backgroundColor: "#E2E8F0",
+  },
+  suggestionItemText: {
+    color: "#334155",
+    fontSize: 16,
+  },
+  suggestionsList: {
+    maxHeight: 200,
+    width: "100%",
+  },
+  calendarStyle: {
+    paddingTop: -20,
+    width: 320,
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: 'gray',
+    height: 400
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F2F4F5',
+  },
+  modalHeader: {
+    width: '100%',
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalHeaderText: {
+    color: '#F2A65A',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#F2A65A',
+    borderRadius: 15,
+    padding: 12,
+    width: '60%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  createTripButton: {
+    backgroundColor: '#F2A65A',
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    alignSelf: 'center',
+    width: '100%',
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
@@ -205,8 +290,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
-  registerButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  createTripButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 20
+  },
+  validateButton: {
+    backgroundColor: '#F2A65A',
+    borderRadius: 15,
+    padding: 12,
+    width: '60%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    marginTop: 20,
+  },
+  validateButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
