@@ -31,7 +31,7 @@ export const userSlice = createSlice({
         state.value.selectedActivity = action.payload.activityId;
     },
     selectDay: (state, action) => {
-        state.value.selectedDay = action.payload.day
+        state.value.selectedDay = action.payload
     },
     addTrip: (state, action) => {
       state.value.trips.push(action.payload);
