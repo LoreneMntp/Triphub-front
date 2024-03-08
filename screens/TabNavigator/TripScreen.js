@@ -2,10 +2,11 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedback} from "react-native";
 import { useRoute } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteActivity, selectActivity, selectDay } from '../../reducers/users';
 
 //Lucide Icons
-import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, SquarePen, Trash2, Copy } from 'lucide-react-native';
+import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, Trash2, Copy } from 'lucide-react-native';
 
 //Moment
 import moment from 'moment'
@@ -29,9 +30,12 @@ export default function TripScreen({ navigation, route}) {
     const [popoverVisible, setPopoverVisible] = useState(false)
     const [modalCalendarVisible, setModalCalendarVisible] = useState(false)
     const [tripTimestamps, setTripTimestamps] = useState([])
+    const [updateRender, setUpdateRender] = useState(0)
 
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const tripsTable = useSelector((state) => state.user.value.trips)
+    const user = useSelector((state) => state.user.value.user)
+    const dispatch = useDispatch()
 
     const tripData = tripsTable.filter((e) => e._id === selectedTrip)
 
@@ -51,6 +55,8 @@ export default function TripScreen({ navigation, route}) {
     const startDate = moment(tripData[0].start_at)
     const endDate = moment(tripData[0].end_at)
     tripDuration = Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24)) + 1
+    //console.log(tripData[0].createdBy)
+    //console.log(user)
 
     //Function to Display Activities
     const displayActivityByDay = () => {
@@ -62,6 +68,7 @@ export default function TripScreen({ navigation, route}) {
             tempArray.push(timeStampOfDay)
         }
         setTripTimestamps(tempArray)
+
         //Group the activities based on their plannedAT
         const groupedData = allActivitiesForTrip.reduce((acc, item) => {
             const date = moment(item.plannedAt).format('YYYY-MM-DD')
@@ -69,8 +76,6 @@ export default function TripScreen({ navigation, route}) {
             acc[date].push(item)
             return acc
         }, {})
-
-        //setGroupedActivities(groupedData)
         setLoading(false)
 
         //Display the activities based on the selected day
@@ -88,9 +93,33 @@ export default function TripScreen({ navigation, route}) {
 
     useEffect(()=>{
         displayActivityByDay()
-        //console.log(daysTable)
-    }, [selectedDay])
+    }, [selectedDay, tripsTable])
 
+    const handleDeleteActivity = (id) => {
+        const bodyData = {
+            tripId: tripData[0]._id,
+            activityId: id,
+            token: user.token
+        }
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/deleteActivity/`
+        fetch(url, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(bodyData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.result)
+            {
+                dispatch(deleteActivity(id))
+            }
+        })
+    }
+
+    const handleSelectActivity = (id) => {
+        dispatch(selectActivity({activityId: id}))
+        navigation.navigate('ShowActivity')
+    }
 
     let activities = []
     if (loading) {
@@ -110,12 +139,14 @@ export default function TripScreen({ navigation, route}) {
                 <View key={i}>
                     <View className='flex-row items-center justify-between mb-1 ml-2 mt-2'  style={{width: '90%'}}>
                         <View title='Activity-content' className='justify-around'>
-                            <Text className='font-bold'>{data.title}</Text>
+                            <Pressable onPress={() => handleSelectActivity(data._id)}>
+                                <Text className='font-bold'>{data.title}</Text>
+                            </Pressable>
                             <Text>Heure : {moment(data.plannedAt).format('HH:mm')}</Text>
                             <Text>Adresse : {data.address}</Text>
                             <Text>Notes : {'\n'}{notes}</Text>
                         </View>
-                        <Pressable>
+                        <Pressable onPress={() => handleDeleteActivity(data._id)}>
                             <Trash2 size={20} color={'black'}/>
                         </Pressable>
                     </View>
@@ -148,6 +179,11 @@ export default function TripScreen({ navigation, route}) {
         const index = tripTimestamps.findIndex((element) => element === day.timestamp)
         setSelectedDay(index + 1)
         setModalCalendarVisible(false)
+    }
+
+    const handleAddActivity = () => {
+        dispatch(selectDay({day: selectedDay}))
+        navigation.navigate('AddActivity')
     }
 
     return (
@@ -208,8 +244,8 @@ export default function TripScreen({ navigation, route}) {
                 </View>
             </View>
             <View title='invite-bar' className='items-center flex-row just ml-10'>
+                <Pressable className='border-2 border-black p-2 rounded-lg flex-row justify-center items-center' onPress={() => setModalInviteVisible(true)}>
                 <UserPlus size={30} color={'black'} className='mr-4 ' fill={'black'}/>
-                <Pressable className='border-2 border-black p-2 rounded-lg' onPress={() => setModalInviteVisible(true)}>
                     <Text>Inviter</Text>
                 </Pressable>
             </View>
@@ -222,7 +258,7 @@ export default function TripScreen({ navigation, route}) {
             <View title='calendar' className='items-center mt-6'>
                 <Text className='text-lg'>Emploi du Temps</Text>
                 <View title='calendar-view' className='border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl' style={{width: '80%', height: 300}}>
-                    <View title='calendar-bar' className='flex-row bg-slate-300 w-full h-10 p-2 mb-2'>
+                    <View title='calendar-bar' className='flex-row bg-slate-300 w-full h-10 p-2 mb-2 items-center'>
                         <View title='calender-left ' className='mr-8'>
                             {selectedDay > 1 ? 
                             <> 
@@ -232,13 +268,13 @@ export default function TripScreen({ navigation, route}) {
                                 </Pressable>
                             </> : <View style={{width: 76}}></View>}
                         </View>
-                        <View title='calendar-center' className='flex-row items-center mr-8'>
-                            <View title='selected-day' className='flex-row items-center bg-white h-8 pr-2 pl-2 border-slate-100 border-2 rounded-md'>
-                                <Pressable onPress={() => setModalCalendarVisible(true)} className='flex-row items-center'>
+                        <View title='calendar-center' className='flex-row items-center bg-white h-8 pr-2 pl-2 border-slate-100 border-2 rounded-md mr-8'>
+                            <Pressable onPress={() => setModalCalendarVisible(true)} className='flex-row items-center'>
+                                <View title='selected-day' className='flex-row items-center'>
                                     <Text className='mr-2'>Jour {selectedDay}</Text>
                                     <CalendarDays size={25} color={'black'}/>
-                                </Pressable>
-                            </View>
+                                </View>
+                            </Pressable>
                         </View>
                         <View title='calendar-right' >
                             {selectedDay < tripDuration ?
@@ -253,7 +289,7 @@ export default function TripScreen({ navigation, route}) {
                     <ScrollView title='activity-container'>
                         {activities}
                         <View title='activity-absent' className=' items-center'>
-                        <Pressable onPress={() => navigation.navigate('AddActivity')}>
+                        <Pressable onPress={() => handleAddActivity()}>
                             <PlusCircle size={100} color={'#F2A65A'}/>
                         </Pressable>
                     </View>

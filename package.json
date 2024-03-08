@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.2.3",
+    "@react-native-community/datetimepicker": "7.6.1",
     "@react-native-community/netinfo": "^11.3.1",
     "@react-navigation/bottom-tabs": "6",
     "@react-navigation/native": "6",
@@ -39,6 +40,7 @@
     "react-native-file-viewer": "^2.1.5",
     "react-native-fs": "^2.20.0",
     "react-native-modal": "^13.0.1",
+    "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-openanything": "^0.0.6",
     "react-native-pdf": "^6.7.4",
     "react-native-pdf-reader": "^1.0.2",
