@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -19,7 +19,9 @@ import TripScreen from "./screens/TabNavigator/TripScreen";
 import HelpScreen from "./screens/TabNavigator/HelpScreen";
 import DocumentsScreen from "./screens/TabNavigator/DocumentsScreen";
 import { FileText, Plane, LifeBuoy } from "lucide-react-native";
-
+import HeaderSettingsButton from "./components/HeaderSettingsButton";
+import HeaderLogoutButton from "./components/HeaderLogoutButton";
+import HeaderHomeButton from "./components/HeaderHomeButton";
 const store = configureStore({
   reducer: { user: user },
 });
@@ -45,6 +47,11 @@ const TabNavigator = () => {
         tabBarActiveTintColor: "#F58549",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
+        headerTitle: "",
+        headerShown: true,
+        headerTintColor: "#F58549",
+        headerRight: () => <HeaderSettingsButton onTabNavigator={true} />,
+        headerLeft: () => <HeaderHomeButton onTabNavigator={true} />,
       })}
     >
       <Tab.Screen name="Trip" component={TripScreen} />
@@ -59,18 +66,80 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator
-          screenOptions={{ headerShown: false, headerBackTitleVisible: false }}
+          screenOptions={{
+            headerShown: false,
+            headerBackTitleVisible: false,
+            headerTitle: "",
+          }}
         >
           <Stack.Screen name="Landing" component={LandingScreen} />
           <Stack.Screen name="LandingFinal" component={LandingFinalScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="AddActivity" component={AddActivityScreen} />
-          <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
-          <Stack.Screen name="ViewDocuments" component={ViewDocumentsScreen} />
-          <Stack.Screen name="ShowActivity" component={ShowActivityScreen} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+              headerRight: () => <HeaderSettingsButton />,
+              headerLeft: () => <HeaderLogoutButton />,
+            }}
+          />
+          <Stack.Screen
+            name="AddActivity"
+            component={AddActivityScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="CreateTrip"
+            component={CreateTripScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="ViewDocuments"
+            component={ViewDocumentsScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="ShowActivity"
+            component={ShowActivityScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
           <Stack.Screen
             name="TabNavigator"
             component={TabNavigator}
