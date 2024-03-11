@@ -1,20 +1,31 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
-import { login } from '../../reducers/users';
-import { Chrome, Facebook } from 'lucide-react-native';
-import { ChevronLeft } from 'lucide-react-native';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { login } from "../../reducers/users";
+import { Chrome, Facebook } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 
-const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/;
+const EMAIL_REGEX =
+  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/;
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -66,7 +77,6 @@ const LoginScreen = () => {
     }
   }
 
-
   const handleEmailChange = (text) => {
     setEmail(text);
     setIsEmailValid(EMAIL_REGEX.test(text));
@@ -77,7 +87,7 @@ const LoginScreen = () => {
   };
 
   const handleNavigateToRegister = () => {
-    navigation.navigate('Register');
+    navigation.navigate("Register");
   };
 
   const handlePress = () => {
@@ -85,10 +95,10 @@ const LoginScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <Pressable style={{ paddingHorizontal: 30, paddingTop: 40, backgroundColor: '#fff' }} onPress={handlePress}>
-        <ChevronLeft style={styles.arrow} />
-      </Pressable>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Connexion</Text>
@@ -100,7 +110,7 @@ const LoginScreen = () => {
               placeholder="Email"
               onChangeText={handleEmailChange}
               inputMode="email"
-              style={[styles.input, { color: isEmailValid ? 'black' : 'grey' }]}
+              style={[styles.input, { color: isEmailValid ? "black" : "grey" }]}
             />
           </View>
 
@@ -114,8 +124,15 @@ const LoginScreen = () => {
                 secureTextEntry={!isPasswordVisible}
                 style={styles.passwordInput}
               />
-              <Pressable onPress={togglePasswordVisibility} style={styles.eyeIconContainer}>
-                <FontAwesome5 name={isPasswordVisible ? 'eye-slash' : 'eye'} size={14} color="grey" />
+              <Pressable
+                onPress={togglePasswordVisibility}
+                style={styles.eyeIconContainer}
+              >
+                <FontAwesome5
+                  name={isPasswordVisible ? "eye-slash" : "eye"}
+                  size={14}
+                  color="grey"
+                />
               </Pressable>
             </View>
           </View>
@@ -140,7 +157,10 @@ const LoginScreen = () => {
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Pas encore de compte ?</Text>
-            <Pressable onPress={handleNavigateToRegister} style={styles.registerButton}>
+            <Pressable
+              onPress={handleNavigateToRegister}
+              style={styles.registerButton}
+            >
               <Text style={styles.registerButtonText}>S'inscrire</Text>
             </Pressable>
           </View>
@@ -153,43 +173,43 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    backgroundColor: "#fff",
     paddingHorizontal: 40,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 40,
     marginBottom: 20,
-
   },
   arrow: {
-    color: 'black',
-    paddingTop: 40
+    color: "black",
+    paddingTop: 40,
   },
   title: {
     fontSize: 40,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    paddingTop: 20,
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     maxWidth: 500,
     marginTop: 20,
   },
   input: {
-    backgroundColor: '#F2F4F5',
-    borderColor: '#ccc',
+    backgroundColor: "#F2F4F5",
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 15,
-    color: '#000',
+    color: "#000",
     marginBottom: 20,
-    width: '100%',
+    width: "100%",
   },
   passwordInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    borderColor: '#ccc',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F2F4F5",
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
     marginBottom: 30,
@@ -203,19 +223,19 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   buttonContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#F2A65A',
+    backgroundColor: "#F2A65A",
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
-    alignSelf: 'center',
-    width: '100%',
+    alignSelf: "center",
+    width: "100%",
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
@@ -224,75 +244,75 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 20
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 20,
   },
   or: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
     marginTop: 40,
   },
   google: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
     borderRadius: 15,
     padding: 10,
     marginTop: 20,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
   },
   googleIcon: {
     marginRight: 10,
-    color: '#F2A65A',
+    color: "#F2A65A",
   },
   google_text: {
-    color: 'black',
+    color: "black",
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   facebook: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
     borderRadius: 15,
     padding: 10,
     marginTop: 20,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
   },
   facebookIcon: {
     marginRight: 10,
-    color: '#1877F2',
+    color: "#1877F2",
   },
   facebook_text: {
-    color: 'black',
+    color: "black",
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerContainer: {
     marginTop: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   registerText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     padding: 30,
   },
   registerButton: {
-    backgroundColor: '#F2A65A',
+    backgroundColor: "#F2A65A",
     borderRadius: 15,
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginLeft: 10,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 3,
@@ -301,8 +321,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   registerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

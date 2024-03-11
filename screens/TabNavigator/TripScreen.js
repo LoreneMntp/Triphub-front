@@ -15,6 +15,7 @@ import {
   deleteActivity,
   selectActivity,
   selectDay,
+  initTrips,
 } from "../../reducers/users";
 
 //Lucide Icons
