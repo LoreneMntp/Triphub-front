@@ -141,19 +141,20 @@ export default function TripScreen({ navigation, route }) {
       });
   };
 
-  const handleSelectActivity = (id) => {
-    dispatch(selectActivity({ activityId: id }));
-    navigation.navigate("ShowActivity");
-  };
+    const handleSelectActivity = (id) => {
+        const foundActivity = tripData[0].activities.find(activity => activity._id === id)
+        console.log(foundActivity)
+        dispatch(selectActivity({activityId: id, content: foundActivity}))
+        navigation.navigate('ShowActivity')
+    }
 
-  let activities = [];
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Chargement...</Text>
-      </View>
-    );
-  }
+    let activities = []
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Chargement...</Text>
+            </View>)
+    }
 
   if (activityForDay) {
     const sortedArray = activityForDay.sort((a, b) => {
