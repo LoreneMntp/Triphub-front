@@ -120,7 +120,7 @@ export default function TripScreen({ navigation, route}) {
 
     const handleSelectActivity = (id) => {
         const foundActivity = tripData[0].activities.find(activity => activity._id === id)
-        //console.log(foundActivity)
+        console.log(foundActivity)
         dispatch(selectActivity({activityId: id, content: foundActivity}))
         navigation.navigate('ShowActivity')
     }
