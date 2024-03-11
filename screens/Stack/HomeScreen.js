@@ -385,16 +385,7 @@ export default function HomeScreen({ navigation }) {
         title="Header"
         className="flex-row items-center justify-around w-full mb-6"
       >
-        <Pressable title="LogoutBtn" onPress={() => handleLogout()}>
-          <LogOut color={"black"} size={30} />
-        </Pressable>
         <Text className="text-3xl font-bold">Bonjour {user.user.username}</Text>
-        <Pressable
-          title="Settings"
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <Settings color={"black"} size={30} />
-        </Pressable>
       </View>
       <View
         title="CreateJoinTrips"
