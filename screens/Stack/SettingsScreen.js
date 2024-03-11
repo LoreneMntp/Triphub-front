@@ -14,26 +14,26 @@ import {
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { X } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SettingsScreen() {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const navigation = useNavigation();
   const [modalInfo, setModalInfo] = useState(false);
   const [modalDeleteAccount, setModalDeleteAccount] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false); // État pour suivre si l'utilisateur est en train de changer de mot de passe
   const [inputValue1, setInputValue1] = useState(""); // Ancien mot de passe
   const [inputValue2, setInputValue2] = useState(""); // Nouveau mot de passe
   const [inputValue3, setInputValue3] = useState(""); // Confirmer le nouveau mot de passe
+  const [isPasswordVisible1, setIsPasswordVisible1] = useState(false);
+  const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
+  const [isPasswordVisible3, setIsPasswordVisible3] = useState(false);
 
   // récupérer données utilisateurs
   const user = useSelector((state) => state.user.value.user);
-  console.log(user);
 
   useEffect(() => {
     // Vérifie si l'utilisateur est défini
     if (user) {
-      console.log("Username:", user.username);
-      console.log("Email:", user.email);
-      console.log("Token:", user.token);
     }
   }, [user]);
 
@@ -49,8 +49,16 @@ export default function SettingsScreen() {
   };
 
   // Rend le password invisible
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
+  const togglePasswordVisibility1 = () => {
+    setIsPasswordVisible1(!isPasswordVisible1);
+  };
+
+  const togglePasswordVisibility2 = () => {
+    setIsPasswordVisible2(!isPasswordVisible2);
+  };
+
+  const togglePasswordVisibility3 = () => {
+    setIsPasswordVisible3(!isPasswordVisible3);
   };
 
   // Ferme la modal
@@ -125,14 +133,15 @@ export default function SettingsScreen() {
           }),
         }
       );
-      console.log(user.token);
 
       const data = await response.json();
       if (data.result) {
         // Afficher un message de confirmation
         Alert.alert("Succès", "Votre compte a été supprimé avec succès.");
+
+        navigation.navigate("Landing");
       } else {
-        // Afficher un message d'erreur si la suppression marche pas
+        // Afficher un message d'erreur si la suppression échoue
         Alert.alert(
           "Erreur",
           `Erreur lors de la suppression du compte: ${data.error}`
@@ -162,9 +171,7 @@ export default function SettingsScreen() {
   };
 
   // Modifie la couleur à l'appui sur le bouton
-  const logPress = (pressType) => {
-    console.log(pressType);
-  };
+  const logPress = (pressType) => {};
 
   return (
     <View style={styles.container}>
@@ -255,14 +262,14 @@ export default function SettingsScreen() {
                         value={inputValue1}
                         placeholder="Ancien mot de passe"
                         placeholderTextColor="grey"
-                        secureTextEntry={!isPasswordVisible}
+                        secureTextEntry={!isPasswordVisible1}
                         style={styles.input}
                       />
 
                       <Pressable
                         onPress={() => {
                           logPress("onPress");
-                          togglePasswordVisibility();
+                          togglePasswordVisibility1();
                         }}
                         onPressIn={() => logPress("onPressIn")}
                         onPressOut={() => logPress("onPressOut")}
@@ -273,7 +280,7 @@ export default function SettingsScreen() {
                         ]}
                       >
                         <FontAwesome5
-                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          name={isPasswordVisible1 ? "eye-slash" : "eye"}
                           size={14}
                           color="grey"
                         />
@@ -285,14 +292,14 @@ export default function SettingsScreen() {
                         value={inputValue2}
                         placeholder="Nouveau mot de passe"
                         placeholderTextColor="grey"
-                        secureTextEntry={!isPasswordVisible}
+                        secureTextEntry={!isPasswordVisible2}
                       />
                       <Pressable
-                        onPress={togglePasswordVisibility}
+                        onPress={togglePasswordVisibility2}
                         style={styles.eyeIconContainer}
                       >
                         <FontAwesome5
-                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          name={isPasswordVisible2 ? "eye-slash" : "eye"}
                           size={14}
                           color="grey"
                         />
@@ -304,14 +311,14 @@ export default function SettingsScreen() {
                         value={inputValue3}
                         placeholder="Confirmer le nouveau mot de passe"
                         placeholderTextColor="grey"
-                        secureTextEntry={!isPasswordVisible}
+                        secureTextEntry={!isPasswordVisible3}
                       />
                       <Pressable
-                        onPress={togglePasswordVisibility}
+                        onPress={togglePasswordVisibility3}
                         style={styles.eyeIconContainer}
                       >
                         <FontAwesome5
-                          name={isPasswordVisible ? "eye-slash" : "eye"}
+                          name={isPasswordVisible3 ? "eye-slash" : "eye"}
                           size={14}
                           color="grey"
                         />
