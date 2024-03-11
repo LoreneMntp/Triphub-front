@@ -22,6 +22,11 @@ export default function AddActivityScreen( {navigation}) {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
     const [hourSelected, setHourSelected] = useState(false)
     const [date, setDate] = useState(null)
+    const [showAlertTitle, setShowAlertTitle] = useState(false)
+    const [showAlertHour, setShowAlertHour] = useState(false)
+    const [showAlertAddress, setShowAlertAddress] = useState(false)
+
+    const allFieldsFilled = title !== '' && hour !== 'Heure' && address !== ''
 
     const dispatch = useDispatch()
 
@@ -62,7 +67,7 @@ export default function AddActivityScreen( {navigation}) {
         return (
             <View key={i} className='flex-row w-full items-center mb-4'>
                 <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] rounded-lg pl-4 w-5/6 mr-4'
-                placeholder={`Note ${i + 1}`}
+                placeholder={`Note ${i + 1} (opt.)`}
                 onChangeText={(text) => handleInputChange(text, i)}
                 value={value}
                 />
@@ -74,29 +79,52 @@ export default function AddActivityScreen( {navigation}) {
     })
 
     const handleSaveActivity = () => {
-        const bodyData = {
-            tripId: selectedTrip,
-            title, 
-            plannedAt: date,
-            token,
-            note,
-            address
-        }
-        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/addActivity`
-        fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(bodyData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            //console.log('reponse addActivity', data)
-            if(data.result) {
-                console.log(bodyData)
-                dispatch(initTrips(data.data))
-                navigation.navigate('TabNavigator')
+        if(allFieldsFilled) {
+            const bodyData = {
+                tripId: selectedTrip,
+                title, 
+                plannedAt: date,
+                token,
+                note,
+                address
             }
-        })
+            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/addActivity`
+            fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(bodyData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                //console.log('reponse addActivity', data)
+                if(data.result) {
+                    console.log(bodyData)
+                    dispatch(initTrips(data.data))
+                    navigation.navigate('TabNavigator')
+                }
+            })
+        } else {
+            if(title === '') {
+                setShowAlertTitle(true)
+            }
+            else {
+                setShowAlertTitle(false)
+            }
+
+            if(hour === 'Heure') {
+                setShowAlertHour(true)
+            }
+            else {
+                setShowAlertHour(false)
+            }
+
+            if(address === '') {
+                setShowAlertAddress(true)
+            }
+            else {
+                setShowAlertAddress(false)
+            }
+        }
     }
 
     return (
@@ -113,23 +141,32 @@ export default function AddActivityScreen( {navigation}) {
                 >
             <ScrollView className='w-4/6 h-5/6'>
                 <View title='Input-container' className='justify-center items-center mt-10'>
-                    <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
-                    placeholder='Titre' 
-                    onChangeText={(value) => setTitle(value)}
-                    value={title}/>
-                    <Pressable className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8 justify-center' onPress={showDatePicker}>
-                        {!hourSelected ? <Text className='text-[#8e8e8e]'>Heure</Text> : <Text>{hour}</Text> }
-                    </Pressable>
-                    <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
-                    mode='time'
-                    date={new Date(moment(selectedDate))}
-                    onConfirm={handleConfirm}
-                    onCancel={hideDatePicker}/>
-                    <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
-                    placeholder='Adresse'
-                    onChangeText={(value) => setAddress(value)}
-                    value={address}/>
+                    <View className='w-full'>
+                        {showAlertTitle && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
+                        <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
+                        placeholder='Titre *' 
+                        onChangeText={(value) => setTitle(value)}
+                        value={title}/>
+                        {showAlertHour && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
+                    </View>
+                    <View className='w-full'>
+                        <Pressable className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8 justify-center' onPress={showDatePicker}>
+                            {!hourSelected ? <Text className='text-[#8e8e8e]'>Heure *</Text> : <Text>{hour}</Text> }
+                        </Pressable>
+                        <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode='time'
+                        date={new Date(moment(selectedDate))}
+                        onConfirm={handleConfirm}
+                        onCancel={hideDatePicker}/>
+                        {showAlertAddress && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
+                    </View>
+                    <View className='w-full'>
+                        <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
+                        placeholder='Adresse *'
+                        onChangeText={(value) => setAddress(value)}
+                        value={address}/>
+                    </View>
                     {displayNotes}
                 </View>
                 <View title='New-Note' className='items-center'>

@@ -4,6 +4,7 @@ import { View, Text, Pressable, Image, ScrollView, Modal, TouchableWithoutFeedba
 import { useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteActivity, selectActivity, selectDay } from '../../reducers/users';
+import { useCallback, useEffect, useState } from 'react';
 
 //Lucide Icons
 import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, Trash2, Copy } from 'lucide-react-native';
@@ -11,7 +12,6 @@ import { UserPlus, ArrowLeft, ArrowRight, CalendarDays, PlusCircle, Trash2, Copy
 //Moment
 import moment from 'moment'
 import 'moment/locale/fr'
-import { useCallback, useEffect, useState } from 'react';
 moment.locale('fr')
 
 //Invite Modal Clipboard/Popover
@@ -119,7 +119,9 @@ export default function TripScreen({ navigation, route}) {
     }
 
     const handleSelectActivity = (id) => {
-        dispatch(selectActivity({activityId: id}))
+        const foundActivity = tripData[0].activities.find(activity => activity._id === id)
+        //console.log(foundActivity)
+        dispatch(selectActivity({activityId: id, content: foundActivity}))
         navigation.navigate('ShowActivity')
     }
 
