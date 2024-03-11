@@ -118,7 +118,7 @@ export default function DocumentsScreen() {
 
   const renderDocumentItem = ({ item }) => (
     <View style={styles.documentItem}>
-      <Text style={styles.documentText}>{item.fileName}</Text>
+      <Text style={styles.documentText}>{item.fileName.substring(0, 20)}</Text>
       <View style={styles.iconContainer}>
         <ButtonOpenPDF fileName={item.fileName} url={item.link_doc} />
         <Pressable onPress={() => handleDeleteDocument(item._id)}>
@@ -204,7 +204,7 @@ export default function DocumentsScreen() {
               (billet) =>
                 billet.category === "others" &&
                 billet.serial_phone === installationId
-            )} // Utilisez mockData directement ici
+            )}
             keyExtractor={(item) => item._id}
             renderItem={renderDocumentItem}
           />
@@ -289,5 +289,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     width: 100,
+    gap: 6,
   },
 });

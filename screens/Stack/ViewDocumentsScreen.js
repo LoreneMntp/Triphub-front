@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, Pressable } from "react-native";
 import PDFReader from "rn-pdf-reader-js";
 import * as FileSystem from "expo-file-system";
 import PdfRendererView from "react-native-pdf-renderer";
-export default function ViewDocumentsScreen({ route }) {
+import { ArrowLeft } from "lucide-react-native";
+export default function ViewDocumentsScreen({ route, navigation }) {
   const { fileName } = route.params;
   const [pdfUri, setPdfUri] = useState(null);
   console.log("pdfURI", pdfUri);
@@ -24,6 +25,20 @@ export default function ViewDocumentsScreen({ route }) {
 
   return (
     <View style={{ flex: 1 }}>
+      <Pressable
+        style={{
+          position: "absolute",
+          top: Platform.OS === "ios" ? 80 : 20,
+          right: 30,
+          zIndex: 999,
+          backgroundColor: "#EEC170",
+          padding: 10,
+          borderRadius: 50,
+        }}
+        onPress={() => navigation.goBack()}
+      >
+        <ArrowLeft color="white" strokeWidth={3} />
+      </Pressable>
       {pdfUri && (
         <PDFReader
           source={{
