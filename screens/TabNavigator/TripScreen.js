@@ -20,6 +20,8 @@ import Popover, { PopoverMode, PopoverPlacement } from 'react-native-popover-vie
 import {Calendar, CalendarUtils} from 'react-native-calendars';
 import { element } from 'prop-types';
 
+import * as ImagePicker from 'expo-image-picker'
+
 export default function TripScreen({ navigation, route}) {
 
     const [activityPresent, setActivityPresent] = useState(false)
@@ -30,6 +32,7 @@ export default function TripScreen({ navigation, route}) {
     const [popoverVisible, setPopoverVisible] = useState(false)
     const [modalCalendarVisible, setModalCalendarVisible] = useState(false)
     const [tripTimestamps, setTripTimestamps] = useState([])
+    const [imageUri, setImageUri] = useState(null)
 
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const tripsTable = useSelector((state) => state.user.value.trips)
@@ -189,6 +192,43 @@ export default function TripScreen({ navigation, route}) {
         navigation.navigate('AddActivity')
     }
 
+    const handleSelectImage = async () => {
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (permission.granted === false) {
+            return;
+        }
+        
+        const pickerResult = await ImagePicker.launchImageLibraryAsync()
+        if (pickerResult.canceled === true) {
+            return;
+        }
+        
+        const formData = new FormData()
+
+        formData.append('photoFromFront', {
+            uri: pickerResult.assets[0].uri,
+            name: pickerResult.assets[0].fileName,
+            type: pickerResult.assets[0].mimeType,
+        })
+        formData.append('tripId', selectedTrip)
+
+        //console.log('uri', pickerResult.assets[0].uri)
+        //console.log('name', pickerResult.assets[0].fileName)
+        //console.log('type', pickerResult.assets[0].mimeType)
+
+        //Insert the fetch to backend
+        const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/uploadImage/`
+        fetch(url, {
+            method: 'PUT',
+            body: formData,
+            headers: {'Content-Type':'multipart/form-data'}
+        })
+        .then ((response) => response.json())
+        .then((data) => {
+            console.log(data)
+        })
+    }
+
     return (
         <SafeAreaView className='flex-1 bg-white'>
             <Modal title="Invite Modal" visible={modalInviteVisible} animationType='fade' transparent>
@@ -253,8 +293,8 @@ export default function TripScreen({ navigation, route}) {
                 </Pressable>
             </View>
             <View title='image-view' className='items-center mt-4'>
-                <Image source={{uri: tripData[0].background_url}} style={{width: '75%', height: 175}}/>
-                <Pressable className='bg-[#F2A65A] w-16 h-8 items-center justify-center rounded-lg shadow-md shadow-black mt-2' style={{position: 'absolute', right: '15%'}}>
+                <Image source={tripData[0].background_url ? {uri: tripData[0].background_url} : require('../../assets/palm-tree-icon.jpg')} style={{width: '75%', height: 175}}/>
+                <Pressable className='bg-[#F2A65A] w-16 h-8 items-center justify-center rounded-lg shadow-md shadow-black mt-2' style={{position: 'absolute', right: '15%'}} onPress={handleSelectImage}>
                     <Text className='text-white'>Choisir</Text>
                 </Pressable>
             </View>
