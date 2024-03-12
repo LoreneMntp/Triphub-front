@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     bottom: "33%",
     width: "auto",
-    elevation: 5,
     shadowColor: "#000",
     shadowOffset: {
       width: 2,
