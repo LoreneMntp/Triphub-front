@@ -331,6 +331,7 @@ export default function TripScreen({ navigation, route }) {
         visible={modalInviteVisible}
         animationType="fade"
         transparent
+        className="rounded-xl shadow-2xl"
       >
         <View className="flex-1 justify-center items-center">
           <TouchableWithoutFeedback
@@ -338,22 +339,19 @@ export default function TripScreen({ navigation, route }) {
           >
             <View
               title="Background opaque"
-              className="bg-slate-400 absolute top-0 left-0 w-full h-full opacity-50"
+              className="bg-gray-700 absolute top-0 left-0 w-full h-full opacity-50"
             ></View>
           </TouchableWithoutFeedback>
 
           <View
             title="Centered view"
-            className="bg-white w-5/6 h-2/6 pt-20 items-center"
+            className="bg-white w-5/6 h-2/6 pt-20 items-center rounded-xl shadow-2xl"
           >
-            <Text className="text-center pr-4 pl-4">
+            <Text className="text-center pr-4 pl-4 text-gray-900 text-base">
               Copiez ce lien, et envoyez le à vos proches pour qu'ils rejoignent
               votre voyage !
             </Text>
-            <View className="flex-row items-center justify-center mt-6">
-              <Text className="font-bold  items-center mr-4" selectable={true}>
-                {tripData[0].invitation_link}
-              </Text>
+            <View className="flex-col items-center justify-center mt-6">
               <Popover
                 isVisible={popoverVisible}
                 placement={PopoverPlacement.TOP}
@@ -364,15 +362,20 @@ export default function TripScreen({ navigation, route }) {
                       copyToClipboard();
                       showPopover();
                     }}
-                    className="flex-row items-center border-2 border-slate-300 p-2"
+                    className="flex-row items-center border-2 border-slate-600 p-2 rounded-xl"
                   >
-                    <Copy size={30} color={"black"} className="mr-2" />
-                    <Text>Copier</Text>
+                    <Text
+                      className="font-bold  items-center  text-orange-400 text-3xl"
+                      selectable={true}
+                    >
+                      {tripData[0].invitation_link}
+                    </Text>
+                    <Copy size={30} color={"rgb(71 85 105)"} className="ml-2" />
                   </Pressable>
                 }
-                animationConfig={{ duration: 1000, timing: "linear" }}
+                animationConfig={{ duration: 800, timing: "linear" }}
               >
-                <Text>Lien copié !</Text>
+                <Text className="text-slate-900 p-2">Lien copié !</Text>
               </Popover>
             </View>
           </View>

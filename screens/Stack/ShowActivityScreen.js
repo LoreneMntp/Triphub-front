@@ -1,63 +1,142 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
-import {View, Text, Pressable} from "react-native";
-import { useDispatch, useSelector } from 'react-redux';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, Pressable } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import * as Notifications from "expo-notifications";
 
 //Moment
-import moment from 'moment'
-import 'moment/locale/fr'
-moment.locale('fr')
+import moment from "moment";
+import "moment/locale/fr";
+moment.locale("fr");
 
-import { SquarePen } from 'lucide-react-native';
+import { Clock, SquarePen, MapPin } from "lucide-react-native";
 
-import { selectDay } from '../../reducers/users';
+import { selectDay } from "../../reducers/users";
 
-export default function ShowActivityScreen({navigation}) {
-    const activity = useSelector((state) => state.user.value.selectedActivity)
-    const selectedDay = useSelector((state) => state.user.value.selectedDay.day)
-    const selectedDate = useSelector((state) => state.user.value.selectedDay.date)
-    const dispatch = useDispatch()
+export default function ShowActivityScreen({ navigation }) {
+  const activity = useSelector((state) => state.user.value.selectedActivity);
+  const selectedDay = useSelector((state) => state.user.value.selectedDay.day);
+  const selectedDate = useSelector(
+    (state) => state.user.value.selectedDay.date
+  );
+  const dispatch = useDispatch();
 
-    //console.log('selectedDay', selectedDay)
-    //console.log('selectedDate', selectedDate)
-    //console.log(activity.content)
-
-    const notes = activity.content.notes.map((data, i) => {
-        return (
-            <View key={i}>
-                <Text className='mb-4 text-base italic'>• {data}</Text>
-            </View>
-        )
-    })
-
-    const handleEditActivity = () => {
-        dispatch(
-            selectDay({ day: selectedDay, date: selectedDate })
-          );
-        navigation.navigate('EditActivity')
+  const openReminders = async () => {
+    const url = "App-Prefs:REMINDERS";
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.log("L'application Rappels n'est pas installée");
     }
-    
-    return (
-        <SafeAreaView className='flex-1 items-center'>
-            <Text className='text-3xl mt-10 items-center'>Activité</Text>
-            <View title='container' className='border-slate-300 border-2 w-5/6 h-4/6 mt-10 p-4'>
-                <Pressable className='mb-4 items-end' onPress={() => handleEditActivity()}>
-                    <SquarePen size={20} color={'black'}/>
-                </Pressable>
-                <Text className='text-xl text-center mb-10 font-semibold'>{activity.content.title}</Text>
-                <View className='flex-row mb-6 justify-between'>
-                    <Text className='text-lg'>Heure </Text>
-                    <Text className='text-lg'>{moment(activity.content.plannedAt).format('LT')}</Text>
-                </View>
-                <View className='flex-row mb-20 justify-between'>
-                    <Text className='text-lg'>Adresse </Text>
-                    <Text className='text-lg'>{activity.content.address}</Text>
-                </View>
-                <View title='note-container mb-6'>
-                    <Text className='text-lg'>Notes</Text>
-                    {notes}
-                </View>
-            </View>
+  };
 
-        </SafeAreaView>
+  //console.log('selectedDay', selectedDay)
+  //console.log('selectedDate', selectedDate)
+  //console.log(activity.content)
+
+  const addNotification = async (minBeforeActivity) => {
+    //console.log("addNotification");
+
+    const notificationTime = moment(activity.content.plannedAt).subtract(
+      minBeforeActivity,
+      "minutes"
     );
+
+    //verif si l'heure de l'activité est déjà passée
+
+    if (moment().isAfter(notificationTime)) {
+      alert("L'heure de l'activité est déjà passée");
+      return;
+    }
+
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission to send notifications denied");
+      return;
+    }
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Rappel",
+        body: `Rappel pour l'activité ${activity.content.title} à ${moment(
+          activity.content.plannedAt
+        ).format("LT")}`,
+      },
+      trigger: notificationTime.toDate(),
+    });
+  };
+
+  const notes = activity.content.notes.map((data, i) => {
+    return (
+      <View
+        key={i}
+        className="bg-slate-200 px-5 rounded-xl flex-col justify-center items-start mt-4"
+      >
+        <Text className="text-base italic">• {data}</Text>
+      </View>
+    );
+  });
+
+  const handleEditActivity = () => {
+    dispatch(selectDay({ day: selectedDay, date: selectedDate }));
+    navigation.navigate("EditActivity");
+  };
+
+  return (
+    <View className="bg-white flex-1 h-screen">
+      <View className="flex mt-4 px-5">
+        <Pressable
+          className="absolute top-4 right-4 p-2 rounded-full bg-[#F2A65A]"
+          onPress={() => handleEditActivity()}
+        >
+          <SquarePen size={20} color="#FFF" strokeWidth={3} />
+        </Pressable>
+        <Text className="text-xl font-bold text-center mt-24">Activité</Text>
+        <Text className="text-5xl font-bold text-center mt-4">
+          {activity.content.title}
+        </Text>
+        <View className="flex flex-row justify-center items-center">
+          <Text className="text-7xl text-center mt-4">
+            {moment(activity.content.plannedAt).format("LT")}
+          </Text>
+        </View>
+        <View className="flex flex-row justify-center items-center">
+          <MapPin size={30} color="#000" />
+          <Text className="text-xl ml-2">{activity.content.address}</Text>
+        </View>
+        {activity.content.notes.length > 0 ? (
+          <View className="px-5">{notes}</View>
+        ) : (
+          <Text className="text-base text-center mt-4">
+            Pas de notes pour cette activité.
+          </Text>
+        )}
+        <View className="flex flex-col bg-slate-200 rounded-lg p-2 mt-4 ">
+          <Text className="mb-2">
+            Ajouter une notification de rappel: (avant l'heure de l'activité)
+          </Text>
+          <View className="flex flex-row justify-around">
+            <Pressable
+              onPress={() => addNotification(5)}
+              className="bg-[#F2A65A] p-2 rounded-lg"
+            >
+              <Text className="text-base text-white font-medium ">5 mins</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => addNotification(30)}
+              className="bg-[#F2A65A] p-2 rounded-lg"
+            >
+              <Text className="text-base text-white font-medium ">30 mins</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => addNotification(60)}
+              className="bg-[#F2A65A] p-2 rounded-lg"
+            >
+              <Text className="text-base text-white font-medium ">1 heure</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
 }
