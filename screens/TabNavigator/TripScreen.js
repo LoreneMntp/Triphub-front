@@ -317,7 +317,7 @@ export default function TripScreen({ navigation, route }) {
   };
 
   return (
-    <View className="bg-white flex-1 h-full ">
+    <View className="bg-white flex-1 h-screen">
       <Modal
         title="Invite Modal"
         visible={modalInviteVisible}
@@ -407,14 +407,15 @@ export default function TripScreen({ navigation, route }) {
           <Text>Chargement de l'image...</Text>
         </View>
       ) : (
-        <View title="image-view" className="items-center">
+        <View title="image-view" className="items-center h-[30%]">
           <Image
             source={
               tripData[0].background_url
                 ? { uri: tripData[0].background_url }
                 : require("../../assets/palm-tree-icon.jpg")
             }
-            style={{ width: "100%", height: 230 }}
+            style={{ width: "100%" }}
+            className="h-full"
           />
           <Pressable
             className="bg-white/50 p-2 rounded-full mt-5"
@@ -458,7 +459,7 @@ export default function TripScreen({ navigation, route }) {
           <Text className="ml-2">{tripData[0].shareWith.length + 1}</Text>
         </View>
       </View>
-      <View title="calendar" className="items-center mt-3 px-5">
+      <View title="calendar" className="items-center mt-3 px-5 ">
         <Text className="text-lg">Emploi du Temps</Text>
         <View
           title="calendar-view"
@@ -515,7 +516,7 @@ export default function TripScreen({ navigation, route }) {
               )}
             </View>
           </View>
-          <ScrollView title="activity-container" className="">
+          <ScrollView title="activity-container" style={{ height: 500 }}>
             {activities}
             <View title="activity-absent" className=" items-center">
               <Pressable onPress={() => handleAddActivity()}>
