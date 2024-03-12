@@ -244,7 +244,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     bottom: "33%",
     width: "auto",
+    /*
     elevation: 5,
+    */
     shadowColor: "#000",
     shadowOffset: {
       width: 2,
@@ -253,6 +255,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
+
   buttonText: {
     color: "black",
     fontWeight: "bold",
