@@ -14,8 +14,16 @@ export default function LandingScreen({ navigation }) {
             onPress={() => navigation.navigate("Login")}
             className="bg-[#F2A65A] px-6 py-2 rounded-2xl"
           >
+            
             <Text className="text-xl text-white font-bold ">Login</Text>
-          </Pressable>
+            </Pressable>
+            <Pressable
+            onPress={() => navigation.navigate("Map")}
+            className="bg-[#F2A65A] px-6 py-2 rounded-2xl"
+          >
+            <Text className="text-xl text-white font-bold ">Map</Text>
+            </Pressable>
+          
           <Pressable
             onPress={() => navigation.navigate("LandingFinal")}
             className="bg-[#F2A65A] px-6 py-2 rounded-2xl"

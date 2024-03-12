@@ -14,6 +14,7 @@ import AddActivityScreen from "./screens/Stack/AddActivityScreen";
 import CreateTripScreen from "./screens/Stack/CreateTripScreen";
 import ViewDocumentsScreen from "./screens/Stack/ViewDocumentsScreen";
 import ShowActivityScreen from "./screens/Stack/ShowActivityScreen";
+import MapScreen from "./screens/Stack/MapScreen";
 import HomeScreen from "./screens/Stack/HomeScreen";
 import TripScreen from "./screens/TabNavigator/TripScreen";
 import HelpScreen from "./screens/TabNavigator/HelpScreen";
@@ -140,6 +141,14 @@ export default function App() {
               headerTintColor: "#F58549",
             }}
           />
+          <Stack.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            headerShown: true,
+            headerTintColor: "#F58549",
+          }}
+        />
           <Stack.Screen
             name="TabNavigator"
             component={TabNavigator}
