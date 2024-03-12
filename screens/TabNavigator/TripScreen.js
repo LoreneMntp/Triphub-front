@@ -56,6 +56,7 @@ import { Calendar, CalendarUtils } from "react-native-calendars";
 import { element } from "prop-types";
 
 import * as ImagePicker from "expo-image-picker";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function TripScreen({ navigation, route }) {
   const [activityPresent, setActivityPresent] = useState(false);
@@ -68,12 +69,12 @@ export default function TripScreen({ navigation, route }) {
   const [tripTimestamps, setTripTimestamps] = useState([]);
   const [imageUri, setImageUri] = useState(null);
   const [loadingUploadImage, setLoadingUploadImage] = useState(false);
+  const [isConnected, setIsConnected] = useState(null);
 
   const selectedTrip = useSelector((state) => state.user.value.selectedTripId);
   const tripsTable = useSelector((state) => state.user.value.trips);
   const user = useSelector((state) => state.user.value.user);
   const dispatch = useDispatch();
-  const insets = useSafeAreaInsets();
 
   const tripData = tripsTable.filter((e) => e._id === selectedTrip);
 
@@ -131,6 +132,10 @@ export default function TripScreen({ navigation, route }) {
 
   useEffect(() => {
     displayActivityByDay();
+    const unsubscribe = NetInfo.addEventListener((state) => {
+        setIsConnected(state.isConnected);
+      });
+      return () => unsubscribe();
   }, [selectedDay, tripsTable]);
 
   const handleDeleteActivity = (id) => {
@@ -218,12 +223,19 @@ export default function TripScreen({ navigation, route }) {
                   {notes}
                 </Text>
               </View>
-              <Pressable
+              {isConnected ? <Pressable
                 onPress={() => handleDeleteActivity(data._id)}
                 className="bg-orange-100 p-3 rounded-full absolute -top-2 right-0"
+                disabled={!isConnected}
               >
                 <Trash2 size={20} color={"black"} />
-              </Pressable>
+              </Pressable> : <Pressable
+                onPress={() => handleDeleteActivity(data._id)}
+                className="bg-slate-500 p-3 rounded-full absolute -top-2 right-0"
+                disabled={!isConnected}
+              >
+                <Trash2 size={20} color={"red"} />
+              </Pressable>}
             </View>
           </Pressable>
         </View>
@@ -425,15 +437,26 @@ export default function TripScreen({ navigation, route }) {
             style={{ width: "100%" }}
             className="h-full"
           />
-          <Pressable
+          {isConnected ? <Pressable
             className="bg-white/0 p-2 rounded-full mt-5"
             style={{ position: "absolute", right: "5%" }}
             onPress={handleSelectImage}
+            disabled={!isConnected}
           >
             <Text className="text-white">
               <SquarePen className="text-sm" color="#F2A65A" />
             </Text>
-          </Pressable>
+          </Pressable> : 
+          <Pressable
+          className="bg-slate-500 p-2 rounded-full mt-5"
+          style={{ position: "absolute", right: "5%" }}
+          onPress={handleSelectImage}
+          disabled={!isConnected}
+        >
+          <Text className="text-white">
+            <SquarePen className="text-sm" color="red" />
+          </Text>
+        </Pressable>}
         </View>
       )}
       <View className="flex-row justify-between pt-4 rounded-t-3xl  px-5">
@@ -526,9 +549,11 @@ export default function TripScreen({ navigation, route }) {
           <ScrollView title="activity-container" style={{ height: 500 }}>
             {activities}
             <View title="activity-absent" className=" items-center">
-              <Pressable onPress={() => handleAddActivity()}>
+              {isConnected ? <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
                 <PlusCircle size={70} color={"#F2A65A"} />
-              </Pressable>
+              </Pressable> : <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
+                <PlusCircle size={70} color={"red"} />
+              </Pressable>}
             </View>
           </ScrollView>
         </View>

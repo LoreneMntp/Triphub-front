@@ -49,86 +49,6 @@ export default function HomeScreen({ navigation }) {
     return () => unsubscribe();
   }, [isConnected]);
 
-  /* const mockUserData = {
-    username: 'JohnD123',
-    email: 'john.doe@gmail.com',
-    password: 'test123',
-    token: '12345',
-    trips: [{
-        title: 'Las Vegas',
-        background_url: 'https://www.civitatis.com/f/estados-unidos/las-vegas/tour-privado-nocturno-las-vegas-589x392.jpg',
-        country: 'United States of America',
-        start_at: new Date('2025-06-21'),
-        end_at: new Date('2025-07-03'),
-        createdBy: '0123456789',
-        sharedWith: [],
-        activities: [{
-            title: 'Restaurant',
-            plannedAt: new Date('2025-06-22T21:00:00'),
-            address: '312 main street',
-            notes: ['Table n°12']
-        }],
-        sos_infos: [{
-            country: 'United States of America',
-            embassy: {
-                address: '122 Example Street',
-                phone: '500-123-456-789',
-                email: 'france-ambassade@americanmail.com',
-                emergency_phone: '500-123-123-123',
-            },
-            consulate: [{
-                address: '123 Example Street',
-                phone: '500-123-456-789',
-                email: 'france-consulat@americanmail.com',
-                emergency_phone: '500-123-123-123',
-            }],
-            emergency_number: '911',
-            police_number: '911',
-            firefighter_number: '911',
-            member_112: true
-        }]
-    },
-    {
-        title: 'Pékin',
-        background_url: 'https://www.autigrevanille.ch/wp-content/uploads/2020/07/pekin-cite-interdite-empereur-chine.jpg',
-        country: 'China',
-        start_at: new Date('2025-06-21'),
-        end_at: new Date('2025-07-03'),
-        createdBy: '0123456789',
-        sharedWith: [],
-        activities: [{
-            title: 'Restaurant',
-            plannedAt: new Date('2025-06-22T21:00:00'),
-            address: '312 chinese street',
-            notes: ['Table n°12']
-        }],
-        sos_infos: [{
-            country: 'China',
-            embassy: {
-                address: '122 Example chinese Street',
-                phone: '500-123-456-789',
-                email: 'france-ambassade@chinesemail.com',
-                emergency_phone: '500-123-123-123',
-            },
-            consulate: [{
-                address: '123 Example chinese Street',
-                phone: '500-123-456-789',
-                email: 'france-consulat@chinesemail.com',
-                emergency_phone: '500-123-123-123',
-            }],
-            emergency_number: '911',
-            police_number: '911',
-            firefighter_number: '911',
-            member_112: true
-        }]
-    }],
-    documents: [{
-        title: 'Plane Ticket Flight 122',
-        link_doc: 'file://...',
-        linked_trip: '123456789',
-        serial_phone: '0000-0000'
-    }]
-} */
 
   const handleSelectTrip = (id) => {
     dispatch(selectTrip({ tripId: id }));
@@ -179,11 +99,14 @@ export default function HomeScreen({ navigation }) {
             handleShowDeleteTrip();
             setTempSelectedTrip(data._id);
           }}
-        >
-          <Trash2
+          disabled={!isConnected}>
+          {isConnected ? <Trash2
             size={20}
             style={i % 2 === 0 ? { color: "white" } : { color: "black" }}
-          />
+          /> : <Trash2
+          size={20}
+          style={{ color: "red" }}
+        />}
         </Pressable>
         <View title="Trip Content" className="flex-row mt-2 justify-center">
           <Image
