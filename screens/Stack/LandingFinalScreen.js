@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Circle } from "lucide-react-native";
+import { Plane } from "lucide-react-native";
 import Animated, {
   useAnimatedStyle,
   withRepeat,
@@ -10,32 +10,40 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import * as Animatable from "react-native-animatable";
-import ConfettiCannon from "react-native-confetti-cannon";
+import { Video } from "expo-av";
+import { Bar } from "react-native-progress";
 
 export default function LandingScreen() {
-  const logo = require("../../assets/logo.png");
-  const backgroundImage = require("../../assets/background.jpg");
+  const logo = require("../../assets/triphublogofinal.png");
   const [buttonText, setButtonText] = useState("Commencer l'aventure !");
+  const [buttonColor, setButtonColor] = useState("#fff");
+  const [progress, setProgress] = useState(0);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [planePosition, setPlanePosition] = useState(0);
   const navigation = useNavigation();
-  const confettiRef = useRef(null);
 
+  //Navigation vers login
   function handleNavigateToLogin() {
     navigation.navigate("Login");
   }
 
+  // au clic, changement d'état du bouton
   const handlePress = () => {
-    if (confettiRef.current) {
-      confettiRef.current.start();
-    }
+    setShowProgressBar(true);
     setButtonText("L'aventure commence !");
+    setButtonColor("#EEC170");
+    animateProgress();
     setTimeout(() => {
       handleNavigateToLogin();
-    }, 5000);
+    }, 3000);
     setTimeout(() => {
       setButtonText("Commencer l'aventure !");
-    }, 7000);
+      setButtonColor("#FFF");
+      setShowProgressBar(false);
+    }, 4000);
   };
 
+  // permet au bouton d'être animé
   const glowAnimation = useAnimatedStyle(() => ({
     transform: [
       {
@@ -52,67 +60,76 @@ export default function LandingScreen() {
     ],
   }));
 
+  const planeAnimation = useAnimatedStyle(() => ({
+    transform: [{ translateX: planePosition }],
+  }));
+
+  const animateProgress = () => {
+    setProgress(0); // Réinitialiser la progression
+    let progressValue = 0;
+    const interval = setInterval(() => {
+      progressValue += 0.01; // Augmenter la progression
+      setProgress(progressValue);
+      setPlanePosition(progressValue * 300); // Mettre à jour la position de l'avion en fonction de la progression
+      if (progressValue >= 1) {
+        clearInterval(interval);
+      }
+    }, 10); // Intervalle de mise à jour de la progression
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.background}>
-        <Image source={backgroundImage} style={styles.backgroundImage} />
+        <Video
+          source={require("../../assets/paysage.mp4")}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
+          isLooping
+          rate={0.9}
+          shouldPlay
+        />
       </View>
       <View style={styles.overlay} />
-      <View style={styles.circleBackground}>
-        <Circle
-          strokeWidth={0}
-          absoluteStrokeWidth
-          style={styles.circle1}
-          fill="#F58549"
-          size={300}
-        />
-        <Circle
-          style={styles.circle2}
-          strokeWidth={0}
-          absoluteStrokeWidth
-          fill="white"
-          size={50}
-        />
-
-        <Circle
-          style={styles.circle4}
-          strokeWidth={0}
-          absoluteStrokeWidth
-          fill="#F58549"
-          size={600}
-        />
-        <Circle
-          style={styles.circle5}
-          strokeWidth={0}
-          absoluteStrokeWidth
-          fill="#FFA6CC"
-          size={600}
-        />
-      </View>
 
       <View style={styles.content}>
-        <View style={styles.appName}>
-          <View style={styles.logoContainer}>
-            <Animatable.Image
-              animation="fadeIn"
-              duration={1000}
-              delay={500}
-              style={styles.logo}
-              source={logo}
-            />
-            <Animatable.Text
-              animation="fadeIn"
-              duration={1000}
-              delay={1000}
-              style={styles.title}
-            >
-              TripHub
-            </Animatable.Text>
-          </View>
-          <Text style={styles.text}>
-            Explorez le monde avec Triphub à vos côtés.
-          </Text>
+        <View style={styles.logoContainer}>
+          <Animatable.Image
+            animation="fadeIn"
+            duration={1000}
+            delay={500}
+            style={styles.logo}
+            source={logo}
+          />
+          {/* <Animatable.Text
+    animation="fadeIn"
+    duration={1000}
+    delay={1000}
+    style={[styles.title]} // Appliquer la police
+  >
+    TripHub
+  </Animatable.Text> */}
+
+          {showProgressBar && (
+            <View style={styles.progressBar}>
+              <Bar
+                progress={progress}
+                width={300}
+                color="#EEC170"
+                unfilledColor="transparent"
+              />
+              <View
+                style={[StyleSheet.absoluteFill, styles.progressBarOutline]}
+              />
+              {/* Icône de l'avion */}
+              <Animated.View style={[styles.planeIcon, planeAnimation]}>
+                <Plane size={24} color="#FFF" />
+              </Animated.View>
+            </View>
+          )}
         </View>
+
+        <Text style={styles.textLeft}>Explorez le monde</Text>
+        <Text style={styles.textRight}>avec Triphub à vos côtés.</Text>
       </View>
 
       <Animated.View
@@ -124,30 +141,18 @@ export default function LandingScreen() {
           onPress={handlePress}
           style={({ pressed }) => [
             styles.button,
-            { opacity: pressed ? 0.5 : 1 },
+            { opacity: pressed ? 0.5 : 1, backgroundColor: buttonColor },
           ]}
         >
           <Text style={styles.buttonText}>{buttonText}</Text>
         </Pressable>
       </Animated.View>
-
-      <ConfettiCannon
-        ref={confettiRef}
-        count={500}
-        origin={{ x: 180, y: -15 }}
-        explosionSpeed={500}
-        fadeOut={true}
-        autoStart={false}
-      />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     padding: 20,
     position: "relative",
     backgroundColor: "#fff",
@@ -163,88 +168,81 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 70,
     opacity: 0.9,
   },
-  backgroundImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-  },
-  circleBackground: {
+  overlay: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: -1,
-  },
-  circle1: {
-    position: "absolute",
-    bottom: "65%",
-    right: "55%",
-    strokeWidth: 0,
-    opacity: 0.4,
-  },
-  circle2: {
-    position: "absolute",
-    top: "10%",
-    right: "10%",
-  },
-  circle4: {
-    position: "absolute",
-    top: "65%",
-    left: "5%",
-    opacity: 0.5,
-  },
-  circle5: {
-    position: "absolute",
-    top: "80%",
-    left: "5%",
-    opacity: 0.3,
+    backgroundColor: "rgba(255, 165, 0, 0.2)", // Orange avec +50% d'opacité
   },
   content: {
     flex: 1,
-    padding: 50,
+    padding: "7%",
   },
   logoContainer: {
-    bottom: 10,
-    left: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 270,
+    height: 270,
     resizeMode: "contain",
   },
-  appName: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 50,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
   text: {
-    flexWrap: "wrap",
     fontWeight: "bold",
     fontSize: 25,
-    textAlign: "center",
     paddingVertical: 20,
     paddingHorizontal: 10,
     width: 400,
     top: "20%",
+  },
+  title: {
+    fontSize: 55,
+    fontWeight: "bold",
+    color: "#FF8E34",
+    marginTop: -65,
+    marginRight: -15,
+    textShadowColor: "rgba(125, 69, 0, 0.8)", // Couleur de l'ombre
+    textShadowOffset: { width: 3, height: 3 }, // Décalage de l'ombre
+    textShadowRadius: 1, // Rayon de l'ombre
+  },
+  textLeft: {
+    color: "#fff",
+    textShadowColor: "rgba(125, 69, 0, 0.8)",
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 1,
+    fontWeight: "bold",
+    fontSize: 22,
+    textAlign: "left",
+    position: "absolute",
+    margin: 10,
+    bottom: "50%",
+    width: "auto",
+    left: 0,
+  },
+  textRight: {
+    color: "#fff",
+    textShadowColor: "rgba(125, 69, 0, 0.8)",
+    textShadowOffset: { width: 4, height: 3 },
+    textShadowRadius: 1,
+    fontWeight: "bold",
+    fontSize: 22,
+    margin: 10,
+    textAlign: "right",
+    position: "absolute",
+    bottom: "45%",
+    width: "150%",
+    right: 0,
   },
   button: {
     backgroundColor: "#FFF",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    bottom: "10%",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    bottom: "33%",
     width: "auto",
     elevation: 5,
     shadowColor: "#000",
@@ -261,6 +259,28 @@ const styles = StyleSheet.create({
   },
   glowContainer: {
     borderRadius: 20,
-    backgroundColor: "rgba(242, 166, 90, 0.1)",
+    backgroundColor: "transparent",
+    overflow: "hidden",
+  },
+  progressBar: {
+    top: "140%",
+    margin: "5%",
+    color: "#585123",
+    borderColor: "black",
+  },
+  progressBarOutline: {
+    borderWidth: 1, // Largeur de la bordure
+    borderColor: "#585123", // Couleur de la bordure
+    borderRadius: 5, // Rayon des coins pour arrondir la bordure
+  },
+  planeIcon: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 24,
+    height: 24,
   },
 });
