@@ -23,7 +23,9 @@
           "WRITE_EXTERNAL_STORAGE",
           "READ_EXTERNAL_STORAGE",
           "READ_MEDIA_STORAGE",
-          "MANAGE_DOCUMENTS"
+          "MANAGE_DOCUMENTS",
+          "ACCESS_FINE_LOCATION",
+          "ACCESS_COARSE_LOCATION"
         ]
       }
     },
