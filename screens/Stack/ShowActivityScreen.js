@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {View, Text, Pressable} from "react-native";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 //Moment
 import moment from 'moment'
@@ -9,9 +9,17 @@ moment.locale('fr')
 
 import { SquarePen } from 'lucide-react-native';
 
-export default function ShowActivityScreen() {
+import { selectDay } from '../../reducers/users';
+
+export default function ShowActivityScreen({navigation}) {
     const activity = useSelector((state) => state.user.value.selectedActivity)
-    console.log(activity.content)
+    const selectedDay = useSelector((state) => state.user.value.selectedDay.day)
+    const selectedDate = useSelector((state) => state.user.value.selectedDay.date)
+    const dispatch = useDispatch()
+
+    //console.log('selectedDay', selectedDay)
+    //console.log('selectedDate', selectedDate)
+    //console.log(activity.content)
 
     const notes = activity.content.notes.map((data, i) => {
         return (
@@ -20,12 +28,19 @@ export default function ShowActivityScreen() {
             </View>
         )
     })
+
+    const handleEditActivity = () => {
+        dispatch(
+            selectDay({ day: selectedDay, date: selectedDate })
+          );
+        navigation.navigate('EditActivity')
+    }
     
     return (
         <SafeAreaView className='flex-1 items-center'>
             <Text className='text-3xl mt-10 items-center'>Activité</Text>
             <View title='container' className='border-slate-300 border-2 w-5/6 h-4/6 mt-10 p-4'>
-                <Pressable className='mb-4 items-end'>
+                <Pressable className='mb-4 items-end' onPress={() => handleEditActivity()}>
                     <SquarePen size={20} color={'black'}/>
                 </Pressable>
                 <Text className='text-xl text-center mb-10 font-semibold'>{activity.content.title}</Text>

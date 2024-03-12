@@ -14,6 +14,7 @@ import AddActivityScreen from "./screens/Stack/AddActivityScreen";
 import CreateTripScreen from "./screens/Stack/CreateTripScreen";
 import ViewDocumentsScreen from "./screens/Stack/ViewDocumentsScreen";
 import ShowActivityScreen from "./screens/Stack/ShowActivityScreen";
+import EditActivityScreen from "./screens/Stack/EditActivityScreen";
 import HomeScreen from "./screens/Stack/HomeScreen";
 import TripScreen from "./screens/TabNavigator/TripScreen";
 import HelpScreen from "./screens/TabNavigator/HelpScreen";
@@ -135,6 +136,14 @@ export default function App() {
           <Stack.Screen
             name="ShowActivity"
             component={ShowActivityScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
+          <Stack.Screen
+            name="EditActivity"
+            component={EditActivityScreen}
             options={{
               headerShown: true,
               headerTintColor: "#F58549",

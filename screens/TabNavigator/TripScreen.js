@@ -1,5 +1,5 @@
 //React Native
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -62,6 +63,8 @@ export default function TripScreen({ navigation, route }) {
   const tripsTable = useSelector((state) => state.user.value.trips);
   const user = useSelector((state) => state.user.value.user);
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
+
 
   const tripData = tripsTable.filter((e) => e._id === selectedTrip);
 
@@ -143,8 +146,11 @@ export default function TripScreen({ navigation, route }) {
 
     const handleSelectActivity = (id) => {
         const foundActivity = tripData[0].activities.find(activity => activity._id === id)
-        console.log(foundActivity)
+        //console.log(foundActivity)
         dispatch(selectActivity({activityId: id, content: foundActivity}))
+        dispatch(
+            selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
+          );
         navigation.navigate('ShowActivity')
     }
 
@@ -172,7 +178,7 @@ export default function TripScreen({ navigation, route }) {
       return (
         <View key={i}>
           <View
-            className="flex-row items-center justify-between mb-1 ml-2 mt-2"
+            className="flex-row items-center justify-between mb-1 ml-2 mt-1"
             style={{ width: "90%" }}
           >
             <View title="Activity-content" className="justify-around">
@@ -288,9 +294,10 @@ export default function TripScreen({ navigation, route }) {
         handleUploadImage(data.url);
       });
   };
+  
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <Modal
         title="Invite Modal"
         visible={modalInviteVisible}
@@ -376,7 +383,7 @@ export default function TripScreen({ navigation, route }) {
         </View>
       </Modal>
 
-      <View title="header" className="items-center mt-4 mb-6">
+      <View title="header" className="items-center flex-1 mt-2">
         <Text className="text-xl font-bold mb-2">{tripData[0].title}</Text>
         <View title="dates">
           <Text>Du : {moment(tripData[0].start_at).calendar()}</Text>
@@ -389,7 +396,7 @@ export default function TripScreen({ navigation, route }) {
           onPress={() => setModalInviteVisible(true)}
         >
           <UserPlus
-            size={30}
+            size={20}
             color={"black"}
             className="mr-4 "
             fill={"black"}
@@ -421,73 +428,73 @@ export default function TripScreen({ navigation, route }) {
         </View>
       )}
 
-      <View title="calendar" className="items-center mt-6">
-        <Text className="text-lg">Emploi du Temps</Text>
-        <View
-          title="calendar-view"
-          className="border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl"
-          style={{ width: "80%", height: 300 }}
-        >
-          <View
-            title="calendar-bar"
-            className="flex-row bg-slate-300 w-full h-10 p-2 mb-2 items-center"
-          >
-            <View title="calender-left " className="mr-8">
-              {selectedDay > 1 ? (
-                <>
-                  <Pressable
-                    title="arrow-left"
-                    className=" flex-row items-center"
-                    onPress={() => setSelectedDay(selectedDay - 1)}
-                  >
-                    <ArrowLeft size={25} color={"black"} className="mr-2" />
-                    <Text>Jour {selectedDay - 1}</Text>
-                  </Pressable>
-                </>
-              ) : (
-                <View style={{ width: 76 }}></View>
-              )}
-            </View>
+        <View title="calendar" className="items-center mt-4 h-3/6">
+            <Text className="text-lg">Emploi du Temps</Text>
             <View
-              title="calendar-center"
-              className="flex-row items-center bg-white h-8 pr-2 pl-2 border-slate-100 border-2 rounded-md mr-8"
+            title="calendar-view"
+            className="border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl h-full"
+            style={{ width: "80%", height: 300 }}
             >
-              <Pressable
-                onPress={() => setModalCalendarVisible(true)}
-                className="flex-row items-center"
-              >
-                <View title="selected-day" className="flex-row items-center">
-                  <Text className="mr-2">Jour {selectedDay}</Text>
-                  <CalendarDays size={25} color={"black"} />
+                <View
+                    title="calendar-bar"
+                    className="flex-row bg-slate-300 w-full h-10 p-2 items-center"
+                >
+                    <View title="calender-left " className="mr-8">
+                    {selectedDay > 1 ? (
+                        <>
+                        <Pressable
+                            title="arrow-left"
+                            className=" flex-row items-center"
+                            onPress={() => setSelectedDay(selectedDay - 1)}
+                        >
+                            <ArrowLeft size={25} color={"black"} className="mr-2" />
+                            <Text>Jour {selectedDay - 1}</Text>
+                        </Pressable>
+                        </>
+                    ) : (
+                        <View style={{ width: 76 }}></View>
+                    )}
+                    </View>
+                    <View
+                    title="calendar-center"
+                    className="flex-row items-center bg-white h-8 pr-2 pl-2 border-slate-100 border-2 rounded-md mr-8"
+                    >
+                    <Pressable
+                        onPress={() => setModalCalendarVisible(true)}
+                        className="flex-row items-center"
+                    >
+                        <View title="selected-day" className="flex-row items-center">
+                        <Text className="mr-2">Jour {selectedDay}</Text>
+                        <CalendarDays size={25} color={"black"} />
+                        </View>
+                    </Pressable>
+                    </View>
+                    <View title="calendar-right">
+                    {selectedDay < tripDuration ? (
+                        <>
+                        <Pressable
+                            onPress={() => setSelectedDay(selectedDay + 1)}
+                            className="flex-row items-center"
+                        >
+                            <Text className="mr-2">Jour {selectedDay + 1}</Text>
+                            <ArrowRight size={25} color={"black"} />
+                        </Pressable>
+                        </>
+                    ) : (
+                        <></>
+                    )}
                 </View>
-              </Pressable>
             </View>
-            <View title="calendar-right">
-              {selectedDay < tripDuration ? (
-                <>
-                  <Pressable
-                    onPress={() => setSelectedDay(selectedDay + 1)}
-                    className="flex-row items-center"
-                  >
-                    <Text className="mr-2">Jour {selectedDay + 1}</Text>
-                    <ArrowRight size={25} color={"black"} />
-                  </Pressable>
-                </>
-              ) : (
-                <></>
-              )}
+                <ScrollView title="activity-container">
+                    {activities}
+                    <View title="activity-absent" className=" items-center">
+                    <Pressable onPress={() => handleAddActivity()}>
+                        <PlusCircle size={100} color={"#F2A65A"} />
+                    </Pressable>
+                    </View>
+                </ScrollView>
             </View>
-          </View>
-          <ScrollView title="activity-container">
-            {activities}
-            <View title="activity-absent" className=" items-center">
-              <Pressable onPress={() => handleAddActivity()}>
-                <PlusCircle size={100} color={"#F2A65A"} />
-              </Pressable>
-            </View>
-          </ScrollView>
         </View>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -9,18 +9,21 @@ import 'moment/locale/fr'
 moment.locale('fr')
 import { initTrips } from '../../reducers/users';
 
-export default function AddActivityScreen( {navigation}) {
+export default function EditActivityScreen( {navigation}) {
     const selectedDay = useSelector((state) => state.user.value.selectedDay.day)
     const selectedDate = useSelector((state) => state.user.value.selectedDay.date)
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const token = useSelector((state) => state.user.value.user.token)
+    const activity = useSelector((state) => state.user.value.selectedActivity)
 
-    const [title, setTitle] = useState('')
-    const [hour, setHour] = useState('Heure')
-    const [address, setAddress] = useState('')
-    const [note, setNote] = useState([''])
+    //console.log('selectedDate', selectedDate)
+
+    const [title, setTitle] = useState(activity.content.title)
+    const [hour, setHour] = useState(moment(activity.content.plannedAt).format('LT'))
+    const [address, setAddress] = useState(activity.content.address)
+    const [note, setNote] = useState(activity.content.notes)
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
-    const [hourSelected, setHourSelected] = useState(false)
+    const [hourSelected, setHourSelected] = useState(true)
     const [date, setDate] = useState(null)
     const [showAlertTitle, setShowAlertTitle] = useState(false)
     const [showAlertHour, setShowAlertHour] = useState(false)
@@ -28,7 +31,7 @@ export default function AddActivityScreen( {navigation}) {
 
     const allFieldsFilled = title !== '' && hour !== 'Heure' && address !== ''
 
-    const dispatch = useDispatch()
+    //const dispatch = useDispatch()
 
     const showDatePicker = () => {
         setDatePickerVisibility(true)
@@ -66,11 +69,11 @@ export default function AddActivityScreen( {navigation}) {
     const displayNotes = note.map((value, i) => {
         return (
             <View key={i} className='flex-row w-full items-center mb-4'>
-                <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] rounded-lg pl-4 w-5/6 mr-4'
+                <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] rounded-lg pl-4 pr-4 w-5/6 mr-4 text-left'
                 placeholder={`Note ${i + 1} (opt.)`}
                 onChangeText={(text) => handleInputChange(text, i)}
                 value={value}
-                />
+                multiline={true}/>
                 <Pressable onPress={() => removeInput(i)}>
                     <MinusCircle size={25} color={'black'}/>
                 </Pressable>
@@ -78,7 +81,7 @@ export default function AddActivityScreen( {navigation}) {
         )
     })
 
-    const handleSaveActivity = () => {
+    /* const handleSaveActivity = () => {
         if(allFieldsFilled) {
             const bodyData = {
                 tripId: selectedTrip,
@@ -125,10 +128,10 @@ export default function AddActivityScreen( {navigation}) {
                 setShowAlertAddress(false)
             }
         }
-    }
+    } */
 
     return (
-        <SafeAreaView className='items-center bg-white h-full flex-1'>
+        <SafeAreaView className='items-center  bg-white h-full flex-1'>
             <Text className="text-3xl font-bold">
                 Activité
             </Text>
@@ -176,7 +179,7 @@ export default function AddActivityScreen( {navigation}) {
                     </Pressable>
                     <View title='Save-BTN' className='mt-10 w-4/6'>
                         <Pressable className='bg-[#585123] items-center h-14 justify-center rounded-2xl' onPress={() => handleSaveActivity()}>
-                            <Text className='text-lg text-white'>Sauvegarder</Text>
+                            <Text className='text-lg text-white'>Modifier</Text>
                         </Pressable>
                     </View>
                 </View>
