@@ -156,7 +156,7 @@ export default function DocumentsScreen() {
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Réservation</Text>
-          <Pressable onPress={() => handleAddDocument("reservation ")}>
+          <Pressable onPress={() => handleAddDocument("reservation")}>
             <PlusCircle color="#F58549" size={24} />
           </Pressable>
         </View>
@@ -166,7 +166,7 @@ export default function DocumentsScreen() {
               (billet) =>
                 billet.category === "reservation" &&
                 billet.serial_phone === installationId
-            )} // Utilisez mockData directement ici
+            )}
             keyExtractor={(item) => item._id}
             renderItem={renderDocumentItem}
           />
