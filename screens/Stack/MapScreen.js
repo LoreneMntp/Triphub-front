@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useSelector } from 'react-redux';
 import * as Location from 'expo-location';
@@ -11,18 +11,42 @@ export default function MapScreen({ navigation }) {
   const consulates = selectedTrip?.sos_infos?.consulate || [];
   const [currentPosition, setCurrentPosition] = useState(null);
 
-  async function getLocation() {
+  async function requestLocationPermission() {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.error('Permission to access location was denied');
       return;
     }
+  
+    if (Platform.OS === 'ios') {
+      let { status: alwaysStatus } = await Location.requestBackgroundPermissionsAsync();
+      if (alwaysStatus !== 'granted') {
+        console.error('Permission to access location in the background was denied');
+      }
+    }
+  
     let location = await Location.getCurrentPositionAsync({});
     setCurrentPosition({
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     });
     fitAllMarkers();
+  }
+
+  function getLocation() {
+    Alert.alert(
+      "Permission de localisation",
+      "Cette application nécessite l'accès à votre localisation pour fonctionner correctement. Voulez-vous continuer?",
+      [
+        {
+          text: "Non",
+          onPress: () => console.log("Permission de localisation refusée par l'utilisateur."),
+          style: "cancel"
+        },
+        { text: "Oui", onPress: requestLocationPermission }
+      ],
+      { cancelable: false }
+    );
   }
 
   useEffect(() => {
