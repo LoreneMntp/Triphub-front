@@ -152,13 +152,14 @@ export default function TripScreen({ navigation, route }) {
   };
 
   const handleSelectActivity = (id) => {
-    const foundActivity = tripData[0].activities.find(
-      (activity) => activity._id === id
-    );
-    console.log(foundActivity);
-    dispatch(selectActivity({ activityId: id, content: foundActivity }));
-    navigation.navigate("ShowActivity");
-  };
+    const foundActivity = tripData[0].activities.find(activity => activity._id === id)
+    //console.log(foundActivity)
+    dispatch(selectActivity({activityId: id, content: foundActivity}))
+    dispatch(
+        selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
+      );
+    navigation.navigate('ShowActivity')
+}
 
   let activities = [];
   if (loading) {
