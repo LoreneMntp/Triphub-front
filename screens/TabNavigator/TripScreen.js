@@ -1,5 +1,5 @@
 //React Native
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -69,6 +70,8 @@ export default function TripScreen({ navigation, route }) {
   const tripsTable = useSelector((state) => state.user.value.trips);
   const user = useSelector((state) => state.user.value.user);
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
+
 
   const tripData = tripsTable.filter((e) => e._id === selectedTrip);
 
@@ -315,6 +318,7 @@ export default function TripScreen({ navigation, route }) {
         handleUploadImage(data.url);
       });
   };
+  
 
   return (
     <View className="bg-white flex-1 h-full ">
