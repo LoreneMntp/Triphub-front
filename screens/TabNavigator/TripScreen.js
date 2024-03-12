@@ -27,6 +27,13 @@ import {
   PlusCircle,
   Trash2,
   Copy,
+  SquarePen,
+  Pin,
+  MapPin,
+  CalendarClock,
+  UserRound,
+  UsersRound,
+  Clock,
 } from "lucide-react-native";
 
 //Moment
@@ -141,20 +148,23 @@ export default function TripScreen({ navigation, route }) {
       });
   };
 
-    const handleSelectActivity = (id) => {
-        const foundActivity = tripData[0].activities.find(activity => activity._id === id)
-        console.log(foundActivity)
-        dispatch(selectActivity({activityId: id, content: foundActivity}))
-        navigation.navigate('ShowActivity')
-    }
+  const handleSelectActivity = (id) => {
+    const foundActivity = tripData[0].activities.find(
+      (activity) => activity._id === id
+    );
+    console.log(foundActivity);
+    dispatch(selectActivity({ activityId: id, content: foundActivity }));
+    navigation.navigate("ShowActivity");
+  };
 
-    let activities = []
-    if (loading) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Chargement...</Text>
-            </View>)
-    }
+  let activities = [];
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Chargement...</Text>
+      </View>
+    );
+  }
 
   if (activityForDay) {
     const sortedArray = activityForDay.sort((a, b) => {
@@ -170,27 +180,44 @@ export default function TripScreen({ navigation, route }) {
       });
 
       return (
-        <View key={i}>
-          <View
-            className="flex-row items-center justify-between mb-1 ml-2 mt-2"
-            style={{ width: "90%" }}
-          >
-            <View title="Activity-content" className="justify-around">
-              <Pressable onPress={() => handleSelectActivity(data._id)}>
-                <Text className="font-bold">{data.title}</Text>
+        <View key={i} className="">
+          <Pressable onPress={() => handleSelectActivity(data._id)}>
+            <View
+              className="flex-row items-center justify-between mb-1 mt-2 bg-slate-200/30 rounded-xl p-2"
+              style={{ width: "100%" }}
+            >
+              <View title="Activity-content" className="justify-around">
+                <Text className="font-bold text-xl">{data.title}</Text>
+
+                <View className="flex flex-row">
+                  <View className=" flex flex-row items-center justify-center">
+                    <Clock size={15} color="#000" />
+                    <Text className="ml-2 text-base">
+                      {moment(data.plannedAt).format("HH:mm")}
+                    </Text>
+                  </View>
+                  <Text className="ml-1 mr-1 flex items-center justify-center text-base">
+                    -
+                  </Text>
+                  <View className=" flex flex-row items-center justify-center">
+                    <MapPin size={15} color="#000" />
+                    <Text className="ml-2 text-base">{data.address}</Text>
+                  </View>
+                </View>
+
+                <Text>
+                  Notes : {"\n"}
+                  {notes}
+                </Text>
+              </View>
+              <Pressable
+                onPress={() => handleDeleteActivity(data._id)}
+                className="bg-orange-100 p-3 rounded-full absolute -top-2 right-0"
+              >
+                <Trash2 size={20} color={"black"} />
               </Pressable>
-              <Text>Heure : {moment(data.plannedAt).format("HH:mm")}</Text>
-              <Text>Adresse : {data.address}</Text>
-              <Text>
-                Notes : {"\n"}
-                {notes}
-              </Text>
             </View>
-            <Pressable onPress={() => handleDeleteActivity(data._id)}>
-              <Trash2 size={20} color={"black"} />
-            </Pressable>
-          </View>
-          <View className="border-b-2 border-slate-300 w-full mb-2"></View>
+          </Pressable>
         </View>
       );
     });
@@ -290,7 +317,7 @@ export default function TripScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="bg-white flex-1 h-full ">
       <Modal
         title="Invite Modal"
         visible={modalInviteVisible}
@@ -375,62 +402,72 @@ export default function TripScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
-
-      <View title="header" className="items-center mt-4 mb-6">
-        <Text className="text-xl font-bold mb-2">{tripData[0].title}</Text>
-        <View title="dates">
-          <Text>Du : {moment(tripData[0].start_at).calendar()}</Text>
-          <Text>Au : {moment(tripData[0].end_at).calendar()}</Text>
-        </View>
-      </View>
-      <View title="invite-bar" className="items-center flex-row just ml-10">
-        <Pressable
-          className="border-2 border-black p-2 rounded-lg flex-row justify-center items-center"
-          onPress={() => setModalInviteVisible(true)}
-        >
-          <UserPlus
-            size={30}
-            color={"black"}
-            className="mr-4 "
-            fill={"black"}
-          />
-          <Text>Inviter</Text>
-        </Pressable>
-      </View>
       {loadingUploadImage ? (
-        <View title="loading" className="items-center mt-4">
+        <View title="loading" className="items-center">
           <Text>Chargement de l'image...</Text>
         </View>
       ) : (
-        <View title="image-view" className="items-center mt-4">
+        <View title="image-view" className="items-center">
           <Image
             source={
               tripData[0].background_url
                 ? { uri: tripData[0].background_url }
                 : require("../../assets/palm-tree-icon.jpg")
             }
-            style={{ width: "75%", height: 175 }}
+            style={{ width: "100%", height: 230 }}
           />
           <Pressable
-            className="bg-[#F2A65A] w-16 h-8 items-center justify-center rounded-lg shadow-md shadow-black mt-2"
-            style={{ position: "absolute", right: "15%" }}
+            className="bg-white/50 p-2 rounded-full mt-5"
+            style={{ position: "absolute", right: "5%" }}
             onPress={handleSelectImage}
           >
-            <Text className="text-white">Choisir</Text>
+            <Text className="text-white">
+              <SquarePen className="text-sm" color="white" />
+            </Text>
           </Pressable>
         </View>
       )}
-
-      <View title="calendar" className="items-center mt-6">
+      <View className="flex-row justify-between pt-4 rounded-t-3xl  px-5">
+        <Text className="text-3xl font-bold">{tripData[0].title}</Text>
+        <Pressable
+          className=" bg-[#F2A65A] text-white p-2 rounded-lg flex-row justify-center items-center"
+          onPress={() => setModalInviteVisible(true)}
+        >
+          <UserPlus
+            size={15}
+            color={"white"}
+            className="mr-4 "
+            fill={"white"}
+          />
+          <Text className="text-white font-medium">Inviter</Text>
+        </Pressable>
+      </View>
+      <View className="px-5 mt-2">
+        <Text className="text-lg text-gray-600">
+          <MapPin size={15} className="text-base" color="rgb(75 85 99)" />{" "}
+          {tripData[0].country}
+        </Text>
+      </View>
+      <View className="px-5 mt-3 flex-row">
+        <View className="flex flex-row w-1/4 justify-center p-2 rounded-full items-center bg-orange-300/40  ">
+          <CalendarClock size={18} color="#000" />
+          <Text className="ml-2">{tripTimestamps.length} jours</Text>
+        </View>
+        <View className="flex flex-row w-1/4 justify-center p-2 rounded-full items-center bg-blue-300/30 ml-4 ">
+          <UsersRound size={18} color="#000" />
+          <Text className="ml-2">{tripData[0].shareWith.length + 1}</Text>
+        </View>
+      </View>
+      <View title="calendar" className="items-center mt-3 px-5">
         <Text className="text-lg">Emploi du Temps</Text>
         <View
           title="calendar-view"
           className="border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl"
-          style={{ width: "80%", height: 300 }}
+          style={{ width: "100%", height: 300 }}
         >
           <View
             title="calendar-bar"
-            className="flex-row bg-slate-300 w-full h-10 p-2 mb-2 items-center"
+            className="flex-row bg-slate-300/70 w-full h-10 p-2 mb-2 items-center rounded-lg justify-around"
           >
             <View title="calender-left " className="mr-8">
               {selectedDay > 1 ? (
@@ -478,7 +515,7 @@ export default function TripScreen({ navigation, route }) {
               )}
             </View>
           </View>
-          <ScrollView title="activity-container">
+          <ScrollView title="activity-container" className="">
             {activities}
             <View title="activity-absent" className=" items-center">
               <Pressable onPress={() => handleAddActivity()}>
@@ -488,6 +525,6 @@ export default function TripScreen({ navigation, route }) {
           </ScrollView>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
