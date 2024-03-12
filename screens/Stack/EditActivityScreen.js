@@ -31,7 +31,7 @@ export default function EditActivityScreen( {navigation}) {
 
     const allFieldsFilled = title !== '' && hour !== 'Heure' && address !== ''
 
-    //const dispatch = useDispatch()
+    const dispatch = useDispatch()
 
     const showDatePicker = () => {
         setDatePickerVisibility(true)
@@ -80,28 +80,28 @@ export default function EditActivityScreen( {navigation}) {
             </View>
         )
     })
-
-    /* const handleSaveActivity = () => {
+    //console.log(activity.content._id)
+    const handleUpdateActivity = () => {
         if(allFieldsFilled) {
             const bodyData = {
                 tripId: selectedTrip,
+                activityId: activity.content._id,
                 title, 
                 plannedAt: date,
                 token,
                 note,
                 address
             }
-            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/addActivity`
+            const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/editActivity`
             fetch(url, {
-                method: 'POST',
+                method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(bodyData)
             })
             .then(response => response.json())
             .then(data => {
-                //console.log('reponse addActivity', data)
+                //console.log('reponse editActivity', data.data)
                 if(data.result) {
-                    console.log(bodyData)
                     dispatch(initTrips(data.data))
                     navigation.navigate('TabNavigator')
                 }
@@ -128,7 +128,7 @@ export default function EditActivityScreen( {navigation}) {
                 setShowAlertAddress(false)
             }
         }
-    } */
+    }
 
     return (
         <SafeAreaView className='items-center  bg-white h-full flex-1'>
@@ -178,7 +178,7 @@ export default function EditActivityScreen( {navigation}) {
                         <PlusCircle size={30} color={'black'}></PlusCircle>
                     </Pressable>
                     <View title='Save-BTN' className='mt-10 w-4/6'>
-                        <Pressable className='bg-[#585123] items-center h-14 justify-center rounded-2xl' onPress={() => handleSaveActivity()}>
+                        <Pressable className='bg-[#585123] items-center h-14 justify-center rounded-2xl' onPress={() => handleUpdateActivity()}>
                             <Text className='text-lg text-white'>Modifier</Text>
                         </Pressable>
                     </View>

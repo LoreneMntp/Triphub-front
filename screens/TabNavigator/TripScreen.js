@@ -1,5 +1,8 @@
 //React Native
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -71,7 +74,6 @@ export default function TripScreen({ navigation, route }) {
   const user = useSelector((state) => state.user.value.user);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
-
 
   const tripData = tripsTable.filter((e) => e._id === selectedTrip);
 
@@ -152,14 +154,16 @@ export default function TripScreen({ navigation, route }) {
   };
 
   const handleSelectActivity = (id) => {
-    const foundActivity = tripData[0].activities.find(activity => activity._id === id)
+    const foundActivity = tripData[0].activities.find(
+      (activity) => activity._id === id
+    );
     //console.log(foundActivity)
-    dispatch(selectActivity({activityId: id, content: foundActivity}))
+    dispatch(selectActivity({ activityId: id, content: foundActivity }));
     dispatch(
-        selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
-      );
-    navigation.navigate('ShowActivity')
-}
+      selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
+    );
+    navigation.navigate("ShowActivity");
+  };
 
   let activities = [];
   if (loading) {
@@ -319,10 +323,9 @@ export default function TripScreen({ navigation, route }) {
         handleUploadImage(data.url);
       });
   };
-  
 
   return (
-    <View className="bg-white flex-1 h-full ">
+    <View className="bg-white flex-1 h-screen">
       <Modal
         title="Invite Modal"
         visible={modalInviteVisible}
@@ -412,22 +415,23 @@ export default function TripScreen({ navigation, route }) {
           <Text>Chargement de l'image...</Text>
         </View>
       ) : (
-        <View title="image-view" className="items-center">
+        <View title="image-view" className="items-center h-[30%]">
           <Image
             source={
               tripData[0].background_url
                 ? { uri: tripData[0].background_url }
                 : require("../../assets/palm-tree-icon.jpg")
             }
-            style={{ width: "100%", height: 230 }}
+            style={{ width: "100%" }}
+            className="h-full"
           />
           <Pressable
-            className="bg-white/50 p-2 rounded-full mt-5"
+            className="bg-white/0 p-2 rounded-full mt-5"
             style={{ position: "absolute", right: "5%" }}
             onPress={handleSelectImage}
           >
             <Text className="text-white">
-              <SquarePen className="text-sm" color="white" />
+              <SquarePen className="text-sm" color="#F2A65A" />
             </Text>
           </Pressable>
         </View>
@@ -463,8 +467,7 @@ export default function TripScreen({ navigation, route }) {
           <Text className="ml-2">{tripData[0].shareWith.length + 1}</Text>
         </View>
       </View>
-      <View title="calendar" className="items-center mt-3 px-5">
-        <Text className="text-lg">Emploi du Temps</Text>
+      <View title="calendar" className="items-center mt-3 px-5 ">
         <View
           title="calendar-view"
           className="border-slate-100 border-0 mt-2 drop-shadow-xl shadow-black rounded-b-3xl"
@@ -520,11 +523,11 @@ export default function TripScreen({ navigation, route }) {
               )}
             </View>
           </View>
-          <ScrollView title="activity-container" className="">
+          <ScrollView title="activity-container" style={{ height: 500 }}>
             {activities}
             <View title="activity-absent" className=" items-center">
               <Pressable onPress={() => handleAddActivity()}>
-                <PlusCircle size={100} color={"#F2A65A"} />
+                <PlusCircle size={70} color={"#F2A65A"} />
               </Pressable>
             </View>
           </ScrollView>
