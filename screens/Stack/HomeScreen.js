@@ -9,7 +9,15 @@ import {
   TouchableWithoutFeedback,
   TextInput,
 } from "react-native";
-import { LogOut, Settings, WifiOff, Trash2 } from "lucide-react-native";
+import {
+  LogOut,
+  Settings,
+  WifiOff,
+  Trash2,
+  Clock,
+  PlaneTakeoff,
+  BedDouble,
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,7 +57,6 @@ export default function HomeScreen({ navigation }) {
     return () => unsubscribe();
   }, [isConnected]);
 
-
   const handleSelectTrip = (id) => {
     dispatch(selectTrip({ tripId: id }));
     navigation.navigate("TabNavigator");
@@ -85,39 +92,59 @@ export default function HomeScreen({ navigation }) {
       <Pressable
         key={i}
         title="Trip"
-        className="mb-8 w-80 h-40 items-between p-2 rounded-3xl"
-        style={
-          i % 2 === 0
-            ? { backgroundColor: "#585123" }
-            : { backgroundColor: "#EEC170" }
-        }
+        className="mb-6 w-full h-56 items-between rounded-2xl"
         onPress={() => handleSelectTrip(data._id)}
       >
-        <Pressable
-          title="Delete BTN"
-          onPress={() => {
-            handleShowDeleteTrip();
-            setTempSelectedTrip(data._id);
-          }}
-          disabled={!isConnected}>
-          {isConnected ? <Trash2
-            size={20}
-            style={i % 2 === 0 ? { color: "white" } : { color: "black" }}
-          /> : <Trash2
-          size={20}
-          style={{ color: "red" }}
-        />}
-        </Pressable>
-        <View title="Trip Content" className="flex-row mt-2 justify-center">
-          <Image
-            source={
-              data.background_url
-                ? { uri: data.background_url }
-                : require("../../assets/palm-tree-icon.jpg")
-            }
-            style={{ width: 150, height: 100 }}
-            className="mr-3 rounded-3xl"
-          />
+        <Image
+          source={
+            data.background_url
+              ? { uri: data.background_url }
+              : require("../../assets/viet.png")
+          }
+          style={{ width: "100%", height: "100%" }}
+          className="rounded-2xl "
+        />
+        <View className="absolute top-3 right-3">
+          {isConnected && (
+            <Pressable
+              title="Delete BTN"
+              onPress={() => {
+                handleShowDeleteTrip();
+                setTempSelectedTrip(data._id);
+              }}
+              className="bg-[#F2A65A] p-2 rounded-full"
+            >
+              <View className="flex-row justify-center items-center">
+                <Trash2 size={20} color={"white"} strokeWidth={3} />
+              </View>
+            </Pressable>
+          )}
+        </View>
+        <View className="absolute bottom-2 left-2">
+          <Text className="text-white font-bold text-3xl">{data.title}</Text>
+          <View className="flex-row justify-start items-center">
+            <PlaneTakeoff size={20} color={"white"} />
+            <Text className="text-white font-bold text-base ml-1">
+              {startDate.calendar()}
+            </Text>
+          </View>
+          <View className="flex-row justify-start items-center">
+            <Clock size={20} color={"white"} />
+            <Text className="text-white font-bold text-base ml-1">
+              {Math.ceil(
+                (moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24)
+              ) + 1}{" "}
+              jours
+            </Text>
+          </View>
+          <View className="flex-row justify-start items-center">
+            <BedDouble size={20} color={"white"} />
+            <Text className="text-white font-bold text-base ml-1">
+              {startDate.fromNow()}
+            </Text>
+          </View>
+        </View>
+        {/* <View title="Trip Content" className="flex-row mt-2 justify-center">
           <View title="Trip Infos">
             <Text
               title="Trip Title"
@@ -149,7 +176,7 @@ export default function HomeScreen({ navigation }) {
               Départ {startDate.fromNow()}
             </Text>
           </View>
-        </View>
+        </View> */}
       </Pressable>
     );
   });
@@ -178,10 +205,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView
-      title="Background"
-      className="bg-white flex-1 items-center pt-8"
-    >
+    <View className="flex-1 bg-white">
       <Modal
         title="Invite Modal"
         visible={modalInviteVisible}
@@ -200,11 +224,11 @@ export default function HomeScreen({ navigation }) {
 
           <View
             title="Centered view"
-            className="bg-white w-5/6 h-3/6 pt-20 items-center"
+            className="bg-white w-5/6 h-2/6 pt-20 items-center rounded-lg"
           >
             <TextInput
-              placeholder="Lien inviation"
-              className="border-2 border-slate-200 rounded-md p-2 w-2/3"
+              placeholder="Code invitation"
+              className="border-2 border-slate-300 rounded-md p-2 w-2/3 "
               onChangeText={setInvitationLink}
               value={invitationLink}
             ></TextInput>
@@ -213,10 +237,10 @@ export default function HomeScreen({ navigation }) {
             )}
             <Pressable
               title="Join"
-              className="bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-lg shadow-black mb-3 mt-10"
+              className="bg-[#F2A65A] w-2/3 items-center justify-center rounded-lg p-1 mb-3 mt-4"
               onPress={() => handleJoinTrip(invitationLink)}
             >
-              <Text className="text-white text-lg">Rejoindre</Text>
+              <Text className="text-white text-lg font-bold">Rejoindre</Text>
             </Pressable>
           </View>
         </View>
@@ -283,79 +307,64 @@ export default function HomeScreen({ navigation }) {
 
           <View
             title="Centered view"
-            className="bg-white w-5/6 h-3/6 pt-20 items-center"
+            className="bg-white w-5/6 h-1/5 pt-8 items-center rounded-lg"
           >
-            <Text className="text-2xl mb-3 text-center">
+            <Text className="text-xl mb-3 text-center">
               Êtes-vous sûr(e) de vouloir supprimer ce Voyage ?
             </Text>
-            <Pressable
-              className="bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3"
-              onPress={() => handleDeleteTrip(tempSelectedTrip)}
-            >
-              <Text className="text-white text-lg">Oui</Text>
-            </Pressable>
-            <Pressable
-              className="bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3"
-              onPress={() => setModalDeleteVisible(false)}
-            >
-              <Text className="text-white text-lg">Non</Text>
-            </Pressable>
+            <View className="flex-row items-center">
+              <Pressable
+                className="bg-[#F2A65A]  w-1/3 p-2 items-center justify-center rounded-lg mr-1 mb-3"
+                onPress={() => handleDeleteTrip(tempSelectedTrip)}
+              >
+                <Text className="text-white text-lg font-bold">Oui</Text>
+              </Pressable>
+              <Pressable
+                className="bg-[#d1d1d0]  p-2 w-1/3 items-center justify-center rounded-lg ml-1 mb-3"
+                onPress={() => setModalDeleteVisible(false)}
+              >
+                <Text className="text-white text-lg font-bold">Non</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
-
-      <View
-        title="Header"
-        className="flex-row items-center justify-around w-full mb-6"
-      >
-        <Text className="text-3xl font-bold">Bonjour {user.user.username}</Text>
-      </View>
-      <View
-        title="CreateJoinTrips"
-        className="items-center mb-3 justify-around"
-      >
+      <Text className="text-3xl font-bold text-center mt-4">
+        Bonjour {user.user.username}
+      </Text>
+      <View className="flex-row justify-around mt-4 px-5">
         <Pressable
           title="NewTrip"
-          className="bg-[#F2A65A] w-60 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3"
+          className="bg-[#F2A65A] items-center justify-center rounded-lg p-2"
           onPress={() => navigation.navigate("CreateTrip")}
           disabled={!isConnected}
           style={{ backgroundColor: isConnected ? "#F2A65A" : "gray" }}
         >
           <Text
-            className="text-white text-lg"
+            className="text-white text-lg font-bold"
             style={{ color: isConnected ? "white" : "black" }}
           >
-            Créer un nouveau Voyage
+            Créer un voyage
           </Text>
           {!isConnected && <WifiOff color={"#ff0000"} size={14} />}
         </Pressable>
         <Pressable
           title="JoinTrip"
-          className="bg-[#F2A65A] w-60 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3"
+          className="bg-[#242424] items-center justify-center  rounded-lg  p-2 "
           onPress={() => setModalInviteVisible(true)}
           disabled={!isConnected}
-          style={{ backgroundColor: isConnected ? "#F2A65A" : "gray" }}
+          style={{ backgroundColor: isConnected ? "#F0F3F4" : "gray" }}
         >
           <Text
-            className="text-white text-lg"
-            style={{ color: isConnected ? "white" : "black" }}
+            className="text-lg font-medium"
+            style={{ color: isConnected ? "#242424" : "black" }}
           >
             Rejoindre un voyage
           </Text>
           {!isConnected && <WifiOff color={"#ff0000"} size={14} />}
         </Pressable>
-        <Text className="text-black text-lg">
-          Commencer à préparer un nouveau voyage
-        </Text>
       </View>
-      <View
-        title="Divider"
-        className="border-b border-black w-80 mt-2 mb-2"
-      ></View>
-      <View title="YourTrips" className="items-center h-[70%]">
-        <Text className="text-xl mb-3">Vos Voyages</Text>
-        <ScrollView>{trips}</ScrollView>
-      </View>
-    </SafeAreaView>
+      <ScrollView className="mt-8 px-5">{trips}</ScrollView>
+    </View>
   );
 }

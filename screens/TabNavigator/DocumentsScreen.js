@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  Modal,
-  FlatList,
-  StyleSheet,
-  Platform,
-} from "react-native";
+import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useNavigation } from "@react-navigation/native";
@@ -15,22 +7,20 @@ import ViewDocumentsScreen from "../Stack/ViewDocumentsScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { initDocuments } from "../../reducers/users";
 import ButtonOpenPDF from "../../components/ButtonOpenPDF";
-import {
-  PlusCircle,
-  Eye,
-  Trash2,
-  Filter,
-  ChevronLeft,
-} from "lucide-react-native";
+import { PlusCircle, Trash2, ChevronLeft } from "lucide-react-native";
 import Constants from "expo-constants";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function DocumentsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState("");
+  const [isConnected, setIsConnected] = useState(null);
+
   const navigation = useNavigation();
   const userInfos = useSelector((state) => state.user.value);
   const installationId = Constants.installationId;
 
+  //inutilisée ?
   const openModal = (document) => {
     setSelectedDocument(document);
     setModalVisible(true);
@@ -93,12 +83,10 @@ export default function DocumentsScreen() {
     dispatch(initDocuments(data.documents));
   };
 
-  // const disabledModalButtonStyle = {
-  //   ...modalButtonStyle,
-  //   backgroundColor: "grey", // Changez la couleur pour griser le bouton
-  // };
-
   useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
     const fetchData = async () => {
       const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/documents/${userInfos.user.token}`;
       const res = await fetch(url);
@@ -108,38 +96,57 @@ export default function DocumentsScreen() {
         dispatch(initDocuments(data.documents));
       }
     };
-
-    fetchData();
+    if (isConnected) {
+      fetchData();
+    }
+    return () => unsubscribe();
   }, []);
-
-  const handlePress = () => {
-    navigation.goBack();
-  };
 
   const renderDocumentItem = ({ item }) => (
     <View style={styles.documentItem}>
       <Text style={styles.documentText}>{item.fileName.substring(0, 20)}</Text>
       <View style={styles.iconContainer}>
         <ButtonOpenPDF fileName={item.fileName} url={item.link_doc} />
-        <Pressable onPress={() => handleDeleteDocument(item._id)}>
-          <Trash2 color="#E53935" size={24} />
-        </Pressable>
+        {isConnected ? (
+          <Pressable
+            onPress={() => handleDeleteDocument(item._id)}
+            disabled={!isConnected}
+          >
+            <Trash2 color="#E53935" size={24} />
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => handleDeleteDocument(item._id)}
+            disabled={!isConnected}
+          >
+            <Trash2 color="#BABABA" size={24} />
+          </Pressable>
+        )}
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.pressableContainer} onPress={handlePress}>
-        <ChevronLeft style={styles.arrow} />
-      </Pressable>
       <Text style={styles.header}>Gestion des documents</Text>
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Billets de transport</Text>
-          <Pressable onPress={() => handleAddDocument("transport")}>
-            <PlusCircle color="#F58549" size={24} />
-          </Pressable>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("transport")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("transport")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
+          )}
         </View>
         {userInfos.documents && (
           <FlatList
@@ -156,9 +163,21 @@ export default function DocumentsScreen() {
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Réservation</Text>
-          <Pressable onPress={() => handleAddDocument("reservation")}>
-            <PlusCircle color="#F58549" size={24} />
-          </Pressable>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("reservation")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("reservation")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
+          )}
         </View>
         {userInfos.documents && (
           <FlatList
@@ -175,9 +194,21 @@ export default function DocumentsScreen() {
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Identité</Text>
-          <Pressable onPress={() => handleAddDocument("identity")}>
-            <PlusCircle color="#F58549" size={24} />
-          </Pressable>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("identity")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("identity")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
+          )}
         </View>
         {userInfos.documents && (
           <FlatList
@@ -194,9 +225,21 @@ export default function DocumentsScreen() {
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Autres documents</Text>
-          <Pressable onPress={() => handleAddDocument("others")}>
-            <PlusCircle color="#F58549" size={24} />
-          </Pressable>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("others")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("others")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
+          )}
         </View>
         {userInfos.documents && (
           <FlatList

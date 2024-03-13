@@ -27,13 +27,12 @@ export default function HelpScreen({ navigation }) {
     Linking.openURL(`tel:${emergencyNumber}`);
   };
 
- 
 
   return (
     <ScrollView>
       <View>
           <View style={styles.container}>
-          <Text style={styles.title}>SOS</Text>
+          <Text style={styles.title}>Informations Pays</Text>
 
           {/* Affichage du numéro d'urgence du pays */}
 

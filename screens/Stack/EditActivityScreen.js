@@ -1,7 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView} from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusCircle, MinusCircle, Navigation } from 'lucide-react-native';
+import { PlusCircle, MinusCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import moment from 'moment'
@@ -15,8 +15,6 @@ export default function EditActivityScreen( {navigation}) {
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const token = useSelector((state) => state.user.value.user.token)
     const activity = useSelector((state) => state.user.value.selectedActivity)
-
-    //console.log('selectedDate', selectedDate)
 
     const [title, setTitle] = useState(activity.content.title)
     const [hour, setHour] = useState(moment(activity.content.plannedAt).format('LT'))
@@ -42,7 +40,6 @@ export default function EditActivityScreen( {navigation}) {
     }
 
     const handleConfirm = (date) => {
-        //console.log("A date has been picked: ", date);
         setDate(date)
         const formattedDate = moment(date).format('LT')
         setHour(formattedDate)
@@ -80,7 +77,7 @@ export default function EditActivityScreen( {navigation}) {
             </View>
         )
     })
-    //console.log(activity.content._id)
+
     const handleUpdateActivity = () => {
         if(allFieldsFilled) {
             const bodyData = {
@@ -100,7 +97,6 @@ export default function EditActivityScreen( {navigation}) {
             })
             .then(response => response.json())
             .then(data => {
-                //console.log('reponse editActivity', data.data)
                 if(data.result) {
                     dispatch(initTrips(data.data))
                     navigation.navigate('TabNavigator')
@@ -131,60 +127,94 @@ export default function EditActivityScreen( {navigation}) {
     }
 
     return (
-        <SafeAreaView className='items-center  bg-white h-full flex-1'>
-            <Text className="text-3xl font-bold">
-                Activité
-            </Text>
-            <View title='Day-container' className='mt-10 border-slate-200 border-8 w-5/6 justify-center items-center h-12'>
-                <Text className='text-lg'>Jour {selectedDay}</Text>
-            </View>
+        <SafeAreaView style={{ flex: 1, alignItems: 'center', backgroundColor: '#F2F4F5' }}>
             <KeyboardAvoidingView
-                className='w-full items-center'
+                style={{ flex: 1, width: '100%' }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <ScrollView
+                    style={{ flex: 1, width: '100%' }}
+                    contentContainerStyle={{ alignItems: 'center', paddingTop: 20 }}
                 >
-            <ScrollView className='w-4/6 h-5/6'>
-                <View title='Input-container' className='justify-center items-center mt-10'>
-                    <View className='w-full'>
-                        {showAlertTitle && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
-                        <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
-                        placeholder='Titre *' 
-                        onChangeText={(value) => setTitle(value)}
-                        value={title}/>
-                        {showAlertHour && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
-                    </View>
-                    <View className='w-full'>
-                        <Pressable className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8 justify-center' onPress={showDatePicker}>
-                            {!hourSelected ? <Text className='text-[#8e8e8e]'>Heure *</Text> : <Text>{hour}</Text> }
+                    <View style={{
+                        width: '90%',
+                        backgroundColor: '#FFF',
+                        borderRadius: 20,
+                        padding: 20,
+                        marginBottom: 20,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
+                    }}>
+                        <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: "center" }}>
+                            Modifier l'Aventure
+                        </Text>
+                        <View style={{
+                            borderWidth: 2,
+                            borderColor: '#F58549',
+                            backgroundColor: "#EEC170",
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: 60,
+                            borderRadius: 10,
+                            marginBottom: 20,
+                        }}>
+                            <Text style={{ fontSize: 18 }}>Jour {selectedDay}</Text>
+                        </View>
+
+                        <TextInput
+                            style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }}
+                            placeholder='Nom de l’aventure *'
+                            onChangeText={setTitle}
+                            value={title}
+                        />
+
+                        <Pressable
+                            onPress={showDatePicker}
+                            style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20, justifyContent: 'center' }}
+                        >
+                            <Text style={!hourSelected ? { color: '#8e8e8e' } : {}}>{hourSelected ? hour : "Heure *"}</Text>
                         </Pressable>
-                        <DateTimePickerModal
-                        isVisible={isDatePickerVisible}
-                        mode='time'
-                        date={new Date(moment(selectedDate))}
-                        onConfirm={handleConfirm}
-                        onCancel={hideDatePicker}/>
-                        {showAlertAddress && <Text className='text-red-600'>Veuillez remplir ce champ</Text>}
-                    </View>
-                    <View className='w-full'>
-                        <TextInput className='h-14 border-[#ccc] border-2 bg-[#F2F4F5] w-full rounded-lg pl-4 mb-8' 
-                        placeholder='Adresse *'
-                        onChangeText={(value) => setAddress(value)}
-                        value={address}/>
-                    </View>
-                    {displayNotes}
-                </View>
-                <View title='New-Note' className='items-center'>
-                    <Pressable className='flex-row items-center' onPress={addInput}>
-                        <Text className='font-bold mr-4'>Ajouter une autre note</Text>
-                        <PlusCircle size={30} color={'black'}></PlusCircle>
-                    </Pressable>
-                    <View title='Save-BTN' className='mt-10 w-4/6'>
-                        <Pressable className='bg-[#585123] items-center h-14 justify-center rounded-2xl' onPress={() => handleUpdateActivity()}>
-                            <Text className='text-lg text-white'>Modifier</Text>
+                        <DateTimePickerModal isVisible={isDatePickerVisible} mode="time" onConfirm={handleConfirm} onCancel={hideDatePicker} />
+
+                        <TextInput
+                            style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }}
+                            placeholder='Adresse *'
+                            onChangeText={setAddress}
+                            value={address}
+                        />
+
+                        {note.map((value, i) => (
+                            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
+                                <TextInput
+                                    style={{ height: 40, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', borderRadius: 10, paddingLeft: 10, width: '85%', marginRight: 10 }}
+                                    placeholder={`Note ${i + 1} (opt.)`}
+                                    onChangeText={(text) => handleInputChange(text, i)}
+                                    value={value}
+                                    multiline={true}
+                                />
+                                <Pressable onPress={() => removeInput(i)}>
+                                    <MinusCircle size={25} color="#F58549" />
+                                </Pressable>
+                            </View>
+                        ))}
+
+                        <Pressable onPress={addInput} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                            <Text style={{ fontWeight: 'bold', marginRight: 10 }}>Ajouter une note</Text>
+                            <PlusCircle size={25} color="#F58549" />
+                        </Pressable>
+
+                        <Pressable
+                            onPress={handleUpdateActivity}
+                            style={{ backgroundColor: '#F58549', alignItems: 'center', height: 50, justifyContent: 'center', borderRadius: 15, marginTop: 20 }}
+                        >
+                            <Text style={{ fontSize: 18, color: 'white' }}>Modifier l'Aventure</Text>
                         </Pressable>
                     </View>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
