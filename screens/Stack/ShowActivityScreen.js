@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Notifications from "expo-notifications";
 
@@ -69,7 +69,7 @@ export default function ShowActivityScreen({ navigation }) {
     return (
       <View
         key={i}
-        className="bg-slate-200 px-5 rounded-xl flex-col justify-center items-start mt-4"
+        className="px-5 rounded-xl flex-col justify-center items-start my-2"
       >
         <Text className="text-base italic">• {data}</Text>
       </View>
@@ -82,61 +82,104 @@ export default function ShowActivityScreen({ navigation }) {
   };
 
   return (
-    <View className="bg-white flex-1 h-screen">
-      <View className="flex mt-4 px-5">
-        <Pressable
-          className="absolute top-4 right-4 p-2 rounded-full bg-[#F2A65A]"
-          onPress={() => handleEditActivity()}
-        >
-          <SquarePen size={20} color="#FFF" strokeWidth={3} />
-        </Pressable>
-        <Text className="text-xl font-bold text-center mt-24">Activité</Text>
-        <Text className="text-5xl font-bold text-center mt-4">
-          {activity.content.title}
-        </Text>
-        <View className="flex flex-row justify-center items-center">
-          <Text className="text-7xl text-center mt-4">
-            {moment(activity.content.plannedAt).format("LT")}
-          </Text>
-        </View>
-        <View className="flex flex-row justify-center items-center">
-          <MapPin size={30} color="#000" />
-          <Text className="text-xl ml-2">{activity.content.address}</Text>
-        </View>
-        {activity.content.notes.length > 0 ? (
-          <View className="px-5">{notes}</View>
-        ) : (
-          <Text className="text-base text-center mt-4">
-            Pas de notes pour cette activité.
-          </Text>
-        )}
-        <View className="flex flex-col bg-slate-200 rounded-lg p-2 mt-4 ">
-          <Text className="mb-2">
-            Ajouter une notification de rappel: (avant l'heure de l'activité)
-          </Text>
-          <View className="flex flex-row justify-around">
-            <Pressable
-              onPress={() => addNotification(5)}
-              className="bg-[#F2A65A] p-2 rounded-lg"
-            >
-              <Text className="text-base text-white font-medium ">5 mins</Text>
-            </Pressable>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F4F5', alignItems: 'center', justifyContent: 'center' }}>
+  <ScrollView style={{ flex: 1, width: '100%' }} contentContainerStyle={{ alignItems: 'center', paddingVertical: 20 }}>
+    <View style={{ width: '90%', backgroundColor: '#FFF', borderRadius: 20, padding: 20, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 }}>
+      <Pressable
+        onPress={handleEditActivity}
+        style={{
+          alignSelf: 'flex-end',
+          padding: 10,
+          borderRadius: 20,
+          backgroundColor: '#EEC170',
+        }}
+      >
+        <SquarePen size={20} color="#FFF" strokeWidth={2} />
+      </Pressable>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginTop: 24 }}>
+        Votre aventure
+      </Text>
+      <Text style={{ fontSize: 40, fontWeight: 'bold', textAlign: 'center', marginTop: 16 }}>
+        {activity.content.title}
+      </Text>
+      <Text style={{ fontSize: 56, textAlign: 'center', marginTop: 16 }}>
+        {moment(activity.content.plannedAt).format("LT")}
+      </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16 }}>
+        <MapPin size={30} color="#000" />
+        <Text style={{ fontSize: 20, marginLeft: 8 }}>{activity.content.address}</Text>
+      </View>
+      {
+  activity.content.notes.length > 0 ? (
+    <View style={{ elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.22,
+      shadowRadius: 2.22, paddingHorizontal: 20, marginTop: 16, backgroundColor: '#EEC170', padding: 10, borderRadius: 15 }}>
+      {notes}
+    </View>
+  ) : (
+    <View style={{ paddingHorizontal: 20, marginTop: 16, backgroundColor: '#FFF7E0', padding: 15, borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.22, shadowRadius: 2.22, alignItems: 'center' }}>
+      <Text style={{ fontSize: 16, textAlign: 'center', fontStyle: 'italic' }}>
+        Aucune note pour cette aventure.
+      </Text>
+    </View>
+  )
+}
 
-            <Pressable
-              onPress={() => addNotification(30)}
-              className="bg-[#F2A65A] p-2 rounded-lg"
-            >
-              <Text className="text-base text-white font-medium ">30 mins</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => addNotification(60)}
-              className="bg-[#F2A65A] p-2 rounded-lg"
-            >
-              <Text className="text-base text-white font-medium ">1 heure</Text>
-            </Pressable>
-          </View>
+      <View style={{
+        backgroundColor: '#EEC170',
+        borderRadius: 15,
+        padding: 20,
+        marginTop: 24,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+      }}>
+        <Text style={{ marginBottom: 16, fontWeight: 'bold' }}>
+          Ajouter un rappel pour l'aventure :
+        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+          <Pressable
+            onPress={() => addNotification(5)}
+            style={{
+              backgroundColor: '#F58549',
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: '#FFF', fontWeight: '500' }}>5 min</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => addNotification(30)}
+            style={{
+              backgroundColor: '#F58549',
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: '#FFF', fontWeight: '500' }}>30 min</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => addNotification(60)}
+            style={{
+              backgroundColor: '#F58549',
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: '#FFF', fontWeight: '500' }}>1 h</Text>
+          </Pressable>
         </View>
       </View>
     </View>
+  </ScrollView>
+</SafeAreaView>
+
   );
 }
