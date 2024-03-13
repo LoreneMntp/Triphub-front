@@ -40,9 +40,7 @@ moment.locale("fr");
 
 //Invite Modal Clipboard/Popover
 import * as Clipboard from "expo-clipboard";
-import Popover, {
-  PopoverPlacement,
-} from "react-native-popover-view";
+import Popover, { PopoverPlacement } from "react-native-popover-view";
 import { Calendar } from "react-native-calendars";
 
 import * as ImagePicker from "expo-image-picker";
@@ -120,9 +118,9 @@ export default function TripScreen({ navigation, route }) {
   useEffect(() => {
     displayActivityByDay();
     const unsubscribe = NetInfo.addEventListener((state) => {
-        setIsConnected(state.isConnected);
-      });
-      return () => unsubscribe();
+      setIsConnected(state.isConnected);
+    });
+    return () => unsubscribe();
   }, [selectedDay, tripsTable]);
 
   const handleDeleteActivity = (id) => {
@@ -210,20 +208,24 @@ export default function TripScreen({ navigation, route }) {
                   {notes}
                 </Text>
               </View>
-              {isConnected ? <Pressable
-                onPress={() => handleDeleteActivity(data._id)}
-                className="bg-orange-100 p-3 rounded-full absolute -top-2 right-0"
-                disabled={!isConnected}
-              >
-                <Trash2 size={20} color={"black"} />
-              </Pressable> : <Pressable
-                onPress={() => handleDeleteActivity(data._id)}
-                className="p-3 rounded-full absolute -top-2 right-0"
-                disabled={!isConnected}
-                style={{backgroundColor : '#BABABA'}}
-              >
-                <Trash2 size={20} color={"#595959"} />
-              </Pressable>}
+              {isConnected ? (
+                <Pressable
+                  onPress={() => handleDeleteActivity(data._id)}
+                  className="bg-orange-100 p-3 rounded-full absolute -top-2 right-0"
+                  disabled={!isConnected}
+                >
+                  <Trash2 size={20} color={"black"} />
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => handleDeleteActivity(data._id)}
+                  className="p-3 rounded-full absolute -top-2 right-0"
+                  disabled={!isConnected}
+                  style={{ backgroundColor: "#BABABA" }}
+                >
+                  <Trash2 size={20} color={"#595959"} />
+                </Pressable>
+              )}
             </View>
           </Pressable>
         </View>
@@ -276,7 +278,6 @@ export default function TripScreen({ navigation, route }) {
     })
       .then((response) => response.json())
       .then((data) => {
-
         if (data.result) {
           dispatch(initTrips(data.data));
         }
@@ -416,31 +417,38 @@ export default function TripScreen({ navigation, route }) {
             source={
               tripData[0].background_url
                 ? { uri: tripData[0].background_url }
-                : require("../../assets/palm-tree-icon.jpg")
+                : require("../../assets/bg-1.png")
             }
             style={{ width: "100%" }}
             className="h-full"
           />
-          {isConnected ? <Pressable
-            className="bg-white/0 p-2 rounded-full mt-5"
-            style={{ position: "absolute", right: "5%" }}
-            onPress={handleSelectImage}
-            disabled={!isConnected}
-          >
-            <Text className="text-white">
-              <SquarePen className="text-sm" color="#F2A65A" />
-            </Text>
-          </Pressable> : 
-          <Pressable
-          className="p-2 rounded-full mt-5"
-          style={{ position: "absolute", right: "5%", backgroundColor:'#BABABA' }}
-          onPress={handleSelectImage}
-          disabled={!isConnected}
-        >
-          <Text className="text-white">
-            <SquarePen className="text-sm" color="#595959" />
-          </Text>
-        </Pressable>}
+          {isConnected ? (
+            <Pressable
+              className="bg-white/0 p-2 rounded-full mt-5"
+              style={{ position: "absolute", right: "5%" }}
+              onPress={handleSelectImage}
+              disabled={!isConnected}
+            >
+              <Text className="text-white">
+                <SquarePen className="text-sm" color="#F2A65A" />
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              className="p-2 rounded-full mt-5"
+              style={{
+                position: "absolute",
+                right: "5%",
+                backgroundColor: "#BABABA",
+              }}
+              onPress={handleSelectImage}
+              disabled={!isConnected}
+            >
+              <Text className="text-white">
+                <SquarePen className="text-sm" color="#595959" />
+              </Text>
+            </Pressable>
+          )}
         </View>
       )}
       <View className="flex-row justify-between pt-4 rounded-t-3xl  px-5">
@@ -533,11 +541,21 @@ export default function TripScreen({ navigation, route }) {
           <ScrollView title="activity-container" style={{ height: 500 }}>
             {activities}
             <View title="activity-absent" className=" items-center">
-              {isConnected ? <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
-                <PlusCircle size={70} color={"#F2A65A"} />
-              </Pressable> : <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
-                <PlusCircle size={70} color={"#BABABA"} />
-              </Pressable>}
+              {isConnected ? (
+                <Pressable
+                  onPress={() => handleAddActivity()}
+                  disabled={!isConnected}
+                >
+                  <PlusCircle size={70} color={"#F2A65A"} />
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => handleAddActivity()}
+                  disabled={!isConnected}
+                >
+                  <PlusCircle size={70} color={"#BABABA"} />
+                </Pressable>
+              )}
             </View>
           </ScrollView>
         </View>
