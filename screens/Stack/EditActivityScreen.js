@@ -1,7 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView} from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusCircle, MinusCircle, Navigation } from 'lucide-react-native';
+import { PlusCircle, MinusCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import moment from 'moment'
@@ -15,8 +15,6 @@ export default function EditActivityScreen( {navigation}) {
     const selectedTrip = useSelector((state) => state.user.value.selectedTripId)
     const token = useSelector((state) => state.user.value.user.token)
     const activity = useSelector((state) => state.user.value.selectedActivity)
-
-    //console.log('selectedDate', selectedDate)
 
     const [title, setTitle] = useState(activity.content.title)
     const [hour, setHour] = useState(moment(activity.content.plannedAt).format('LT'))
@@ -42,7 +40,6 @@ export default function EditActivityScreen( {navigation}) {
     }
 
     const handleConfirm = (date) => {
-        //console.log("A date has been picked: ", date);
         setDate(date)
         const formattedDate = moment(date).format('LT')
         setHour(formattedDate)
@@ -80,7 +77,7 @@ export default function EditActivityScreen( {navigation}) {
             </View>
         )
     })
-    //console.log(activity.content._id)
+
     const handleUpdateActivity = () => {
         if(allFieldsFilled) {
             const bodyData = {
@@ -100,7 +97,6 @@ export default function EditActivityScreen( {navigation}) {
             })
             .then(response => response.json())
             .then(data => {
-                //console.log('reponse editActivity', data.data)
                 if(data.result) {
                     dispatch(initTrips(data.data))
                     navigation.navigate('TabNavigator')

@@ -1,9 +1,5 @@
 //React Native
 import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import {
   View,
   Text,
   Pressable,
@@ -11,9 +7,7 @@ import {
   ScrollView,
   Modal,
   TouchableWithoutFeedback,
-  Platform,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import {
   deleteActivity,
@@ -32,10 +26,8 @@ import {
   Trash2,
   Copy,
   SquarePen,
-  Pin,
   MapPin,
   CalendarClock,
-  UserRound,
   UsersRound,
   Clock,
 } from "lucide-react-native";
@@ -43,17 +35,15 @@ import {
 //Moment
 import moment from "moment";
 import "moment/locale/fr";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 moment.locale("fr");
 
 //Invite Modal Clipboard/Popover
 import * as Clipboard from "expo-clipboard";
 import Popover, {
-  PopoverMode,
   PopoverPlacement,
 } from "react-native-popover-view";
-import { Calendar, CalendarUtils } from "react-native-calendars";
-import { element } from "prop-types";
+import { Calendar } from "react-native-calendars";
 
 import * as ImagePicker from "expo-image-picker";
 import NetInfo from "@react-native-community/netinfo";
@@ -67,7 +57,6 @@ export default function TripScreen({ navigation, route }) {
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [modalCalendarVisible, setModalCalendarVisible] = useState(false);
   const [tripTimestamps, setTripTimestamps] = useState([]);
-  const [imageUri, setImageUri] = useState(null);
   const [loadingUploadImage, setLoadingUploadImage] = useState(false);
   const [isConnected, setIsConnected] = useState(null);
 
@@ -96,8 +85,6 @@ export default function TripScreen({ navigation, route }) {
   tripDuration =
     Math.ceil((moment(endDate) - moment(startDate)) / (1000 * 60 * 60 * 24)) +
     1;
-  //console.log(tripData[0].createdBy)
-  //console.log(user)
 
   //Function to Display Activities
   const displayActivityByDay = () => {
@@ -162,7 +149,7 @@ export default function TripScreen({ navigation, route }) {
     const foundActivity = tripData[0].activities.find(
       (activity) => activity._id === id
     );
-    //console.log(foundActivity)
+
     dispatch(selectActivity({ activityId: id, content: foundActivity }));
     dispatch(
       selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
@@ -231,10 +218,11 @@ export default function TripScreen({ navigation, route }) {
                 <Trash2 size={20} color={"black"} />
               </Pressable> : <Pressable
                 onPress={() => handleDeleteActivity(data._id)}
-                className="bg-slate-500 p-3 rounded-full absolute -top-2 right-0"
+                className="p-3 rounded-full absolute -top-2 right-0"
                 disabled={!isConnected}
+                style={{backgroundColor : '#BABABA'}}
               >
-                <Trash2 size={20} color={"red"} />
+                <Trash2 size={20} color={"#595959"} />
               </Pressable>}
             </View>
           </Pressable>
@@ -258,7 +246,6 @@ export default function TripScreen({ navigation, route }) {
   };
 
   const INITIAL_DATE = moment(tripData[0].start_at).format("YYYY-MM-DD");
-  //console.log(INITIAL_DATE)
 
   const handleDayPress = (day) => {
     const index = tripTimestamps.findIndex(
@@ -272,7 +259,7 @@ export default function TripScreen({ navigation, route }) {
     dispatch(
       selectDay({ day: selectedDay, date: tripTimestamps[selectedDay - 1] })
     );
-    //console.log('navigating', tripTimestamps[selectedDay - 1])
+
     navigation.navigate("AddActivity");
   };
 
@@ -289,8 +276,7 @@ export default function TripScreen({ navigation, route }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
-        //console.log("DATA", data.data);
+
         if (data.result) {
           dispatch(initTrips(data.data));
         }
@@ -317,10 +303,6 @@ export default function TripScreen({ navigation, route }) {
       type: pickerResult.assets[0].mimeType,
     });
 
-    //console.log('uri', pickerResult.assets[0].uri)
-    //console.log('name', pickerResult.assets[0].fileName)
-    //console.log('type', pickerResult.assets[0].mimeType)
-
     //Insert the fetch to backend
     setLoadingUploadImage(true);
     const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/trips/uploadImage/`;
@@ -331,7 +313,6 @@ export default function TripScreen({ navigation, route }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
         handleUploadImage(data.url);
       });
   };
@@ -451,13 +432,13 @@ export default function TripScreen({ navigation, route }) {
             </Text>
           </Pressable> : 
           <Pressable
-          className="bg-slate-500 p-2 rounded-full mt-5"
-          style={{ position: "absolute", right: "5%" }}
+          className="p-2 rounded-full mt-5"
+          style={{ position: "absolute", right: "5%", backgroundColor:'#BABABA' }}
           onPress={handleSelectImage}
           disabled={!isConnected}
         >
           <Text className="text-white">
-            <SquarePen className="text-sm" color="red" />
+            <SquarePen className="text-sm" color="#595959" />
           </Text>
         </Pressable>}
         </View>
@@ -555,7 +536,7 @@ export default function TripScreen({ navigation, route }) {
               {isConnected ? <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
                 <PlusCircle size={70} color={"#F2A65A"} />
               </Pressable> : <Pressable onPress={() => handleAddActivity()} disabled={!isConnected}>
-                <PlusCircle size={70} color={"red"} />
+                <PlusCircle size={70} color={"#BABABA"} />
               </Pressable>}
             </View>
           </ScrollView>
