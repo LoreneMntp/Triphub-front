@@ -126,55 +126,46 @@ export default function AddActivityScreen( {navigation}) {
     }
 
     return (
-        <SafeAreaView style={{ alignItems: 'center', backgroundColor: '#EFEAD8', flex: 1 }}>
-            <Text style={{ fontSize: 28, fontWeight: 'bold', marginTop: 20 }}>
-                Nouvelle Aventure
-            </Text>
-            <View style={{ marginTop: 20, borderWidth: 2, borderColor: '#D9CAB3', width: '85%', justifyContent: 'center', alignItems: 'center', height: 60, borderRadius: 10 }}>
-                <Text style={{ fontSize: 18 }}>Jour {selectedDay}</Text>
-            </View>
-            <KeyboardAvoidingView
-                style={{ width: '100%', alignItems: 'center' }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <ScrollView style={{ width: '80%', marginTop: 20 }}>
-                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <TextInput style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }} placeholder='Nom de l’aventure *' onChangeText={(value) => setTitle(value)} value={title} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F4F5', alignItems: 'center' }}>
+            <KeyboardAvoidingView style={{ flex: 1, width: '100%' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScrollView contentContainerStyle={{ paddingHorizontal: 10, alignItems: 'center', paddingTop: 20 }}>
+                    <View style={{
+                        width: '90%', backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginBottom: 20, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84
+                    }}>
+                        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 }}>
+                            Nouvelle Aventure
+                        </Text>
+                        <View style={{
+                            borderWidth: 2, borderColor: '#EEC170', justifyContent: 'center', alignItems: 'center', height: 60, borderRadius: 10, marginBottom: 20
+                        }}>
+                            <Text style={{ fontSize: 18 }}>Jour {selectedDay}</Text>
+                        </View>
 
-                        
+                        <TextInput style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }} placeholder='Nom de l’aventure *' onChangeText={setTitle} value={title} />
+
                         <Pressable onPress={showDatePicker} style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20, justifyContent: 'center' }}>
-                            {!hourSelected ? <Text style={{ color: '#8e8e8e' }}>Heure *</Text> : <Text>{hour}</Text>}
+                            <Text style={!hourSelected ? { color: '#8e8e8e' } : {}}>{hourSelected ? hour : "Heure *"}</Text>
                         </Pressable>
-                        <DateTimePickerModal
-                            isVisible={isDatePickerVisible}
-                            mode="time"
-                            onConfirm={handleConfirm}
-                            onCancel={hideDatePicker}
-                        />
+                        <DateTimePickerModal isVisible={isDatePickerVisible} mode="time" onConfirm={handleConfirm} onCancel={hideDatePicker} />
 
-                        
-                        <TextInput style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }} placeholder='Adresse *' onChangeText={(value) => setAddress(value)} value={address} />
+                        <TextInput style={{ height: 50, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', width: '100%', borderRadius: 10, paddingLeft: 10, marginBottom: 20 }} placeholder='Adresse *' onChangeText={setAddress} value={address} />
 
-                        
                         {note.map((value, i) => (
                             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
                                 <TextInput style={{ height: 40, borderColor: '#ccc', borderWidth: 2, backgroundColor: '#F7F6F2', borderRadius: 10, paddingLeft: 10, width: '85%', marginRight: 10 }} placeholder={`Note ${i + 1} (opt.)`} onChangeText={(text) => handleInputChange(text, i)} value={value} />
                                 <Pressable onPress={() => removeInput(i)}>
-                                    <MinusCircle size={25} color={'#5C4033'} />
+                                    <MinusCircle size={25} color="#F58549" />
                                 </Pressable>
                             </View>
                         ))}
                         <Pressable onPress={addInput} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Text style={{ fontWeight: 'bold', marginRight: 10 }}>Ajouter une note</Text>
-                            <PlusCircle size={30} color={'#5C4033'} />
+                            <PlusCircle size={30} color="#F58549" />
                         </Pressable>
 
-                        
-                        <View style={{ marginTop: 20, width: '80%' }}>
-                            <Pressable onPress={handleSaveActivity} style={{ backgroundColor: '#A26734', alignItems: 'center', height: 50, justifyContent: 'center', borderRadius: 15 }}>
-                                <Text style={{ fontSize: 18, color: 'white' }}>Sauvegarder l'Aventure</Text>
-                            </Pressable>
-                        </View>
+                        <Pressable onPress={handleSaveActivity} style={{ marginTop: 20, backgroundColor: '#F58549', alignItems: 'center', height: 50, justifyContent: 'center', borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 }}>
+                            <Text style={{ fontSize: 18, color: 'white' }}>Sauvegarder l'Aventure</Text>
+                        </Pressable>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
