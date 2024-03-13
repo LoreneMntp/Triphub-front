@@ -86,7 +86,7 @@ export default function ShowActivityScreen({ navigation }) {
             <Text style={{ fontSize: 20, marginLeft: 8 }}>{activity.content.address}</Text>
           </View>
           {activity.content.notes.length > 0 ? (
-            <View style={{ paddingHorizontal: 10, marginTop: 16, backgroundColor: '#EEC170', padding: 15, borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.22, shadowRadius: 2.22 }}>
+            <View style={{ paddingHorizontal: 10, marginTop: 16, backgroundColor: '#EEC170', padding: 15, borderRadius: 15 }}>
               {notes}
             </View>
           ) : (

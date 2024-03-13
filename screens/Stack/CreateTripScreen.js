@@ -13,7 +13,7 @@ import {
   FlatList,
   Modal,
 } from "react-native";
-import { ChevronLeft } from "lucide-react-native"; // Icône pour revenir en arrière
+import { ChevronLeft, ChevronDown } from "lucide-react-native"; // Icône pour revenir en arrière
 import { useNavigation } from "@react-navigation/native"; // Navigation
 import { Calendar, LocaleConfig } from "react-native-calendars"; // Calendrier
 import countriesData from "../../pays.json"; // Données des pays
