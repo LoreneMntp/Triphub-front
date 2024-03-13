@@ -38,13 +38,22 @@ export default function AddActivityScreen( {navigation}) {
         setDatePickerVisibility(false);
     }
 
-    const handleConfirm = (date) => {
-        setDate(date)
-        const formattedDate = moment(date).format('LT')
-        setHour(formattedDate)
-        setHourSelected(true)
+    const handleConfirm = (time) => {
+        // Crée un moment avec la date sélectionnée pour le jour de l'activité
+        const dayDate = moment(selectedDate);
+        
+        // Met à jour ce moment avec l'heure sélectionnée
+        const dateTime = dayDate.clone().hour(moment(time).hour()).minute(moment(time).minute());
+        
+        // Met à jour l'état avec la date et l'heure complètes de l'activité
+        setDate(dateTime.toISOString());
+        
+        // Formate et affiche seulement l'heure dans l'interface utilisateur
+        setHour(dateTime.format('LT'));
+        setHourSelected(true);
         hideDatePicker();
-    }
+    };
+    
 
     const handleInputChange = (text, index) => {
         const newNote = [...note]
