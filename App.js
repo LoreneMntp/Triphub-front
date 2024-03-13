@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import user from "./reducers/users";
 import LandingScreen from "./screens/Stack/LandingScreen";
-import LandingFinalScreen from "./screens/Stack/LandingFinalScreen";
+
 import LoginScreen from "./screens/Stack/LoginScreen";
 import RegisterScreen from "./screens/Stack/RegisterScreen";
 import SettingsScreen from "./screens/Stack/SettingsScreen";
@@ -75,7 +75,7 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Landing" component={LandingScreen} />
-          <Stack.Screen name="LandingFinal" component={LandingFinalScreen} />
+
           <Stack.Screen
             name="Login"
             component={LoginScreen}
