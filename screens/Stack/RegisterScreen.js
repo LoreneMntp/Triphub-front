@@ -9,10 +9,22 @@
  */
 
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+  ImageBackground,
+  Image,
+} from "react-native";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/native";
-import { ChevronLeft, Chrome, Facebook } from "lucide-react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { login } from "../../reducers/users"; // Import du composant Facebook et Google et Flèche de droite
 import { useDispatch } from "react-redux";
 
@@ -22,11 +34,26 @@ const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const dispatch = useDispatch();
   // Hook de navigation pour gérer les actions de navigation
   const navigation = useNavigation();
+
+  // import du background et du logo
+  const backgroundImage = require("../../assets/background.png");
+  const logo = require("../../assets/triphublogofinal.png");
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+  };
 
   // Fonction pour gérer la navigation arrière
   const handlePress = () => {
@@ -115,89 +142,148 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Titre de la page */}
-      <Text style={styles.page}>S'inscrire</Text>
-      {/* Champs de saisie pour le nom d'utilisateur, l'e-mail, le mot de passe et la confirmation du mot de passe */}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ImageBackground
+          source={backgroundImage}
+          style={styles.backgroundImage}
+        >
+          <View style={styles.overlay} />
+          <View style={styles.backgroundContainer}>
+            <View style={styles.container}>
+              <View style={styles.logoContainer}>
+                <Image source={logo} style={styles.logo} />
+              </View>
+              <Text style={styles.page}>Créer un compte</Text>
+              {/* Champs de saisie pour le nom d'utilisateur, l'e-mail, le mot de passe et la confirmation du mot de passe */}
 
-      <TextInput
-        onChangeText={setUsername}
-        value={username}
-        placeholder="Nom d'utilisateur"
-        style={styles.input}
-        autoCapitalize="none"
-      />
-      <TextInput
-        onChangeText={setEmail}
-        value={email}
-        placeholder="E-mail"
-        style={styles.input}
-        autoCapitalize="none"
-      />
-      <TextInput
-        onChangeText={setPassword}
-        value={password}
-        secureTextEntry={true}
-        placeholder="Mot de passe"
-        style={styles.input}
-        autoCapitalize="none"
-      />
-      <TextInput
-        onChangeText={setConfirmPassword}
-        value={confirmPassword}
-        secureTextEntry={true}
-        placeholder="Confirmer le mot de passe"
-        style={styles.input}
-        autoCapitalize="none"
-      />
-      {/* Bouton d'inscription */}
-      <Pressable style={styles.button_register} onPress={handleRegister}>
-        <Text style={styles.buttonText}>S'inscrire</Text>
-      </Pressable>
-      {/* Séparateur OU */}
-      <Text style={styles.or}>OU</Text>
-      {/* Bouton d'authentification Google */}
-      <Pressable style={styles.google}>
-        <Chrome style={styles.googleIcon} />
-        <Text style={styles.google_text}>Continuer avec Google</Text>
-      </Pressable>
-      {/* Bouton d'authentification Facebook */}
-      <Pressable style={styles.facebook}>
-        <Facebook style={styles.facebookIcon} />
-        <Text style={styles.facebook_text}>Continuer avec Facebook</Text>
-      </Pressable>
-      {/* Modal d'alerte pour afficher les messages d'inscription */}
-      <Modal isVisible={isAlertVisible}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{alertMessage}</Text>
-          <Pressable
-            style={styles.modalButton}
-            onPress={() => setAlertVisible(false)}
-          >
-            <Text style={styles.buttonText}>OK</Text>
-          </Pressable>
-        </View>
-      </Modal>
-    </View>
+              <TextInput
+                onChangeText={setUsername}
+                value={username}
+                placeholder="Nom d'utilisateur"
+                style={styles.input}
+                autoCapitalize="none"
+              />
+              <TextInput
+                onChangeText={setEmail}
+                value={email}
+                placeholder="E-mail"
+                style={styles.input}
+                autoCapitalize="none"
+              />
+
+              <View style={styles.inputContainer}>
+                <View style={styles.passwordInputContainer}>
+                  <TextInput
+                    onChangeText={setPassword}
+                    value={password}
+                    secureTextEntry={!isPasswordVisible}
+                    placeholder="Mot de passe"
+                    style={styles.passwordInput}
+                    autoCapitalize="none"
+                  />
+                  <Pressable
+                    onPress={togglePasswordVisibility}
+                    style={styles.eyeIconContainer}
+                  >
+                    <FontAwesome5
+                      name={isPasswordVisible ? "eye-slash" : "eye"}
+                      size={14}
+                      color="grey"
+                    />
+                  </Pressable>
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <View style={styles.passwordInputContainer}>
+                  <TextInput
+                    onChangeText={setConfirmPassword}
+                    value={confirmPassword}
+                    secureTextEntry={!isConfirmPasswordVisible}
+                    placeholder="Confirmer le mot de passe"
+                    style={styles.passwordInput}
+                    autoCapitalize="none"
+                  />
+                  <Pressable
+                    onPress={toggleConfirmPasswordVisibility}
+                    style={styles.eyeIconContainer}
+                  >
+                    <FontAwesome5
+                      name={isConfirmPasswordVisible ? "eye-slash" : "eye"}
+                      size={14}
+                      color="grey"
+                    />
+                  </Pressable>
+                </View>
+              </View>
+              {/* Bouton d'inscription */}
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button_register,
+                  {
+                    backgroundColor: pressed ? "#F2A65A" : "#F2A65A",
+                    opacity: pressed ? 0.5 : 1,
+                  },
+                ]}
+                onPress={handleRegister}
+              >
+                <Text style={styles.buttonText}>S'inscrire</Text>
+              </Pressable>
+
+              {/* Modal d'alerte pour afficher les messages d'inscription */}
+              <Modal isVisible={isAlertVisible}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalText}>{alertMessage}</Text>
+
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.modalButton,
+                      {
+                        backgroundColor: pressed ? "#F2A65A" : "#F2A65A",
+                        opacity: pressed ? 0.5 : 1,
+                      },
+                    ]}
+                    onPress={() => setAlertVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>OK</Text>
+                  </Pressable>
+                </View>
+              </Modal>
+            </View>
+          </View>
+        </ImageBackground>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
-
 // Styles pour le composant RegisterScreen
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    alignItems: "center",
     paddingHorizontal: 40,
-    backgroundColor: "#fff",
-    paddingTop: 60,
-  },
-  arrow: {
-    color: "black",
-    marginBottom: 10,
-  },
-  page: {
     textAlign: "center",
     fontSize: 40,
+    paddingRight: "10%",
+    paddingLeft: "10%",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    margin: 30,
+    borderRadius: 30,
+  },
+  page: {
+    fontSize: 30,
     fontWeight: "bold",
-    marginBottom: 20,
+    paddingTop: "50%",
+    paddingBottom: "10%",
+  },
+  inputContainer: {
+    width: "100%",
+    maxWidth: 500,
   },
   input: {
     backgroundColor: "#F2F4F5",
@@ -206,36 +292,50 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 15,
+    marginBottom: 30,
     color: "#000",
-    marginBottom: 20,
     width: "100%",
   },
+  passwordInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F2F4F5",
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 30,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+  },
   button_register: {
-    marginTop: 20,
+    marginTop: 30,
     backgroundColor: "#F2A65A",
     borderRadius: 15,
-    padding: 10,
     alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    alignSelf: "center",
+    width: "100%",
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
+
   buttonText: {
-    color: "white",
-    fontSize: 20,
+    color: "#fff",
     fontWeight: "bold",
+    fontSize: 20,
   },
-  or: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 40,
+  eyeIconContainer: {
+    margin: 10,
   },
   modalContent: {
     backgroundColor: "white",
@@ -254,45 +354,33 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
   },
-  google: {
-    flexDirection: "row",
-    alignItems: "center",
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover",
     justifyContent: "center",
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
-    marginTop: 20,
-    borderColor: "gray",
-    borderWidth: 1,
   },
-  googleIcon: {
-    marginRight: 10,
-    color: "#F2A65A",
+  backgroundContainer: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // Fond blanc avec opacité
   },
-  google_text: {
-    color: "black",
-    fontSize: 18,
-    fontWeight: "bold",
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 165, 0, 0.2)",
   },
-  facebook: {
-    flexDirection: "row",
-    alignItems: "center",
+  logoContainer: {
+    position: "absolute",
+    top: "2%",
     justifyContent: "center",
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
-    marginTop: 20,
-    borderColor: "gray",
-    borderWidth: 1,
+    alignItems: "center",
+    width: "100%",
   },
-  facebookIcon: {
-    marginRight: 10,
-    color: "#1877F2",
-  },
-  facebook_text: {
-    color: "black",
-    fontSize: 18,
-    fontWeight: "bold",
+  logo: {
+    width: 100,
+    height: 100,
   },
 });
 

@@ -143,13 +143,13 @@ export default function App() {
             }}
           />
           <Stack.Screen
-          name="Map"
-          component={MapScreen}
-          options={{
-            headerShown: true,
-            headerTintColor: "#F58549",
-          }}
-        />
+            name="Map"
+            component={MapScreen}
+            options={{
+              headerShown: true,
+              headerTintColor: "#F58549",
+            }}
+          />
           <Stack.Screen
             name="EditActivity"
             component={EditActivityScreen}
