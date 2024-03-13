@@ -319,7 +319,7 @@ export default function HomeScreen({ navigation }) {
 
           <View
             title="Centered view"
-            className="bg-white w-5/6 h-1/5 pt-8 items-center rounded-lg"
+            className="bg-white w-5/6 h-1/5 pt-6 items-center rounded-lg justify-center"
           >
             <Text className="text-xl mb-3 text-center">
               Êtes-vous sûr(e) de vouloir supprimer ce Voyage ?
