@@ -8,9 +8,12 @@ import moment from "moment";
 import "moment/locale/fr";
 moment.locale("fr");
 
-import { Clock, SquarePen, MapPin } from "lucide-react-native";
+import { SquarePen, MapPin } from "lucide-react-native";
 
 import { selectDay } from "../../reducers/users";
+
+import NetInfo from "@react-native-community/netinfo";
+import { useEffect, useState } from "react";
 
 export default function ShowActivityScreen({ navigation }) {
   const activity = useSelector((state) => state.user.value.selectedActivity);
@@ -18,8 +21,19 @@ export default function ShowActivityScreen({ navigation }) {
   const selectedDate = useSelector(
     (state) => state.user.value.selectedDay.date
   );
+
+  const [isConnected, setIsConnected] = useState(null);
+
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+    return () => unsubscribe();
+  }, [])
+
+  //inutilisée ?
   const openReminders = async () => {
     const url = "App-Prefs:REMINDERS";
     const supported = await Linking.canOpenURL(url);
@@ -30,12 +44,8 @@ export default function ShowActivityScreen({ navigation }) {
     }
   };
 
-  //console.log('selectedDay', selectedDay)
-  //console.log('selectedDate', selectedDate)
-  //console.log(activity.content)
 
   const addNotification = async (minBeforeActivity) => {
-    //console.log("addNotification");
 
     const notificationTime = moment(activity.content.plannedAt).subtract(
       minBeforeActivity,
@@ -84,12 +94,19 @@ export default function ShowActivityScreen({ navigation }) {
   return (
     <View className="bg-white flex-1 h-screen">
       <View className="flex mt-4 px-5">
-        <Pressable
+        {isConnected ? <Pressable
           className="absolute top-4 right-4 p-2 rounded-full bg-[#F2A65A]"
           onPress={() => handleEditActivity()}
+          disabled={!isConnected}
         >
           <SquarePen size={20} color="#FFF" strokeWidth={3} />
-        </Pressable>
+        </Pressable> : <Pressable
+          className="absolute top-4 right-4 p-2 rounded-full bg-[#BABABA]"
+          onPress={() => handleEditActivity()}
+          disabled={!isConnected}
+        >
+          <SquarePen size={20} color="#595959" strokeWidth={3} />
+        </Pressable>}
         <Text className="text-xl font-bold text-center mt-24">Activité</Text>
         <Text className="text-5xl font-bold text-center mt-4">
           {activity.content.title}

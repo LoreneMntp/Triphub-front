@@ -1,7 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {View, Text, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView} from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusCircle, MinusCircle, Navigation } from 'lucide-react-native';
+import { PlusCircle, MinusCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import moment from 'moment'
@@ -39,7 +39,6 @@ export default function AddActivityScreen( {navigation}) {
     }
 
     const handleConfirm = (date) => {
-        //console.log("A date has been picked: ", date);
         setDate(date)
         const formattedDate = moment(date).format('LT')
         setHour(formattedDate)
@@ -96,7 +95,6 @@ export default function AddActivityScreen( {navigation}) {
             })
             .then(response => response.json())
             .then(data => {
-                //console.log('reponse addActivity', data)
                 if(data.result) {
                     console.log(bodyData)
                     dispatch(initTrips(data.data))
