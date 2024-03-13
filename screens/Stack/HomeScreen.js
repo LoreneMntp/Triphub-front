@@ -1,4 +1,3 @@
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -10,9 +9,6 @@ import {
   TextInput,
 } from "react-native";
 import {
-  LogOut,
-  Settings,
-  WifiOff,
   Trash2,
   Clock,
   PlaneTakeoff,
@@ -37,9 +33,9 @@ export default function HomeScreen({ navigation }) {
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [isConnected, setIsConnected] = useState(null);
   const [tempSelectedTrip, setTempSelectedTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const user = useSelector((state) => state.user.value);
-  const tripData = useSelector((state) => state.user.value.trips);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -50,12 +46,20 @@ export default function HomeScreen({ navigation }) {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          //console.log(data.data)
           dispatch(initTrips(data.data));
+          setLoading(false)
         });
     }
     return () => unsubscribe();
   }, [isConnected]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Chargement...</Text>
+      </View>
+    );
+  }
 
   const handleSelectTrip = (id) => {
     dispatch(selectTrip({ tripId: id }));
@@ -105,7 +109,7 @@ export default function HomeScreen({ navigation }) {
           className="rounded-2xl "
         />
         <View className="absolute top-3 right-3">
-          {isConnected && (
+          {isConnected ? 
             <Pressable
               title="Delete BTN"
               onPress={() => {
@@ -113,12 +117,25 @@ export default function HomeScreen({ navigation }) {
                 setTempSelectedTrip(data._id);
               }}
               className="bg-[#F2A65A] p-2 rounded-full"
+              disabled={!isConnected}
             >
               <View className="flex-row justify-center items-center">
                 <Trash2 size={20} color={"white"} strokeWidth={3} />
               </View>
             </Pressable>
-          )}
+          : <Pressable
+              title="Delete BTN"
+              onPress={() => {
+                handleShowDeleteTrip();
+                setTempSelectedTrip(data._id);
+              }}
+              className="bg-[#BABABA] p-2 rounded-full"
+              disabled={!isConnected}
+            >
+              <View className="flex-row justify-center items-center">
+                <Trash2 size={20} color={"#595959"} strokeWidth={3} />
+              </View>
+            </Pressable>}
         </View>
         <View className="absolute bottom-2 left-2">
           <Text className="text-white font-bold text-3xl">{data.title}</Text>
@@ -194,14 +211,9 @@ export default function HomeScreen({ navigation }) {
       })
         .then((response) => response.json())
         .then((data) => {
-          //console.log(data)
           setModalInviteVisible(false);
         });
     }
-  };
-
-  const handleLogout = () => {
-    setModalLogoutVisible(true);
   };
 
   return (
@@ -338,30 +350,28 @@ export default function HomeScreen({ navigation }) {
           className="bg-[#F2A65A] items-center justify-center rounded-lg p-2"
           onPress={() => navigation.navigate("CreateTrip")}
           disabled={!isConnected}
-          style={{ backgroundColor: isConnected ? "#F2A65A" : "gray" }}
+          style={{ backgroundColor: isConnected ? "#F2A65A" : "#BABABA" }}
         >
           <Text
             className="text-white text-lg font-bold"
-            style={{ color: isConnected ? "white" : "black" }}
+            style={{ color: isConnected ? "white" : "#595959" }}
           >
             Créer un voyage
           </Text>
-          {!isConnected && <WifiOff color={"#ff0000"} size={14} />}
         </Pressable>
         <Pressable
           title="JoinTrip"
           className="bg-[#242424] items-center justify-center  rounded-lg  p-2 "
           onPress={() => setModalInviteVisible(true)}
           disabled={!isConnected}
-          style={{ backgroundColor: isConnected ? "#F0F3F4" : "gray" }}
+          style={{ backgroundColor: isConnected ? "#F0F3F4" : "#BABABA" }}
         >
           <Text
             className="text-lg font-medium"
-            style={{ color: isConnected ? "#242424" : "black" }}
+            style={{ color: isConnected ? "#242424" : "#595959" }}
           >
             Rejoindre un voyage
           </Text>
-          {!isConnected && <WifiOff color={"#ff0000"} size={14} />}
         </Pressable>
       </View>
       <ScrollView className="mt-8 px-5">{trips}</ScrollView>
