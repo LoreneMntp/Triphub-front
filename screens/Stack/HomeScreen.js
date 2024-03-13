@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation }) {
           source={
             data.background_url
               ? { uri: data.background_url }
-              : require("../../assets/palm-tree-icon.jpg")
+              : require("../../assets/viet.png")
           }
           style={{ width: "100%", height: "100%" }}
           className="rounded-2xl "
