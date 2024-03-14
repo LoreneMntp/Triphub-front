@@ -9,8 +9,13 @@ import {
   Text,
 } from "react-native";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "../reducers/users";
+
 export default function HeaderLogoutButton() {
   const navigation = useNavigation();
+  const dispatch = useDispatch()
+
   const [modalLogoutVisible, setModalLogoutVisible] = useState(false);
   const handleLogout = () => {
     setModalLogoutVisible(true);
@@ -54,7 +59,7 @@ export default function HeaderLogoutButton() {
             </Text>
             <Pressable
               className="bg-[#F2A65A] w-40 h-12 items-center justify-center rounded-xl shadow-xl shadow-black mb-3"
-              onPress={() => navigation.navigate("Landing")}
+              onPress={() => {navigation.navigate("Landing"); dispatch(logout())}}
             >
               <Text className="text-white text-lg">Oui</Text>
             </Pressable>

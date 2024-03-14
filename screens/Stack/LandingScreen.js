@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState} from "react";
 import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Plane } from "lucide-react-native";
@@ -12,6 +12,7 @@ import Animated, {
 import * as Animatable from "react-native-animatable";
 import { Video } from "expo-av";
 import { Bar } from "react-native-progress";
+import { useSelector } from "react-redux";
 
 export default function LandingScreen() {
   const logo = require("../../assets/triphublogofinal.png");
@@ -21,10 +22,16 @@ export default function LandingScreen() {
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [planePosition, setPlanePosition] = useState(0);
   const navigation = useNavigation();
+  const token = useSelector((state) => state.user.value.user.token)
 
   //Navigation vers login
   function handleNavigateToLogin() {
-    navigation.navigate("Login");
+    if(token) {
+      navigation.navigate('Home')
+    }
+    else {
+      navigation.navigate("Login");
+    }
   }
 
   // au clic, changement d'état du bouton
