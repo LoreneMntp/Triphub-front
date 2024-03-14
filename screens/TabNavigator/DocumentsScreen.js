@@ -136,134 +136,131 @@ export default function DocumentsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Gestion des documents</Text>
-      <ScrollView style={{ flex: 1 }}>
-        <View style={styles.docs}>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.selectedDocumentText}>
-              Billets de transport
-            </Text>
-            {isConnected ? (
-              <Pressable
-                onPress={() => handleAddDocument("transport")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#F58549" size={24} />
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => handleAddDocument("transport")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#BABABA" size={24} />
-              </Pressable>
-            )}
-          </View>
-          {userInfos.documents && (
-            <FlatList
-              data={userInfos.documents.filter(
-                (billet) =>
-                  billet.category === "transport" &&
-                  billet.serial_phone === installationId
-              )} // Utilisez mockData directement ici
-              keyExtractor={(item) => item._id}
-              renderItem={renderDocumentItem}
-            />
+
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Billets de transport</Text>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("transport")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("transport")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
           )}
         </View>
-        <View style={styles.docs}>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.selectedDocumentText}>Réservation</Text>
-            {isConnected ? (
-              <Pressable
-                onPress={() => handleAddDocument("reservation")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#F58549" size={24} />
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => handleAddDocument("reservation")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#BABABA" size={24} />
-              </Pressable>
-            )}
-          </View>
-          {userInfos.documents && (
-            <FlatList
-              data={userInfos.documents.filter(
-                (billet) =>
-                  billet.category === "reservation" &&
-                  billet.serial_phone === installationId
-              )}
-              keyExtractor={(item) => item._id}
-              renderItem={renderDocumentItem}
-            />
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "transport" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Réservation</Text>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("reservation")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("reservation")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
           )}
         </View>
-        <View style={styles.docs}>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.selectedDocumentText}>Identité</Text>
-            {isConnected ? (
-              <Pressable
-                onPress={() => handleAddDocument("identity")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#F58549" size={24} />
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => handleAddDocument("identity")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#BABABA" size={24} />
-              </Pressable>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "reservation" &&
+                billet.serial_phone === installationId
             )}
-          </View>
-          {userInfos.documents && (
-            <FlatList
-              data={userInfos.documents.filter(
-                (billet) =>
-                  billet.category === "identity" &&
-                  billet.serial_phone === installationId
-              )} // Utilisez mockData directement ici
-              keyExtractor={(item) => item._id}
-              renderItem={renderDocumentItem}
-            />
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Identité</Text>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("identity")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("identity")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
           )}
         </View>
-        <View style={styles.docs}>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.selectedDocumentText}>Autres documents</Text>
-            {isConnected ? (
-              <Pressable
-                onPress={() => handleAddDocument("others")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#F58549" size={24} />
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => handleAddDocument("others")}
-                disabled={!isConnected}
-              >
-                <PlusCircle color="#BABABA" size={24} />
-              </Pressable>
-            )}
-          </View>
-          {userInfos.documents && (
-            <FlatList
-              data={userInfos.documents.filter(
-                (billet) =>
-                  billet.category === "others" &&
-                  billet.serial_phone === installationId
-              )}
-              keyExtractor={(item) => item._id}
-              renderItem={renderDocumentItem}
-            />
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "identity" &&
+                billet.serial_phone === installationId
+            )} // Utilisez mockData directement ici
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
+      <View style={styles.docs}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.selectedDocumentText}>Autres documents</Text>
+          {isConnected ? (
+            <Pressable
+              onPress={() => handleAddDocument("others")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#F58549" size={24} />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => handleAddDocument("others")}
+              disabled={!isConnected}
+            >
+              <PlusCircle color="#BABABA" size={24} />
+            </Pressable>
           )}
         </View>
-      </ScrollView>
+        {userInfos.documents && (
+          <FlatList
+            data={userInfos.documents.filter(
+              (billet) =>
+                billet.category === "others" &&
+                billet.serial_phone === installationId
+            )}
+            keyExtractor={(item) => item._id}
+            renderItem={renderDocumentItem}
+          />
+        )}
+      </View>
     </View>
   );
 }
