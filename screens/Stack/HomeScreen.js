@@ -7,13 +7,9 @@ import {
   Modal,
   TouchableWithoutFeedback,
   TextInput,
+  Alert,
 } from "react-native";
-import {
-  Trash2,
-  Clock,
-  PlaneTakeoff,
-  BedDouble,
-} from "lucide-react-native";
+import { Trash2, Clock, PlaneTakeoff, BedDouble } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { useDispatch, useSelector } from "react-redux";
@@ -47,7 +43,7 @@ export default function HomeScreen({ navigation }) {
         .then((response) => response.json())
         .then((data) => {
           dispatch(initTrips(data.data));
-          setLoading(false)
+          setLoading(false);
         });
     }
     return () => unsubscribe();
@@ -83,7 +79,13 @@ export default function HomeScreen({ navigation }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        dispatch(initTrips(data.data));
+        if (data.error) {
+          Alert.alert("Erreur", data.error);
+        } else {
+          console.log("res data delete:", data.data.trips);
+          dispatch(initTrips(data.data.trips));
+        }
+
         setModalDeleteVisible(false);
       });
   };
@@ -109,7 +111,7 @@ export default function HomeScreen({ navigation }) {
           className="rounded-2xl "
         />
         <View className="absolute top-3 right-3">
-          {isConnected ? 
+          {isConnected ? (
             <Pressable
               title="Delete BTN"
               onPress={() => {
@@ -123,7 +125,8 @@ export default function HomeScreen({ navigation }) {
                 <Trash2 size={20} color={"white"} strokeWidth={3} />
               </View>
             </Pressable>
-          : <Pressable
+          ) : (
+            <Pressable
               title="Delete BTN"
               onPress={() => {
                 handleShowDeleteTrip();
@@ -135,7 +138,8 @@ export default function HomeScreen({ navigation }) {
               <View className="flex-row justify-center items-center">
                 <Trash2 size={20} color={"#595959"} strokeWidth={3} />
               </View>
-            </Pressable>}
+            </Pressable>
+          )}
         </View>
         <View className="absolute bottom-2 left-2">
           <Text className="text-white font-bold text-3xl">{data.title}</Text>
@@ -211,6 +215,12 @@ export default function HomeScreen({ navigation }) {
       })
         .then((response) => response.json())
         .then((data) => {
+          if (data.error) {
+            Alert.alert("Erreur", data.error);
+          } else {
+            console.log("res data:", data);
+            dispatch(initTrips(data.data));
+          }
           setModalInviteVisible(false);
         });
     }
