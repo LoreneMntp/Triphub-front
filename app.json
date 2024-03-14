@@ -11,9 +11,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.guillaume.suchgmailcom.triphub"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,11 +30,19 @@
           "ACCESS_FINE_LOCATION",
           "ACCESS_COARSE_LOCATION"
         ]
-      }
+      },
+      "package": "com.guillaume.suchgmailcom.triphub"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "21fc523c-a142-4867-88a5-38503f02547d"
+      }
+    }
   }
 }
