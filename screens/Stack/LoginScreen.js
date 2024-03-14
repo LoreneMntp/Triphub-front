@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import {
@@ -23,8 +23,10 @@ const EMAIL_REGEX =
 const LoginScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.value);
 
-  const [email, setEmail] = useState("");
+
+  const [email, setEmail] = useState(user.user.email);
   const [password, setPassword] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -32,12 +34,13 @@ const LoginScreen = () => {
   const backgroundImage = require("../../assets/background.png");
   const logo = require("../../assets/triphublogofinal.png");
 
+  //console.log(user)
   async function handleSubmitSignIn() {
     if (!isEmailValid) {
       alert("Please enter a valid email address.");
       return;
     }
-
+    
     if (email && password) {
       try {
         const url = `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/login`;
