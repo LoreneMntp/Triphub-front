@@ -58,7 +58,7 @@ export default function ShowActivityScreen({ navigation }) {
     <View
       key={index}
       style={{
-        backgroundColor: "#EEC170",
+        backgroundColor: "#F7F7F7",
         padding: 10,
         borderRadius: 15,
         marginTop: 10,
@@ -168,7 +168,7 @@ export default function ShowActivityScreen({ navigation }) {
               style={{
                 paddingHorizontal: 10,
                 marginTop: 16,
-                backgroundColor: "#EEC170",
+
                 padding: 15,
                 borderRadius: 15,
               }}
@@ -190,7 +190,7 @@ export default function ShowActivityScreen({ navigation }) {
           <View
             style={{
               marginTop: 20,
-              backgroundColor: "#EEC170",
+              backgroundColor: "#F7F7F7",
               borderRadius: 15,
               padding: 20,
               shadowColor: "#000",
