@@ -27,11 +27,17 @@
           "ACCESS_FINE_LOCATION",
           "ACCESS_COARSE_LOCATION"
         ]
-      }
+      },
+      "package": "com.capaym.triphub"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": ["expo-font"],
+    "extra": {
+      "eas": {
+        "projectId": "b6041e57-5473-47fd-81ff-d79d45e44b9a"
+      }
+    }
   }
 }

@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useNavigation } from "@react-navigation/native";
@@ -129,6 +136,7 @@ export default function DocumentsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Gestion des documents</Text>
+
       <View style={styles.docs}>
         <View style={styles.buttonContainer}>
           <Text style={styles.selectedDocumentText}>Billets de transport</Text>
