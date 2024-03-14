@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "triphub",
-    "slug": "triphub",
+    "name": "myapp",
+    "slug": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/triphublogofinal.png",
@@ -11,10 +11,11 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.guillaume.suchgmailcom.triphub"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -28,17 +29,24 @@
           "ACCESS_FINE_LOCATION",
           "ACCESS_COARSE_LOCATION"
         ]
-      },
-      "package": "com.capaym.triphub"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font"],
+    "plugins": [
+      "expo-font"
+    ],
     "extra": {
       "eas": {
-        "projectId": "b6041e57-5473-47fd-81ff-d79d45e44b9a"
+        "projectId": "94fa7e30-ce7a-466b-a00f-312028da78d8"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/94fa7e30-ce7a-466b-a00f-312028da78d8"
     }
   }
 }
